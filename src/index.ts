@@ -1,16 +1,19 @@
 import express from 'express'
 
 import { envVariables } from '@/constants/env-variables'
-import testRouter from '@/test.routes'
+import usersRouter from '@/routes/users.routes'
+import databaseService from '@/services/database.services'
 
 const app = express()
 const port = envVariables.PORT
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+// kết nối với database
+databaseService.connect()
 
-app.use('/api', testRouter)
+// parse json của client gởi lên, chuyển thành dạnh object để xử lý
+app.use(express.json())
+
+app.use('/users', usersRouter)
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`)

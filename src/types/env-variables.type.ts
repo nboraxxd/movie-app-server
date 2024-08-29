@@ -3,6 +3,10 @@ import { z } from 'zod'
 
 const envVariables = z.object({
   PORT: z.string(),
+  DB_USERNAME: z.string(),
+  DB_PASSWORD: z.string(),
+  DB_CLUSTER: z.string(),
+  DB_NAME: z.string(),
 })
 
 const envProject = envVariables.safeParse(process.env)
