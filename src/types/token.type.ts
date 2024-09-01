@@ -9,3 +9,10 @@ export interface TokenPayload extends JwtPayload {
   iat: number
   exp: number
 }
+
+export type SendEmailParams = {
+  name: string
+  email: string
+  subject: string
+  html: string
+}

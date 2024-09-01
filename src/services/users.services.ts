@@ -6,6 +6,8 @@ import { signToken } from '@/utils/jwt'
 import { TokenType } from '@/constants/type'
 import envVariables from '@/schemas/env-variables.schema'
 import { ObjectId } from 'mongodb'
+import { sendEmail } from '@/utils/mailgun'
+import { EMAIL_TEMPLATES } from '@/constants/email-templates'
 
 class UsersService {
   private async signAccessToken(userId: string, isVerified: boolean) {
@@ -64,6 +66,16 @@ class UsersService {
     )
 
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId.toHexString(), false)
+
+    await sendEmail({
+      name,
+      email,
+      subject: '[nmovies] Verify your email',
+      html: EMAIL_TEMPLATES.EMAIL_VERIFICATION({
+        name,
+        link: `${envVariables.CLIENT_URL}/verify-email?token=${emailVerifyToken}`,
+      }),
+    })
 
     return { accessToken, refreshToken }
   }

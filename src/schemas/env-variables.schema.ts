@@ -6,6 +6,8 @@ config({
 })
 
 const EnvSchema = z.object({
+  CLIENT_URL: z.string(),
+
   PORT: z.string(),
   DB_USERNAME: z.string(),
   DB_PASSWORD: z.string(),
@@ -23,6 +25,9 @@ const EnvSchema = z.object({
 
   PASSWORD_SUFFIX_SECRET: z.string(),
   RESEND_EMAIL_DEBOUNCE_TIME: z.string(),
+
+  MAILGUN_API_KEY: z.string(),
+  MAILGUN_DOMAIN: z.string(),
 })
 
 const envProject = EnvSchema.safeParse(process.env)
