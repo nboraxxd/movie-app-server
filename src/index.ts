@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { envVariables } from '@/constants/env-variables'
+import envVariables from '@/schemas/env-variables.schema'
 import usersRouter from '@/routes/users.routes'
 import databaseService from '@/services/database.services'
 

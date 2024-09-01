@@ -1,9 +1,23 @@
 import z from 'zod'
 
-export const RegisterBody = z
+import databaseService from '@/services/database.services'
+
+export const RegisterBodySchema = z
   .object({
     name: z.string({ required_error: 'Name is required' }).trim(),
-    email: z.string({ required_error: 'Email is required' }).trim().email({ message: 'Invalid email' }),
+    email: z
+      .string({ required_error: 'Email is required' })
+      .trim()
+      .email({ message: 'Invalid email' })
+      // Delete this refine when using in frontend
+      .refine(
+        async (email) => {
+          const user = await databaseService.users.findOne({ email })
+
+          return !user
+        },
+        { message: 'Email already exists' }
+      ),
     password: z
       .string({ required_error: 'Password is required' })
       .min(6, { message: 'Password must be at least 6 characters' }),
@@ -22,10 +36,16 @@ export const RegisterBody = z
     }
   })
 
-export type RegisterBodyType = z.TypeOf<typeof RegisterBody>
+export type RegisterBodyType = z.TypeOf<typeof RegisterBodySchema>
 
 export const registerResponse = z.object({
   message: z.string(),
+  data: z
+    .object({
+      accessToken: z.string(),
+      refreshToken: z.string(),
+    })
+    .optional(),
 })
 
 export type RegisterResponseType = z.TypeOf<typeof registerResponse>

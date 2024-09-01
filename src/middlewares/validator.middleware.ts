@@ -11,7 +11,7 @@ export function zodValidator(schema: Schema, location: 'body' | 'params' | 'quer
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(HttpStatusCode.UnprocessableEntity).json({
-          message: 'Validation error occurred when validating the request body',
+          message: `Validation error occurred in ${location}`,
           error: error.errors.map((error) => {
             return {
               message: error.message,
