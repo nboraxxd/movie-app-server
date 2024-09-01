@@ -1,5 +1,6 @@
 import { Db, MongoClient } from 'mongodb'
 
+import User from '@/models/user.model'
 import { envVariables } from '@/constants/env-variables'
 
 const uri = `mongodb+srv://${envVariables.DB_USERNAME}:${envVariables.DB_PASSWORD}@movie-app-singapore.s0ve5.mongodb.net/?retryWrites=true&w=majority&appName=${envVariables.DB_CLUSTER}`
@@ -22,6 +23,10 @@ class DatabaseService {
       console.log('😥 Error', error)
       throw error
     }
+  }
+
+  get users() {
+    return this.db.collection<User>('users')
   }
 }
 
