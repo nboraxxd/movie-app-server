@@ -3,6 +3,7 @@ import express from 'express'
 import envVariables from '@/schemas/env-variables.schema'
 import usersRouter from '@/routes/users.routes'
 import databaseService from '@/services/database.services'
+import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
 
 const app = express()
 const port = envVariables.PORT
@@ -14,6 +15,8 @@ databaseService.connect()
 app.use(express.json())
 
 app.use('/users', usersRouter)
+
+app.use(defaultErrorHandler)
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`)

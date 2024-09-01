@@ -59,23 +59,26 @@ class UsersService {
 
     const userId = new ObjectId()
 
-    const emailVerifyToken = await this.signEmailVerifyToken(userId.toHexString(), false)
+    const [emailVerifyToken, accessToken, refreshToken] = await Promise.all([
+      this.signEmailVerifyToken(userId.toHexString(), false),
+      this.signAccessToken(userId.toHexString(), false),
+      this.signRefreshToken(userId.toHexString(), false),
+    ])
 
-    await databaseService.users.insertOne(
-      new User({ _id: userId, email, name, password: hashPassword(password), email_verify_token: emailVerifyToken })
-    )
-
-    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId.toHexString(), false)
-
-    await sendEmail({
-      name,
-      email,
-      subject: '[nmovies] Verify your email',
-      html: EMAIL_TEMPLATES.EMAIL_VERIFICATION({
+    await Promise.all([
+      databaseService.users.insertOne(
+        new User({ _id: userId, email, name, password: hashPassword(password), email_verify_token: emailVerifyToken })
+      ),
+      sendEmail({
         name,
-        link: `${envVariables.CLIENT_URL}/verify-email?token=${emailVerifyToken}`,
+        email,
+        subject: '[nmovies] Verify your email',
+        html: EMAIL_TEMPLATES.EMAIL_VERIFICATION({
+          name,
+          link: `${envVariables.CLIENT_URL}/verify-email?token=${emailVerifyToken}`,
+        }),
       }),
-    })
+    ])
 
     return { accessToken, refreshToken }
   }

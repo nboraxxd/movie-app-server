@@ -13,7 +13,6 @@ export const RegisterBodySchema = z
       .refine(
         async (email) => {
           const user = await databaseService.users.findOne({ email })
-
           return !user
         },
         { message: 'Email already exists' }
@@ -40,12 +39,10 @@ export type RegisterBodyType = z.TypeOf<typeof RegisterBodySchema>
 
 export const registerResponse = z.object({
   message: z.string(),
-  data: z
-    .object({
-      accessToken: z.string(),
-      refreshToken: z.string(),
-    })
-    .optional(),
+  data: z.object({
+    accessToken: z.string(),
+    refreshToken: z.string(),
+  }),
 })
 
 export type RegisterResponseType = z.TypeOf<typeof registerResponse>
