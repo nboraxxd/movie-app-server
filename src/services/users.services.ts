@@ -8,6 +8,7 @@ import envVariables from '@/schemas/env-variables.schema'
 import { ObjectId } from 'mongodb'
 import { sendEmail } from '@/utils/mailgun'
 import { EMAIL_TEMPLATES } from '@/constants/email-templates'
+import RefreshToken from '@/models/refresh-token.model'
 
 class UsersService {
   private async signAccessToken(userId: string, isVerified: boolean) {
@@ -54,6 +55,10 @@ class UsersService {
     })
   }
 
+  async findByEmail(email: string) {
+    return databaseService.users.findOne({ email })
+  }
+
   async register(payload: Omit<RegisterBodyType, 'confirmPassword'>) {
     const { email, name, password } = payload
 
@@ -69,6 +74,7 @@ class UsersService {
       databaseService.users.insertOne(
         new User({ _id: userId, email, name, password: hashPassword(password), email_verify_token: emailVerifyToken })
       ),
+      databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: userId, token: refreshToken })),
       sendEmail({
         name,
         email,

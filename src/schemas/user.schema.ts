@@ -1,6 +1,6 @@
 import z from 'zod'
 
-import databaseService from '@/services/database.services'
+import usersService from '@/services/users.services'
 
 export const RegisterBodySchema = z
   .object({
@@ -12,7 +12,7 @@ export const RegisterBodySchema = z
       // Delete this refine when using in frontend
       .refine(
         async (email) => {
-          const user = await databaseService.users.findOne({ email })
+          const user = await usersService.findByEmail(email)
           return !user
         },
         { message: 'Email already exists' }

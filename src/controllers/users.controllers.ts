@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
+import usersService from '@/services/users.services'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { RegisterBodyType, RegisterResponseType } from '@/schemas/user.schema'
-import usersService from '@/services/users.services'
 
 export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterBodyType>,

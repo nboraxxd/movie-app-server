@@ -28,6 +28,10 @@ class DatabaseService {
   get users() {
     return this.db.collection<User>('users')
   }
+
+  get refreshTokens() {
+    return this.db.collection('refresh_tokens')
+  }
 }
 
 // Create a new object of the DatabaseService class
