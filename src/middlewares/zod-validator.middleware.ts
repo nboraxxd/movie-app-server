@@ -12,16 +12,17 @@ export function zodValidator(schema: Schema, location: ValidationLocation) {
       next()
     } catch (error) {
       if (error instanceof ZodError) {
-        const entityError = new EntityError({
-          message: `Validation error occurred in ${location}`,
-          errors: error.errors.map((error) => ({
-            code: error.code,
-            message: error.message,
-            path: error.path.join('.'),
-            location,
-          })),
-        })
-        next(entityError)
+        next(
+          new EntityError({
+            message: `Validation error occurred in ${location}`,
+            errors: error.errors.map((error) => ({
+              code: error.code,
+              message: error.message,
+              path: error.path.join('.'),
+              location,
+            })),
+          })
+        )
       } else {
         next(error)
       }

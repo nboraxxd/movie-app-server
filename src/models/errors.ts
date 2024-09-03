@@ -16,11 +16,23 @@ export class ErrorWithStatus extends Error {
 }
 
 export class ErrorWithLocation extends ErrorWithStatus {
-  location: string
+  location: ValidationLocation
+  errorInfo?: Record<string, any>
 
-  constructor({ message, statusCode, location }: { message: string; statusCode: TStatusCode; location: string }) {
+  constructor({
+    message,
+    statusCode,
+    location,
+    errorInfo,
+  }: {
+    message: string
+    statusCode: TStatusCode
+    location: ValidationLocation
+    errorInfo?: Record<string, any>
+  }) {
     super({ message, statusCode })
     this.location = location
+    this.errorInfo = errorInfo
   }
 }
 

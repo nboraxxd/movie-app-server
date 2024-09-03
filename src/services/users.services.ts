@@ -55,6 +55,22 @@ class UsersService {
     })
   }
 
+  private async sendVerificationEmail({ email, name, token }: { email: string; name: string; token: string }) {
+    return sendEmail({
+      name,
+      email,
+      subject: '[nmovies] Verify your email',
+      html: EMAIL_TEMPLATES.EMAIL_VERIFICATION({
+        name,
+        link: `${envVariables.CLIENT_URL}/verify-email?token=${token}`,
+      }),
+    })
+  }
+
+  async findById(userId: string) {
+    return databaseService.users.findOne({ _id: new ObjectId(userId) })
+  }
+
   async findByEmail(email: string) {
     return databaseService.users.findOne({ email })
   }
@@ -75,18 +91,24 @@ class UsersService {
         new User({ _id: userId, email, name, password: hashPassword(password), email_verify_token: emailVerifyToken })
       ),
       databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: userId, token: refreshToken })),
-      sendEmail({
-        name,
-        email,
-        subject: '[nmovies] Verify your email',
-        html: EMAIL_TEMPLATES.EMAIL_VERIFICATION({
-          name,
-          link: `${envVariables.CLIENT_URL}/verify-email?token=${emailVerifyToken}`,
-        }),
-      }),
+      this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
     ])
 
     return { accessToken, refreshToken }
+  }
+
+  async resendEmailVerification(payload: { userId: ObjectId; email: string; name: string }) {
+    const { email, name, userId } = payload
+
+    const emailVerifyToken = await this.signEmailVerifyToken(email, false)
+
+    await Promise.all([
+      databaseService.users.updateOne(
+        { _id: userId },
+        { $set: { email_verify_token: emailVerifyToken }, $currentDate: { updated_at: true } }
+      ),
+      this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
+    ])
   }
 }
 
