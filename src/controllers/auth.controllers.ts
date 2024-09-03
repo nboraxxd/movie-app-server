@@ -1,29 +1,22 @@
 import ms from 'ms'
-import z from 'zod'
+import { ObjectId } from 'mongodb'
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import { verifyToken } from '@/utils/jwt'
-import { hashPassword } from '@/utils/crypto'
-import { calculateRemainingTimeInSeconds } from '@/utils/common'
 import { TokenPayload } from '@/types/token.type'
 import { HttpStatusCode } from '@/constants/http-status-code'
+import { calculateRemainingTimeInSeconds } from '@/utils/common'
 import authService from '@/services/auth.services'
 import usersService from '@/services/users.services'
-import { EntityError, ErrorWithStatus } from '@/models/errors'
+import User from '@/models/user.model'
+import { ErrorWithStatus } from '@/models/errors'
 import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
-import { AuthResponseType, EmailVerifyTokenType, LoginBodyType } from '@/schemas/auth.schema'
+import { AuthResponseType, EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas/auth.schema'
 
 export const resendEmailVerificationController = async (req: Request, res: Response<MessageResponseType>) => {
-  const { isVerified, userId } = req.decodedAuthorization as TokenPayload
-
-  if (isVerified === true) {
-    throw new ErrorWithStatus({
-      message: 'Account has been verified',
-      statusCode: HttpStatusCode.BadRequest,
-    })
-  }
+  const { userId } = req.decodedAuthorization as TokenPayload
 
   const user = await usersService.findById(userId)
 
@@ -34,9 +27,16 @@ export const resendEmailVerificationController = async (req: Request, res: Respo
     })
   }
 
+  if (user.email_verify_token === null) {
+    throw new ErrorWithStatus({
+      message: 'Account has been verified',
+      statusCode: HttpStatusCode.BadRequest,
+    })
+  }
+
   const decodedEmailVerifyToken = await verifyToken({
-    token: user.email_verify_token as string,
-    secretOrPublicKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
+    token: user.email_verify_token,
+    jwtKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
   })
 
   const nextEmailResendTime = new Date(decodedEmailVerifyToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME))
@@ -59,15 +59,7 @@ export const verifyEmailController = async (
   req: Request<ParamsDictionary, any, EmailVerifyTokenType>,
   res: Response<AuthResponseType>
 ) => {
-  const { emailVerifyToken } = req.body
-
-  const decodedEmailVerifyToken = await verifyToken({
-    token: emailVerifyToken,
-    secretOrPublicKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
-  })
-  console.log('🔥 ~ emailVerifyToken:', decodedEmailVerifyToken)
-
-  const { userId } = decodedEmailVerifyToken
+  const { userId } = req.decodedEmailVerifyToken as TokenPayload
 
   const user = await usersService.findById(userId)
 
@@ -80,7 +72,7 @@ export const verifyEmailController = async (
 
   if (user.email_verify_token === null) {
     throw new ErrorWithStatus({
-      message: 'Email already verified',
+      message: 'Account has been verified',
       statusCode: HttpStatusCode.BadRequest,
     })
   }
@@ -94,27 +86,20 @@ export const loginController = async (
   req: Request<ParamsDictionary, any, LoginBodyType>,
   res: Response<AuthResponseType>
 ) => {
-  const { email, password } = req.body
+  const { _id } = req.user as User
 
-  const user = await usersService.findByEmail(email)
-
-  if (!user || user.password !== hashPassword(password)) {
-    throw new EntityError({
-      errors: [
-        {
-          code: z.ZodIssueCode.custom,
-          message: 'Invalid email or password',
-          path: 'email',
-          location: 'body',
-        },
-      ],
-    })
-  }
-
-  const result = await authService.login({
-    userId: user._id.toHexString(),
-    isVerified: user.email_verify_token === null,
-  })
+  const result = await authService.login((_id as ObjectId).toHexString())
 
   return res.json({ message: 'Login successful', data: result })
+}
+
+export const logoutController = async (
+  req: Request<ParamsDictionary, any, RefreshTokenType>,
+  res: Response<MessageResponseType>
+) => {
+  const { refreshToken } = req.body
+
+  await authService.logout(refreshToken)
+
+  return res.json({ message: 'Logout successful' })
 }

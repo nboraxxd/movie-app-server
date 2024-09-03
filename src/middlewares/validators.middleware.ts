@@ -5,18 +5,21 @@ import { NextFunction, Request, Response } from 'express'
 
 import { verifyToken } from '@/utils/jwt'
 import { capitalizeFirstLetter } from '@/utils/common'
-import { EntityError } from '@/models/errors'
-import { ErrorWithLocation } from '@/models/errors'
+import { HttpStatusCode } from '@/constants/http-status-code'
+import { EntityError, ErrorWithStatusAndLocation } from '@/models/errors'
 import { AuthorizationSchema } from '@/schemas/auth.schema'
 import envVariables from '@/schemas/env-variables.schema'
-import { HttpStatusCode } from '@/constants/http-status-code'
 
 export type ValidationLocation = 'body' | 'params' | 'query' | 'headers'
 
-export const formValidator = (schema: Schema) => {
+export const zodValidator = (schema: Schema, customHandler?: (arg: Request) => Promise<void>) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.body = await schema.parseAsync(req.body)
+
+      if (customHandler) {
+        await customHandler(req)
+      }
 
       next()
     } catch (error) {
@@ -48,7 +51,7 @@ export const requireLoginValidator = () => {
 
       const decodedAuthorization = await verifyToken({
         token: parsedAccessToken,
-        secretOrPublicKey: envVariables.JWT_SECRET_ACCESS_TOKEN,
+        jwtKey: envVariables.JWT_SECRET_ACCESS_TOKEN,
       })
 
       req.decodedAuthorization = decodedAuthorization
@@ -57,7 +60,7 @@ export const requireLoginValidator = () => {
     } catch (error) {
       if (error instanceof ZodError) {
         next(
-          new ErrorWithLocation({
+          new ErrorWithStatusAndLocation({
             message: error.errors.map((error) => error.message).join(', '),
             statusCode: HttpStatusCode.Unauthorized,
             location: 'headers',
@@ -65,7 +68,7 @@ export const requireLoginValidator = () => {
         )
       } else if (error instanceof JsonWebTokenError) {
         next(
-          new ErrorWithLocation({
+          new ErrorWithStatusAndLocation({
             message: capitalizeFirstLetter(error.message),
             statusCode: HttpStatusCode.Unauthorized,
             location: 'headers',
@@ -79,16 +82,20 @@ export const requireLoginValidator = () => {
   }
 }
 
-export const tokenValidator = (schema: Schema) => {
+export const tokenValidator = (schema: Schema, tokenHandler?: (req: Request) => Promise<void>) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.body = await schema.parseAsync(req.body)
+
+      if (tokenHandler) {
+        await tokenHandler(req)
+      }
 
       next()
     } catch (error) {
       if (error instanceof ZodError) {
         next(
-          new ErrorWithLocation({
+          new ErrorWithStatusAndLocation({
             message: error.errors.map((error) => error.message).join(', '),
             statusCode: HttpStatusCode.Unauthorized,
             location: 'body',
@@ -98,6 +105,15 @@ export const tokenValidator = (schema: Schema) => {
               path: error.path.join('.'),
               location: 'body',
             })),
+          })
+        )
+      } else if (error instanceof JsonWebTokenError) {
+        next(
+          new ErrorWithStatusAndLocation({
+            message: capitalizeFirstLetter(error.message),
+            statusCode: HttpStatusCode.Unauthorized,
+            location: 'body',
+            errorInfo: omit(error, ['message']),
           })
         )
       } else {

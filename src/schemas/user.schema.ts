@@ -1,20 +1,11 @@
 import z from 'zod'
 
-import usersService from '@/services/users.services'
 import { EmailSchema, PasswordSchema } from '@/schemas/common.schema'
 
 export const RegisterBodySchema = z
   .object({
     name: z.string({ required_error: 'Name is required' }).trim(),
-    email: EmailSchema
-      // Delete this refine when using in frontend
-      .refine(
-        async (email) => {
-          const user = await usersService.findByEmail(email)
-          return !user
-        },
-        { message: 'Email already exists' }
-      ),
+    email: EmailSchema,
     password: PasswordSchema,
     confirmPassword: z
       .string({ required_error: 'confirmPassword is required' })

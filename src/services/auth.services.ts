@@ -12,23 +12,9 @@ import envVariables from '@/schemas/env-variables.schema'
 import databaseService from '@/services/database.services'
 
 class AuthService {
-  private async signAccessTokenAndRefreshToken(userId: string, isVerified: boolean) {
-    return Promise.all([this.signAccessToken(userId, isVerified), this.signRefreshToken(userId, isVerified)])
-  }
-
-  private async signForgotPasswordToken(userId: string, isVerified: boolean) {
+  async signAccessToken(userId: string) {
     return signToken({
-      payload: { userId, token_type: TokenType.ForgotPasswordToken, isVerified },
-      privateKey: envVariables.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
-      options: {
-        expiresIn: envVariables.JWT_FORGOT_PASSWORD_TOKEN_EXPIRES_IN,
-      },
-    })
-  }
-
-  async signAccessToken(userId: string, isVerified: boolean) {
-    return signToken({
-      payload: { userId, tokenType: TokenType.AccessToken, isVerified },
+      payload: { userId, tokenType: TokenType.AccessToken },
       privateKey: envVariables.JWT_SECRET_ACCESS_TOKEN,
       options: {
         expiresIn: envVariables.JWT_ACCESS_TOKEN_EXPIRES_IN,
@@ -36,9 +22,9 @@ class AuthService {
     })
   }
 
-  async signRefreshToken(userId: string, isVerified: boolean) {
+  async signRefreshToken(userId: string) {
     return signToken({
-      payload: { userId, tokenType: TokenType.RefreshToken, isVerified },
+      payload: { userId, tokenType: TokenType.RefreshToken },
       privateKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
       options: {
         expiresIn: envVariables.JWT_REFRESH_TOKEN_EXPIRES_IN,
@@ -46,9 +32,23 @@ class AuthService {
     })
   }
 
-  async signEmailVerifyToken(userId: string, isVerified: boolean) {
+  private async signAccessTokenAndRefreshToken(userId: string) {
+    return Promise.all([this.signAccessToken(userId), this.signRefreshToken(userId)])
+  }
+
+  private async signForgotPasswordToken(userId: string) {
     return signToken({
-      payload: { userId, token_type: TokenType.EmailVerifyToken, isVerified },
+      payload: { userId, token_type: TokenType.ForgotPasswordToken },
+      privateKey: envVariables.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
+      options: {
+        expiresIn: envVariables.JWT_FORGOT_PASSWORD_TOKEN_EXPIRES_IN,
+      },
+    })
+  }
+
+  async signEmailVerifyToken(userId: string) {
+    return signToken({
+      payload: { userId, token_type: TokenType.EmailVerifyToken },
       privateKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
       options: {
         expiresIn: envVariables.JWT_EMAIL_VERIFY_TOKEN_EXPIRES_IN,
@@ -68,23 +68,15 @@ class AuthService {
     })
   }
 
-  async findById(userId: string) {
-    return databaseService.users.findOne({ _id: new ObjectId(userId) })
-  }
-
-  async findByEmail(email: string) {
-    return databaseService.users.findOne({ email })
-  }
-
   async register(payload: Omit<RegisterBodyType, 'confirmPassword'>) {
     const { email, name, password } = payload
 
     const userId = new ObjectId()
 
     const [emailVerifyToken, accessToken, refreshToken] = await Promise.all([
-      this.signEmailVerifyToken(userId.toHexString(), false),
-      this.signAccessToken(userId.toHexString(), false),
-      this.signRefreshToken(userId.toHexString(), false),
+      this.signEmailVerifyToken(userId.toHexString()),
+      this.signAccessToken(userId.toHexString()),
+      this.signRefreshToken(userId.toHexString()),
     ])
 
     await Promise.all([
@@ -101,7 +93,7 @@ class AuthService {
   async resendEmailVerification(payload: { userId: ObjectId; email: string; name: string }) {
     const { email, name, userId } = payload
 
-    const emailVerifyToken = await this.signEmailVerifyToken(userId.toHexString(), false)
+    const emailVerifyToken = await this.signEmailVerifyToken(userId.toHexString())
 
     await Promise.all([
       databaseService.users.updateOne(
@@ -113,7 +105,7 @@ class AuthService {
   }
 
   async verifyEmail(userId: string) {
-    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId, true)
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
 
     await Promise.all([
       databaseService.users.updateOne(
@@ -126,16 +118,18 @@ class AuthService {
     return { accessToken, refreshToken }
   }
 
-  async login(payload: { userId: string; isVerified: boolean }) {
-    const { isVerified, userId } = payload
-
-    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId, isVerified)
+  async login(userId: string) {
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken })
     )
 
     return { accessToken, refreshToken }
+  }
+
+  async logout(refreshToken: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refreshToken })
   }
 }
 

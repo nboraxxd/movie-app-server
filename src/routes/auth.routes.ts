@@ -1,10 +1,13 @@
 import { Router } from 'express'
 
+import usersService from '@/services/users.services'
 import { wrapRequestHandler } from '@/utils/handlers'
-import { EmailVerifyTokenSchema, LoginBodySchema } from '@/schemas/auth.schema'
-import { formValidator, requireLoginValidator, tokenValidator } from '@/middlewares/validators.middleware'
+import { decodeEmailVerifyToken, decodeRefreshToken } from '@/utils/jwt'
+import { EmailVerifyTokenSchema, LoginBodySchema, RefreshTokenSchema } from '@/schemas/auth.schema'
+import { zodValidator, requireLoginValidator, tokenValidator } from '@/middlewares/validators.middleware'
 import {
   loginController,
+  logoutController,
   resendEmailVerificationController,
   verifyEmailController,
 } from '@/controllers/auth.controllers'
@@ -17,8 +20,23 @@ authRouter.post(
   wrapRequestHandler(resendEmailVerificationController)
 )
 
-authRouter.post('/verify-email', tokenValidator(EmailVerifyTokenSchema), wrapRequestHandler(verifyEmailController))
+authRouter.post(
+  '/verify-email',
+  tokenValidator(EmailVerifyTokenSchema, decodeEmailVerifyToken),
+  wrapRequestHandler(verifyEmailController)
+)
 
-authRouter.post('/login', formValidator(LoginBodySchema), wrapRequestHandler(loginController))
+authRouter.post(
+  '/login',
+  zodValidator(LoginBodySchema, usersService.validateUserLogin),
+  wrapRequestHandler(loginController)
+)
+
+authRouter.post(
+  '/logout',
+  requireLoginValidator(),
+  tokenValidator(RefreshTokenSchema, decodeRefreshToken),
+  wrapRequestHandler(logoutController)
+)
 
 export default authRouter

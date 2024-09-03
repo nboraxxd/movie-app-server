@@ -31,3 +31,9 @@ export const LoginBodySchema = z
   .strict({ message: 'Additional properties not allowed' })
 
 export type LoginBodyType = z.TypeOf<typeof LoginBodySchema>
+
+export const RefreshTokenSchema = z
+  .object({ refreshToken: z.string({ required_error: 'Refresh token is required' }) })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type RefreshTokenType = z.TypeOf<typeof RefreshTokenSchema>

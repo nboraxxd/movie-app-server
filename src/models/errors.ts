@@ -15,7 +15,7 @@ export class ErrorWithStatus extends Error {
   }
 }
 
-export class ErrorWithLocation extends ErrorWithStatus {
+export class ErrorWithStatusAndLocation extends ErrorWithStatus {
   location: ValidationLocation
   errorInfo?: Record<string, any>
 
