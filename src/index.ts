@@ -1,9 +1,10 @@
 import express from 'express'
 
 import envVariables from '@/schemas/env-variables.schema'
-import usersRouter from '@/routes/users.routes'
 import databaseService from '@/services/database.services'
 import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
+import usersRouter from '@/routes/users.routes'
+import authRouter from '@/routes/auth.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -15,6 +16,8 @@ databaseService.connect()
 app.use(express.json())
 
 app.use('/users', usersRouter)
+
+app.use('/auth', authRouter)
 
 app.use(defaultErrorHandler)
 

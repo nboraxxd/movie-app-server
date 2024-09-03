@@ -7,7 +7,7 @@ import { verifyToken } from '@/utils/jwt'
 import { capitalizeFirstLetter } from '@/utils/common'
 import { EntityError } from '@/models/errors'
 import { ErrorWithLocation } from '@/models/errors'
-import { AuthorizationSchema } from '@/schemas/user.schema'
+import { AuthorizationSchema } from '@/schemas/auth.schema'
 import envVariables from '@/schemas/env-variables.schema'
 import { HttpStatusCode } from '@/constants/http-status-code'
 
