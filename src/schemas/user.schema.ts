@@ -37,7 +37,7 @@ export const RegisterBodySchema = z
 
 export type RegisterBodyType = z.TypeOf<typeof RegisterBodySchema>
 
-export const RegisterResponseSchema = z.object({
+export const AuthResponseSchema = z.object({
   message: z.string(),
   data: z.object({
     accessToken: z.string(),
@@ -45,10 +45,18 @@ export const RegisterResponseSchema = z.object({
   }),
 })
 
-export type RegisterResponseType = z.TypeOf<typeof RegisterResponseSchema>
+export type AuthResponseType = z.TypeOf<typeof AuthResponseSchema>
 
 export const AuthorizationSchema = z.object({
   authorization: z.string({ required_error: 'Access token is required' }),
 })
 
 export type AuthorizationType = z.TypeOf<typeof AuthorizationSchema>
+
+export const EmailVerifyTokenSchema = z
+  .object({
+    emailVerifyToken: z.string({ required_error: 'Email verify token is required' }),
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type EmailVerifyTokenType = z.TypeOf<typeof EmailVerifyTokenSchema>

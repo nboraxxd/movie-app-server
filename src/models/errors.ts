@@ -1,6 +1,6 @@
 import { ZodIssueCode } from 'zod'
 import { HttpStatusCode } from '@/constants/http-status-code'
-import { ValidationLocation } from '@/middlewares/zod-validator.middleware'
+import { ValidationLocation } from '@/middlewares/validators.middleware'
 
 type ErrorsType = { code: ZodIssueCode; message: string; path: string; location: ValidationLocation }[]
 

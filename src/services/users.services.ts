@@ -1,14 +1,15 @@
+import { ObjectId } from 'mongodb'
+
 import User from '@/models/user.model'
+import RefreshToken from '@/models/refresh-token.model'
+import { TokenType } from '@/constants/type'
+import { EMAIL_TEMPLATES } from '@/constants/email-templates'
+import { signToken } from '@/utils/jwt'
+import { sendEmail } from '@/utils/mailgun'
 import { hashPassword } from '@/utils/crypto'
 import { RegisterBodyType } from '@/schemas/user.schema'
-import databaseService from '@/services/database.services'
-import { signToken } from '@/utils/jwt'
-import { TokenType } from '@/constants/type'
 import envVariables from '@/schemas/env-variables.schema'
-import { ObjectId } from 'mongodb'
-import { sendEmail } from '@/utils/mailgun'
-import { EMAIL_TEMPLATES } from '@/constants/email-templates'
-import RefreshToken from '@/models/refresh-token.model'
+import databaseService from '@/services/database.services'
 
 class UsersService {
   private async signAccessToken(userId: string, isVerified: boolean) {
@@ -109,6 +110,20 @@ class UsersService {
       ),
       this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
     ])
+  }
+
+  async verifyEmail(userId: string) {
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId, true)
+
+    await Promise.all([
+      databaseService.users.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { email_verify_token: null }, $currentDate: { updated_at: true } }
+      ),
+      databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken })),
+    ])
+
+    return { accessToken, refreshToken }
   }
 }
 

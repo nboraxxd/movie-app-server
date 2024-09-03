@@ -6,7 +6,7 @@ import usersService from '@/services/users.services'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
-import { RegisterBodyType, RegisterResponseType } from '@/schemas/user.schema'
+import { RegisterBodyType, AuthResponseType, EmailVerifyTokenType } from '@/schemas/user.schema'
 import { TokenPayload } from '@/types/token.type'
 import { ErrorWithStatus } from '@/models/errors'
 import { verifyToken } from '@/utils/jwt'
@@ -14,7 +14,7 @@ import { calculateRemainingTimeInSeconds } from '@/utils/common'
 
 export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterBodyType>,
-  res: Response<RegisterResponseType>
+  res: Response<AuthResponseType>
 ) => {
   const { email, name, password } = req.body
 
@@ -63,4 +63,38 @@ export const resendEmailVerificationController = async (req: Request, res: Respo
   await usersService.resendEmailVerification({ email: user.email, name: user.name, userId: user._id })
 
   return res.json({ message: 'Please check your email to verify your account.' })
+}
+
+export const verifyEmailController = async (
+  req: Request<ParamsDictionary, any, EmailVerifyTokenType>,
+  res: Response<AuthResponseType>
+) => {
+  const { emailVerifyToken } = req.body
+
+  const decodedEmailVerifyToken = await verifyToken({
+    token: emailVerifyToken,
+    secretOrPublicKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
+  })
+
+  const { userId } = decodedEmailVerifyToken
+
+  const user = await usersService.findById(userId)
+
+  if (!user) {
+    throw new ErrorWithStatus({
+      message: 'User not found',
+      statusCode: 404,
+    })
+  }
+
+  if (user.email_verify_token === null) {
+    throw new ErrorWithStatus({
+      message: 'Email already verified',
+      statusCode: 400,
+    })
+  }
+
+  const result = await usersService.verifyEmail(userId)
+
+  return res.json({ message: 'Email verified successfully', data: result })
 }
