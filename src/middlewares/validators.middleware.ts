@@ -23,7 +23,7 @@ export const formValidator = (schema: Schema) => {
       if (error instanceof ZodError) {
         next(
           new EntityError({
-            message: `Validation error occurred in ${location}`,
+            message: 'Validation error occurred in body',
             errors: error.errors.map((error) => ({
               code: error.code,
               message: error.message,

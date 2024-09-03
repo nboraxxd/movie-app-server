@@ -6,11 +6,13 @@ import usersService from '@/services/users.services'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
-import { RegisterBodyType, AuthResponseType, EmailVerifyTokenType } from '@/schemas/user.schema'
+import { RegisterBodyType, AuthResponseType, EmailVerifyTokenType, LoginBodyType } from '@/schemas/user.schema'
 import { TokenPayload } from '@/types/token.type'
-import { ErrorWithStatus } from '@/models/errors'
+import { EntityError, ErrorWithStatus } from '@/models/errors'
 import { verifyToken } from '@/utils/jwt'
 import { calculateRemainingTimeInSeconds } from '@/utils/common'
+import { hashPassword } from '@/utils/crypto'
+import z from 'zod'
 
 export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterBodyType>,
@@ -97,4 +99,33 @@ export const verifyEmailController = async (
   const result = await usersService.verifyEmail(userId)
 
   return res.json({ message: 'Email verified successfully', data: result })
+}
+
+export const loginController = async (
+  req: Request<ParamsDictionary, any, LoginBodyType>,
+  res: Response<AuthResponseType>
+) => {
+  const { email, password } = req.body
+
+  const user = await usersService.findByEmail(email)
+
+  if (!user || user.password !== hashPassword(password)) {
+    throw new EntityError({
+      errors: [
+        {
+          code: z.ZodIssueCode.custom,
+          message: 'Invalid email or password',
+          path: 'email',
+          location: 'body',
+        },
+      ],
+    })
+  }
+
+  const result = await usersService.login({
+    userId: user._id.toHexString(),
+    isVerified: user.email_verify_token === null,
+  })
+
+  return res.json({ message: 'Login successful', data: result })
 }

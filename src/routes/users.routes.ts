@@ -1,9 +1,10 @@
 import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
-import { EmailVerifyTokenSchema, RegisterBodySchema } from '@/schemas/user.schema'
+import { EmailVerifyTokenSchema, LoginBodySchema, RegisterBodySchema } from '@/schemas/user.schema'
 import { formValidator, requireLoginValidator, tokenValidator } from '@/middlewares/validators.middleware'
 import {
+  loginController,
   registerController,
   resendEmailVerificationController,
   verifyEmailController,
@@ -20,5 +21,7 @@ usersRouter.post(
 )
 
 usersRouter.post('/verify-email', tokenValidator(EmailVerifyTokenSchema), wrapRequestHandler(verifyEmailController))
+
+usersRouter.post('/login', formValidator(LoginBodySchema), wrapRequestHandler(loginController))
 
 export default usersRouter

@@ -125,6 +125,18 @@ class UsersService {
 
     return { accessToken, refreshToken }
   }
+
+  async login(payload: { userId: string; isVerified: boolean }) {
+    const { isVerified, userId } = payload
+
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId, isVerified)
+
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken })
+    )
+
+    return { accessToken, refreshToken }
+  }
 }
 
 const usersService = new UsersService()

@@ -2,13 +2,15 @@ import z from 'zod'
 
 import usersService from '@/services/users.services'
 
+const email = z.string({ required_error: 'Email is required' }).trim().email({ message: 'Invalid email' })
+const password = z
+  .string({ required_error: 'Password is required' })
+  .min(6, { message: 'Password must be at least 6 characters' })
+
 export const RegisterBodySchema = z
   .object({
     name: z.string({ required_error: 'Name is required' }).trim(),
-    email: z
-      .string({ required_error: 'Email is required' })
-      .trim()
-      .email({ message: 'Invalid email' })
+    email: email
       // Delete this refine when using in frontend
       .refine(
         async (email) => {
@@ -17,9 +19,7 @@ export const RegisterBodySchema = z
         },
         { message: 'Email already exists' }
       ),
-    password: z
-      .string({ required_error: 'Password is required' })
-      .min(6, { message: 'Password must be at least 6 characters' }),
+    password,
     confirmPassword: z
       .string({ required_error: 'confirmPassword is required' })
       .min(6, { message: 'confirmPassword must be at least 6 characters' }),
@@ -60,3 +60,7 @@ export const EmailVerifyTokenSchema = z
   .strict({ message: 'Additional properties not allowed' })
 
 export type EmailVerifyTokenType = z.TypeOf<typeof EmailVerifyTokenSchema>
+
+export const LoginBodySchema = z.object({ email, password })
+
+export type LoginBodyType = z.TypeOf<typeof LoginBodySchema>
