@@ -5,7 +5,7 @@ config({
   path: '.env',
 })
 
-const EnvSchema = z.object({
+const envSchema = z.object({
   CLIENT_URL: z.string(),
 
   PORT: z.string(),
@@ -28,9 +28,12 @@ const EnvSchema = z.object({
 
   MAILGUN_API_KEY: z.string(),
   MAILGUN_DOMAIN: z.string(),
+
+  TMDB_API_URL: z.string(),
+  TMDB_READ_ACCESS_TOKEN: z.string(),
 })
 
-const envProject = EnvSchema.safeParse(process.env)
+const envProject = envSchema.safeParse(process.env)
 
 if (!envProject.success) {
   throw new Error('Invalid configuration. Please check your .env file.')

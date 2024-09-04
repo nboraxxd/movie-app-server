@@ -7,15 +7,19 @@ import { verifyToken } from '@/utils/jwt'
 import { capitalizeFirstLetter } from '@/utils/common'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { EntityError, ErrorWithStatusAndLocation } from '@/models/errors'
-import { AuthorizationSchema } from '@/schemas/auth.schema'
+import { authorizationSchema } from '@/schemas/auth.schema'
 import envVariables from '@/schemas/env-variables.schema'
 
 export type ValidationLocation = 'body' | 'params' | 'query' | 'headers'
 
-export const zodValidator = (schema: Schema, customHandler?: (arg: Request) => Promise<void>) => {
+export const zodValidator = (
+  schema: Schema,
+  location: ValidationLocation,
+  customHandler?: (arg: Request) => Promise<void>
+) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
-      req.body = await schema.parseAsync(req.body)
+      req[location] = await schema.parseAsync(req[location])
 
       if (customHandler) {
         await customHandler(req)
@@ -26,12 +30,12 @@ export const zodValidator = (schema: Schema, customHandler?: (arg: Request) => P
       if (error instanceof ZodError) {
         next(
           new EntityError({
-            message: 'Validation error occurred in body',
+            message: `Validation error occurred in ${location}`,
             errors: error.errors.map((error) => ({
               code: error.code,
               message: error.message,
               path: error.path.join('.'),
-              location: 'body',
+              location,
             })),
           })
         )
@@ -47,7 +51,7 @@ export const requireLoginValidator = () => {
     try {
       const accessToken = req.headers.authorization?.split('Bearer ')[1]
 
-      const { authorization: parsedAccessToken } = await AuthorizationSchema.parseAsync({ authorization: accessToken })
+      const { authorization: parsedAccessToken } = await authorizationSchema.parseAsync({ authorization: accessToken })
 
       const decodedAuthorization = await verifyToken({
         token: parsedAccessToken,

@@ -1,8 +1,8 @@
 import z from 'zod'
 
-import { EmailSchema, PasswordSchema } from '@/schemas/common.schema'
+import { emailSchema, passwordSchema } from '@/schemas/common.schema'
 
-export const AuthResponseSchema = z.object({
+export const authResponseSchema = z.object({
   message: z.string(),
   data: z.object({
     accessToken: z.string(),
@@ -10,30 +10,30 @@ export const AuthResponseSchema = z.object({
   }),
 })
 
-export type AuthResponseType = z.TypeOf<typeof AuthResponseSchema>
+export type AuthResponseType = z.TypeOf<typeof authResponseSchema>
 
-export const AuthorizationSchema = z.object({
+export const authorizationSchema = z.object({
   authorization: z.string({ required_error: 'Access token is required' }),
 })
 
-export type AuthorizationType = z.TypeOf<typeof AuthorizationSchema>
+export type AuthorizationType = z.TypeOf<typeof authorizationSchema>
 
-export const EmailVerifyTokenSchema = z
+export const emailVerifyTokenSchema = z
   .object({
     emailVerifyToken: z.string({ required_error: 'Email verify token is required' }),
   })
   .strict({ message: 'Additional properties not allowed' })
 
-export type EmailVerifyTokenType = z.TypeOf<typeof EmailVerifyTokenSchema>
+export type EmailVerifyTokenType = z.TypeOf<typeof emailVerifyTokenSchema>
 
-export const LoginBodySchema = z
-  .object({ email: EmailSchema, password: PasswordSchema })
+export const loginBodySchema = z
+  .object({ email: emailSchema, password: passwordSchema })
   .strict({ message: 'Additional properties not allowed' })
 
-export type LoginBodyType = z.TypeOf<typeof LoginBodySchema>
+export type LoginBodyType = z.TypeOf<typeof loginBodySchema>
 
-export const RefreshTokenSchema = z
+export const refreshTokenSchema = z
   .object({ refreshToken: z.string({ required_error: 'Refresh token is required' }) })
   .strict({ message: 'Additional properties not allowed' })
 
-export type RefreshTokenType = z.TypeOf<typeof RefreshTokenSchema>
+export type RefreshTokenType = z.TypeOf<typeof refreshTokenSchema>

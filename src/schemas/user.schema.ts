@@ -1,12 +1,12 @@
 import z from 'zod'
 
-import { EmailSchema, PasswordSchema } from '@/schemas/common.schema'
+import { emailSchema, passwordSchema } from '@/schemas/common.schema'
 
-export const RegisterBodySchema = z
+export const registerBodySchema = z
   .object({
     name: z.string({ required_error: 'Name is required' }).trim(),
-    email: EmailSchema,
-    password: PasswordSchema,
+    email: emailSchema,
+    password: passwordSchema,
     confirmPassword: z
       .string({ required_error: 'confirmPassword is required' })
       .min(6, { message: 'confirmPassword must be at least 6 characters' }),
@@ -22,4 +22,4 @@ export const RegisterBodySchema = z
     }
   })
 
-export type RegisterBodyType = z.TypeOf<typeof RegisterBodySchema>
+export type RegisterBodyType = z.TypeOf<typeof registerBodySchema>

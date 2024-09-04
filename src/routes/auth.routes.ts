@@ -3,7 +3,7 @@ import { Router } from 'express'
 import usersService from '@/services/users.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { decodeEmailVerifyToken, decodeRefreshToken } from '@/utils/jwt'
-import { EmailVerifyTokenSchema, LoginBodySchema, RefreshTokenSchema } from '@/schemas/auth.schema'
+import { emailVerifyTokenSchema, loginBodySchema, refreshTokenSchema } from '@/schemas/auth.schema'
 import { zodValidator, requireLoginValidator, tokenValidator } from '@/middlewares/validators.middleware'
 import {
   loginController,
@@ -22,20 +22,20 @@ authRouter.post(
 
 authRouter.post(
   '/verify-email',
-  tokenValidator(EmailVerifyTokenSchema, decodeEmailVerifyToken),
+  tokenValidator(emailVerifyTokenSchema, decodeEmailVerifyToken),
   wrapRequestHandler(verifyEmailController)
 )
 
 authRouter.post(
   '/login',
-  zodValidator(LoginBodySchema, usersService.validateUserLogin),
+  zodValidator(loginBodySchema, 'body', usersService.validateUserLogin),
   wrapRequestHandler(loginController)
 )
 
 authRouter.post(
   '/logout',
   requireLoginValidator(),
-  tokenValidator(RefreshTokenSchema, decodeRefreshToken),
+  tokenValidator(refreshTokenSchema, decodeRefreshToken),
   wrapRequestHandler(logoutController)
 )
 
