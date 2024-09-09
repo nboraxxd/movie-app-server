@@ -1,10 +1,10 @@
 import http from '@/utils/http'
-import { PopularMoviesResponseType } from '@/schemas/tmdb.schema'
+import { TMDBListResponseType } from '@/schemas/tmdb.schema'
 import { MoviesQueryType } from '@/schemas/movies.schema'
 
 class MoviesService {
   async getPopularMovies({ page }: MoviesQueryType) {
-    const response = await http.get<PopularMoviesResponseType>('/movie/popular', {
+    const response = await http.get<TMDBListResponseType>('/movie/popular', {
       params: { page },
     })
 

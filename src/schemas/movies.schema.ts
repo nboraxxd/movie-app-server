@@ -1,3 +1,4 @@
+import { queryPageSchema } from '@/schemas/tmdb.schema'
 import z from 'zod'
 
 export const movieSchema = z.object({
@@ -20,11 +21,7 @@ export const movieSchema = z.object({
 export type MovieType = z.TypeOf<typeof movieSchema>
 
 export const moviesQuerySchema = z.object({
-  page: z.coerce
-    .number({ message: 'Page must be a number' })
-    .int({ message: 'Page must be an integer' })
-    .positive({ message: 'Page must be a positive number' })
-    .optional(),
+  page: queryPageSchema,
 })
 
 export type MoviesQueryType = z.TypeOf<typeof moviesQuerySchema>
