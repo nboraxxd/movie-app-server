@@ -7,6 +7,7 @@ config({
 
 const envSchema = z.object({
   CLIENT_URL: z.string(),
+  SERVER_URL: z.string(),
 
   PORT: z.string(),
   DB_USERNAME: z.string(),

@@ -1,6 +1,8 @@
 import cors from 'cors'
 import express from 'express'
+import swaggerUi from 'swagger-ui-express'
 
+import { openapiSpecification } from '@/utils/swagger'
 import envVariables from '@/schemas/env-variables.schema'
 import databaseService from '@/services/database.services'
 import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
@@ -20,6 +22,8 @@ app.use(cors({ origin: '*' }))
 
 // parse json của client gởi lên, chuyển thành dạnh object để xử lý
 app.use(express.json())
+
+app.use('/', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 
 app.use('/users', usersRouter)
 
