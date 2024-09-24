@@ -23,7 +23,7 @@ app.use(cors({ origin: '*' }))
 // parse json của client gởi lên, chuyển thành dạnh object để xử lý
 app.use(express.json())
 
-app.use('/', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
+app.use('/api', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 
 app.use('/users', usersRouter)
 
