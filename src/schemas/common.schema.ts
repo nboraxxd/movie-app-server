@@ -6,7 +6,7 @@ export const passwordSchema = z
   .string({ required_error: 'Password is required' })
   .min(6, { message: 'Password must be at least 6 characters' })
 
-export const resPaginationSchema = z.object({
+export const paginationResponseSchema = z.object({
   currentPage: z.number(),
   totalPages: z.number(),
   count: z.number(),

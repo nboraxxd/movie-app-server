@@ -1,11 +1,24 @@
 import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
-import { trendingParamsSchema, trendingQuerySchema } from '@/schemas/trending.schema'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { trendingController } from '@/controllers/trending.controllers'
 
-const trendingRouter = Router()
+import {
+  discoverParamsSchema,
+  discoverQuerySchema,
+  trendingParamsSchema,
+  trendingQuerySchema,
+} from '@/schemas/tmdb.schema'
+import { discoverController, trendingController } from '@/controllers/tmdb.controllers'
+
+const tmdbRouter = Router()
+
+tmdbRouter.get(
+  '/discover/:mediaType',
+  zodValidator(discoverParamsSchema, 'params'),
+  zodValidator(discoverQuerySchema, 'query'),
+  wrapRequestHandler(discoverController)
+)
 
 /**
  * @swagger
@@ -56,11 +69,11 @@ const trendingRouter = Router()
  *    '422':
  *     description: Invalid value or missing field
  */
-trendingRouter.get(
-  '/:trendingType?/:timeWindow?',
+tmdbRouter.get(
+  '/trending/:trendingType?/:timeWindow?',
   zodValidator(trendingParamsSchema, 'params'),
   zodValidator(trendingQuerySchema, 'query'),
   wrapRequestHandler(trendingController)
 )
 
-export default trendingRouter
+export default tmdbRouter

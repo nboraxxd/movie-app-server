@@ -8,8 +8,7 @@ import databaseService from '@/services/database.services'
 import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
 import usersRouter from '@/routes/users.routes'
 import authRouter from '@/routes/auth.routes'
-import discoverRouter from '@/routes/discover.routes'
-import trendingRouter from '@/routes/trending.routes'
+import tmdbRouter from '@/routes/tmdb.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -29,9 +28,7 @@ app.use('/users', usersRouter)
 
 app.use('/auth', authRouter)
 
-app.use('/discover', discoverRouter)
-
-app.use('/trending', trendingRouter)
+app.use('/tmdb', tmdbRouter)
 
 app.use(defaultErrorHandler)
 
