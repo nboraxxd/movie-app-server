@@ -1,5 +1,5 @@
 import z from 'zod'
-import { movieSchema } from '@/schemas/movies.schema'
+import { commonResultTMDB } from '@/schemas/tmdb.schema'
 import { resPaginationSchema, queryPageSchema } from '@/schemas/common.schema'
 
 export const trendingParamsSchema = z
@@ -20,7 +20,7 @@ export type TrendingQueryType = z.TypeOf<typeof trendingQuerySchema>
 // total_pages và total_results dùng snake_case vì dữ liệu trả về từ TMDB có dạng snake_case
 export const trendingTMDBResponseSchema = z.object({
   page: z.number(),
-  results: z.array(movieSchema.extend({ media_type: z.enum(['movie', 'tv']) })),
+  results: z.array(commonResultTMDB.extend({ media_type: z.enum(['movie', 'tv']) })),
   total_pages: z.number(),
   total_results: z.number(),
 })
@@ -29,7 +29,7 @@ export type TrendingTMDBResponseType = z.TypeOf<typeof trendingTMDBResponseSchem
 
 export const trendingResponseSchema = z.object({
   message: z.string(),
-  data: z.array(movieSchema.extend({ media_type: z.enum(['movie', 'tv']) })),
+  data: z.array(commonResultTMDB.extend({ media_type: z.enum(['movie', 'tv']) })),
   pagination: resPaginationSchema,
 })
 

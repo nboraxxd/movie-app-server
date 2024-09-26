@@ -9,6 +9,7 @@ class TrendingService {
     const response = await http.get<TrendingTMDBResponseType>(`/trending/${trendingType}/${timeWindow}`, {
       params: { page },
     })
+    console.log('🔥 ~ TrendingService ~ getList ~ response:', response)
 
     return {
       data: response.results.map((item) => {

@@ -1,14 +1,13 @@
 import http from '@/utils/http'
 import envVariables from '@/schemas/env-variables.schema'
-import { TMDBListResponseType } from '@/schemas/tmdb.schema'
-import { DiscoverQueryType, DiscoverType } from '@/schemas/discover.schema'
+import { DiscoverQueryType, DiscoverParams, DiscoverTMDBResponseType } from '@/schemas/discover.schema'
 
 class DiscoverService {
-  async getList(payload: DiscoverType & DiscoverQueryType) {
+  async getList(payload: DiscoverParams & DiscoverQueryType) {
     const { discoverType, includeAdult, includeVideo, page, sortBy, voteAverageGte, voteAverageLte, withGenres } =
       payload
 
-    const response = await http.get<TMDBListResponseType>(`/discover/${discoverType}`, {
+    const response = await http.get<DiscoverTMDBResponseType>(`/discover/${discoverType}`, {
       params: {
         page,
         include_adult: includeAdult,

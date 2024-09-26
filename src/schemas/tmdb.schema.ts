@@ -1,5 +1,4 @@
 import z from 'zod'
-import { movieSchema } from '@/schemas/movies.schema'
 
 export const queryPageSchema = z.coerce
   .number({ message: 'Page must be a number' })
@@ -8,12 +7,21 @@ export const queryPageSchema = z.coerce
   .default(1)
   .optional()
 
-// total_pages và total_results dùng snake_case vì dữ liệu trả về từ API có dạng snake_case
-export const tmdbListResponseSchema = z.object({
-  page: z.number(),
-  results: z.array(movieSchema),
-  total_pages: z.number(),
-  total_results: z.number(),
+export const commonResultTMDB = z.object({
+  adult: z.boolean(),
+  backdrop_path: z.string().nullable(),
+  genre_ids: z.array(z.number()),
+  id: z.number(),
+  original_language: z.string(),
+  original_title: z.string(),
+  overview: z.string(),
+  popularity: z.number(),
+  poster_path: z.string().nullable(),
+  release_date: z.string(),
+  title: z.string(),
+  video: z.boolean(),
+  vote_average: z.number(),
+  vote_count: z.number(),
 })
 
-export type TMDBListResponseType = z.TypeOf<typeof tmdbListResponseSchema>
+export type CommonResultTMDBType = z.TypeOf<typeof commonResultTMDB>

@@ -1,12 +1,11 @@
 import { Request, Response } from 'express'
 
-import { DiscoverQueryType, DiscoverType } from '@/schemas/discover.schema'
+import { DiscoverQueryType, DiscoverParams, DiscoverResponseType } from '@/schemas/discover.schema'
 import discoverService from '@/services/discover.services'
-import { MoviesResponseType } from '@/schemas/movies.schema'
 
 export const discoverController = async (
-  req: Request<DiscoverType, any, any, DiscoverQueryType>,
-  res: Response<MoviesResponseType>
+  req: Request<DiscoverParams, any, any, DiscoverQueryType>,
+  res: Response<DiscoverResponseType>
 ) => {
   const { discoverType } = req.params
   const { page, includeAdult, includeVideo, sortBy, voteAverageGte, voteAverageLte, withGenres } = req.query

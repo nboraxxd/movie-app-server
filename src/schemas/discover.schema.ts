@@ -1,5 +1,6 @@
 import z from 'zod'
-import { queryPageSchema } from '@/schemas/tmdb.schema'
+import { commonResultTMDB, queryPageSchema } from '@/schemas/tmdb.schema'
+import { resPaginationSchema } from '@/schemas/common.schema'
 
 const discoverySortBySchema = z.enum(
   [
@@ -21,13 +22,13 @@ const discoverySortBySchema = z.enum(
   { message: 'Invalid sort by value' }
 )
 
-export const discoverTypeSchema = z
+export const discoverParamsSchema = z
   .object({
     discoverType: z.enum(['movie', 'tv'], { message: 'Media type must be movie or tv' }),
   })
   .strict({ message: 'Additional properties not allowed' })
 
-export type DiscoverType = z.TypeOf<typeof discoverTypeSchema>
+export type DiscoverParams = z.TypeOf<typeof discoverParamsSchema>
 
 export const discoverQuerySchema = z
   .object({
@@ -45,3 +46,21 @@ export const discoverQuerySchema = z
   .strict({ message: 'Additional properties not allowed' })
 
 export type DiscoverQueryType = z.TypeOf<typeof discoverQuerySchema>
+
+// total_pages và total_results dùng snake_case vì dữ liệu trả về từ TMDB có dạng snake_case
+export const discoverTMDBResponseSchema = z.object({
+  page: z.number(),
+  results: z.array(commonResultTMDB),
+  total_pages: z.number(),
+  total_results: z.number(),
+})
+
+export type DiscoverTMDBResponseType = z.TypeOf<typeof discoverTMDBResponseSchema>
+
+export const discoverResponseSchema = z.object({
+  message: z.string(),
+  data: z.array(commonResultTMDB),
+  pagination: resPaginationSchema,
+})
+
+export type DiscoverResponseType = z.TypeOf<typeof discoverResponseSchema>
