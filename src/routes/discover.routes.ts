@@ -2,14 +2,14 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { discoverQuerySchema, mediaTypeSchema } from '@/schemas/discover.schema'
+import { discoverQuerySchema, discoverTypeSchema } from '@/schemas/discover.schema'
 import { discoverController } from '@/controllers/discover.controllers'
 
 const discoverRouter = Router()
 
 discoverRouter.get(
-  '/:mediaType',
-  zodValidator(mediaTypeSchema, 'params'),
+  '/:discoverType',
+  zodValidator(discoverTypeSchema, 'params'),
   zodValidator(discoverQuerySchema, 'query'),
   wrapRequestHandler(discoverController)
 )

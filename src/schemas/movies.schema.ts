@@ -1,5 +1,5 @@
-import { queryPageSchema } from '@/schemas/tmdb.schema'
 import z from 'zod'
+import { queryPageSchema } from '@/schemas/tmdb.schema'
 
 export const movieSchema = z.object({
   adult: z.boolean(),

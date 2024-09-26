@@ -1,5 +1,5 @@
-import { queryPageSchema } from '@/schemas/tmdb.schema'
 import z from 'zod'
+import { queryPageSchema } from '@/schemas/tmdb.schema'
 
 const discoverySortBySchema = z.enum(
   [
@@ -21,15 +21,13 @@ const discoverySortBySchema = z.enum(
   { message: 'Invalid sort by value' }
 )
 
-export const mediaTypeSchema = z
+export const discoverTypeSchema = z
   .object({
-    mediaType: z
-      .string({ required_error: 'Media type is required' })
-      .regex(/^(movie|tv)$/, 'Media type must be movie or tv'),
+    discoverType: z.enum(['movie', 'tv'], { message: 'Media type must be movie or tv' }),
   })
   .strict({ message: 'Additional properties not allowed' })
 
-export type MediaType = z.TypeOf<typeof mediaTypeSchema>
+export type DiscoverType = z.TypeOf<typeof discoverTypeSchema>
 
 export const discoverQuerySchema = z
   .object({

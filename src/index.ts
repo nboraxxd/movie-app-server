@@ -10,6 +10,7 @@ import usersRouter from '@/routes/users.routes'
 import authRouter from '@/routes/auth.routes'
 import moviesRouter from '@/routes/movies.routes'
 import discoverRouter from '@/routes/discover.routes'
+import trendingRouter from '@/routes/trending.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -32,6 +33,8 @@ app.use('/auth', authRouter)
 app.use('/movies', moviesRouter)
 
 app.use('/discover', discoverRouter)
+
+app.use('/trending', trendingRouter)
 
 app.use(defaultErrorHandler)
 
