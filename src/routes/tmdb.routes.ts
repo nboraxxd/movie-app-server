@@ -3,14 +3,15 @@ import { Router } from 'express'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
 
+import { discoverController, trendingController, topRatedController } from '@/controllers/tmdb.controllers'
 import {
   discoverParamsSchema,
   discoverQuerySchema,
   trendingParamsSchema,
   trendingQuerySchema,
-  tvTopRatedQuerySchema,
+  topRatedQuerySchema,
+  topRatedParamsSchema,
 } from '@/schemas/tmdb.schema'
-import { discoverController, trendingController, tvTopRatedController } from '@/controllers/tmdb.controllers'
 
 const tmdbRouter = Router()
 
@@ -112,6 +113,11 @@ tmdbRouter.get(
  *    '422':
  *     description: Invalid value or missing field
  */
-tmdbRouter.get('/tv/top-rated', zodValidator(tvTopRatedQuerySchema, 'query'), wrapRequestHandler(tvTopRatedController))
+tmdbRouter.get(
+  '/top-rated/:topRatedType?',
+  zodValidator(topRatedParamsSchema, 'params'),
+  zodValidator(topRatedQuerySchema, 'query'),
+  wrapRequestHandler(topRatedController)
+)
 
 export default tmdbRouter

@@ -7,7 +7,9 @@ import {
   TrendingParamsType,
   TrendingQueryType,
   TMDBTrendingResponseType,
-  TMDBTvTopRatedResponseType,
+  TMDBTopRatedResponseType,
+  TopRatedParamsType,
+  TopRatedQueryType,
 } from '@/schemas/tmdb.schema'
 
 class TMDBService {
@@ -59,17 +61,49 @@ class TMDBService {
     }
   }
 
-  async tvTopRated(query: TrendingQueryType) {
-    const response = await http.get<TMDBTvTopRatedResponseType>('/tv/top_rated', { params: query })
+  async topRated({ topRatedType, page }: TopRatedParamsType & TopRatedQueryType) {
+    const response = await http.get<TMDBTopRatedResponseType>(`/${topRatedType}/top_rated`, { params: { page } })
 
     return {
       data: response.results.map((item) => {
-        const backdropFullPath = item.backdrop_path
-          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-          : null
-        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+        const {
+          first_air_date,
+          name,
+          origin_country,
+          original_name,
+          original_title,
+          release_date,
+          title,
+          video,
+          backdrop_path,
+          poster_path,
+          ...rest
+        } = item
 
-        return { ...item, backdrop_path: backdropFullPath, poster_path: posterFullPath }
+        const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
+        const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
+
+        return topRatedType === 'movie'
+          ? {
+              original_title,
+              release_date,
+              title,
+              video,
+              backdrop_path: backdropFullPath,
+              poster_path: posterFullPath,
+              media_type: topRatedType,
+              ...rest,
+            }
+          : {
+              first_air_date,
+              name,
+              origin_country,
+              original_name,
+              backdrop_path: backdropFullPath,
+              poster_path: posterFullPath,
+              media_type: topRatedType,
+              ...rest,
+            }
       }),
       pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
     }

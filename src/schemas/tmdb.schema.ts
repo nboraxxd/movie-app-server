@@ -136,26 +136,34 @@ export const trendingResponseSchema = z.object({
 
 export type TrendingResponseType = z.TypeOf<typeof trendingResponseSchema>
 
-/** TV Series schema */
-export const tvTopRatedQuerySchema = z.object({
+/** Top Rated schema */
+export const topRatedParamsSchema = z
+  .object({
+    topRatedType: z.enum(['movie', 'tv'], { message: 'Media type must be movie or tv' }).default('movie'),
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type TopRatedParamsType = z.TypeOf<typeof topRatedParamsSchema>
+
+export const topRatedQuerySchema = z.object({
   page: queryPageSchema,
 })
 
-export type TvTopRatedQueryType = z.TypeOf<typeof tvTopRatedQuerySchema>
+export type TopRatedQueryType = z.TypeOf<typeof topRatedQuerySchema>
 
-export const tmdbTvTopRatedResponseSchema = z.object({
+export const tmdbTopRatedResponseSchema = z.object({
   page: z.number(),
-  results: z.array(tmdbTvResult.omit({ media_type: true })),
+  results: z.array(tmdbMovieResult.omit({ media_type: true }).merge(tmdbTvResult.omit({ media_type: true }))),
   total_pages: z.number(),
   total_results: z.number(),
 })
 
-export type TMDBTvTopRatedResponseType = z.TypeOf<typeof tmdbTvTopRatedResponseSchema>
+export type TMDBTopRatedResponseType = z.TypeOf<typeof tmdbTopRatedResponseSchema>
 
-export const tvTopRatedResponseSchema = z.object({
+export const topRatedResponseSchema = z.object({
   message: z.string(),
-  data: tmdbTvTopRatedResponseSchema.shape.results,
+  data: z.array(z.union([tmdbMovieResult, tmdbTvResult])),
   pagination: paginationResponseSchema,
 })
 
-export type TvTopRatedResponseType = z.TypeOf<typeof tvTopRatedResponseSchema>
+export type TopRatedResponseType = z.TypeOf<typeof topRatedResponseSchema>
