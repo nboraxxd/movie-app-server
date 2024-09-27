@@ -2,11 +2,12 @@ import z from 'zod'
 import { queryPageSchema, paginationResponseSchema } from '@/schemas/common.schema'
 
 /* TMDB schema */
-export const commonResultTMDBResponse = z.object({
+export const tmdbMovieResult = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().nullable(),
   genre_ids: z.array(z.number()),
   id: z.number(),
+  media_type: z.literal('movie'),
   original_language: z.string(),
   original_title: z.string(),
   overview: z.string(),
@@ -19,7 +20,23 @@ export const commonResultTMDBResponse = z.object({
   vote_count: z.number(),
 })
 
-export type CommonResultTMDBType = z.TypeOf<typeof commonResultTMDBResponse>
+export const tmdbTvResult = z.object({
+  adult: z.boolean(),
+  backdrop_path: z.string().nullable(),
+  first_air_date: z.string(),
+  genre_ids: z.array(z.number()),
+  id: z.number(),
+  media_type: z.literal('tv'),
+  name: z.string(),
+  origin_country: z.array(z.string()),
+  original_language: z.string(),
+  original_name: z.string(),
+  overview: z.string(),
+  popularity: z.number(),
+  poster_path: z.string().nullable(),
+  vote_average: z.number(),
+  vote_count: z.number(),
+})
 
 /* Discover schema */
 const discoverySortBySchema = z.enum(
@@ -68,18 +85,18 @@ export const discoverQuerySchema = z
 export type DiscoverQueryType = z.TypeOf<typeof discoverQuerySchema>
 
 // total_pages và total_results dùng snake_case vì dữ liệu trả về từ TMDB có dạng snake_case
-export const discoverTMDBResponseSchema = z.object({
+export const tmdbDiscoverResponseSchema = z.object({
   page: z.number(),
-  results: z.array(commonResultTMDBResponse),
+  results: z.array(tmdbMovieResult.omit({ media_type: true })),
   total_pages: z.number(),
   total_results: z.number(),
 })
 
-export type DiscoverTMDBResponseType = z.TypeOf<typeof discoverTMDBResponseSchema>
+export type TMDBDiscoverResponseType = z.TypeOf<typeof tmdbDiscoverResponseSchema>
 
 export const discoverResponseSchema = z.object({
   message: z.string(),
-  data: z.array(commonResultTMDBResponse),
+  data: tmdbDiscoverResponseSchema.shape.results,
   pagination: paginationResponseSchema,
 })
 
@@ -102,19 +119,43 @@ export const trendingQuerySchema = z.object({
 export type TrendingQueryType = z.TypeOf<typeof trendingQuerySchema>
 
 // total_pages và total_results dùng snake_case vì dữ liệu trả về từ TMDB có dạng snake_case
-export const trendingTMDBResponseSchema = z.object({
+export const tmdbTrendingResponseSchema = z.object({
   page: z.number(),
-  results: z.array(commonResultTMDBResponse.extend({ media_type: z.enum(['movie', 'tv']) })),
+  results: z.array(z.union([tmdbMovieResult, tmdbTvResult])),
   total_pages: z.number(),
   total_results: z.number(),
 })
 
-export type TrendingTMDBResponseType = z.TypeOf<typeof trendingTMDBResponseSchema>
+export type TMDBTrendingResponseType = z.TypeOf<typeof tmdbTrendingResponseSchema>
 
 export const trendingResponseSchema = z.object({
   message: z.string(),
-  data: z.array(commonResultTMDBResponse.extend({ media_type: z.enum(['movie', 'tv']) })),
+  data: tmdbTrendingResponseSchema.shape.results,
   pagination: paginationResponseSchema,
 })
 
 export type TrendingResponseType = z.TypeOf<typeof trendingResponseSchema>
+
+/** TV Series schema */
+export const tvTopRatedQuerySchema = z.object({
+  page: queryPageSchema,
+})
+
+export type TvTopRatedQueryType = z.TypeOf<typeof tvTopRatedQuerySchema>
+
+export const tmdbTvTopRatedResponseSchema = z.object({
+  page: z.number(),
+  results: z.array(tmdbTvResult.omit({ media_type: true })),
+  total_pages: z.number(),
+  total_results: z.number(),
+})
+
+export type TMDBTvTopRatedResponseType = z.TypeOf<typeof tmdbTvTopRatedResponseSchema>
+
+export const tvTopRatedResponseSchema = z.object({
+  message: z.string(),
+  data: tmdbTvTopRatedResponseSchema.shape.results,
+  pagination: paginationResponseSchema,
+})
+
+export type TvTopRatedResponseType = z.TypeOf<typeof tvTopRatedResponseSchema>

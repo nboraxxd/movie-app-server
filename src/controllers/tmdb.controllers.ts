@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { ParamsDictionary } from 'express-serve-static-core'
 
 import tmdbService from '@/services/tmdb.services'
 import {
@@ -8,6 +9,7 @@ import {
   TrendingParamsType,
   TrendingQueryType,
   TrendingResponseType,
+  TvTopRatedResponseType,
 } from '@/schemas/tmdb.schema'
 
 export const discoverController = async (
@@ -45,4 +47,15 @@ export const trendingController = async (
   })
 
   return res.json({ message: 'Get trending list successfully', data, pagination })
+}
+
+export const tvTopRatedController = async (
+  req: Request<ParamsDictionary, any, any, TrendingQueryType>,
+  res: Response<TvTopRatedResponseType>
+) => {
+  const { page } = req.query
+
+  const { data, pagination } = await tmdbService.tvTopRated({ page })
+
+  return res.json({ message: 'Get top rated TV shows successfully', data, pagination })
 }

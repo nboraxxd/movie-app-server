@@ -3,17 +3,18 @@ import envVariables from '@/schemas/env-variables.schema'
 import {
   DiscoverQueryType,
   DiscoverParamsType,
-  DiscoverTMDBResponseType,
+  TMDBDiscoverResponseType,
   TrendingParamsType,
   TrendingQueryType,
-  TrendingTMDBResponseType,
+  TMDBTrendingResponseType,
+  TMDBTvTopRatedResponseType,
 } from '@/schemas/tmdb.schema'
 
 class TMDBService {
   async discover(payload: DiscoverParamsType & DiscoverQueryType) {
     const { mediaType, includeAdult, includeVideo, page, sortBy, voteAverageGte, voteAverageLte, withGenres } = payload
 
-    const response = await http.get<DiscoverTMDBResponseType>(`/discover/${mediaType}`, {
+    const response = await http.get<TMDBDiscoverResponseType>(`/discover/${mediaType}`, {
       params: {
         page,
         include_adult: includeAdult,
@@ -27,8 +28,10 @@ class TMDBService {
 
     return {
       data: response.results.map((item) => {
-        const backdropFullPath = `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-        const posterFullPath = `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}`
+        const backdropFullPath = item.backdrop_path
+          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
+          : null
+        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
 
         return { ...item, backdrop_path: backdropFullPath, poster_path: posterFullPath }
       }),
@@ -39,15 +42,32 @@ class TMDBService {
   async trending(payload: TrendingParamsType & TrendingQueryType) {
     const { timeWindow, trendingType, page } = payload
 
-    const response = await http.get<TrendingTMDBResponseType>(`/trending/${trendingType}/${timeWindow}`, {
+    const response = await http.get<TMDBTrendingResponseType>(`/trending/${trendingType}/${timeWindow}`, {
       params: { page },
     })
-    console.log('🔥 ~ TrendingService ~ getList ~ response:', response)
 
     return {
       data: response.results.map((item) => {
-        const backdropFullPath = `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-        const posterFullPath = `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}`
+        const backdropFullPath = item.backdrop_path
+          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
+          : null
+        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+
+        return { ...item, backdrop_path: backdropFullPath, poster_path: posterFullPath }
+      }),
+      pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
+    }
+  }
+
+  async tvTopRated(query: TrendingQueryType) {
+    const response = await http.get<TMDBTvTopRatedResponseType>('/tv/top_rated', { params: query })
+
+    return {
+      data: response.results.map((item) => {
+        const backdropFullPath = item.backdrop_path
+          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
+          : null
+        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
 
         return { ...item, backdrop_path: backdropFullPath, poster_path: posterFullPath }
       }),
