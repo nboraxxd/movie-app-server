@@ -78,41 +78,6 @@ tmdbRouter.get(
   wrapRequestHandler(trendingController)
 )
 
-/**
- * @swagger
- * /tv/top-rated:
- *  get:
- *   tags:
- *   - tv
- *   summary: Get top rated TV series
- *   description: Get top rated TV series list by page number
- *   operationId: tvTopRated
- *   parameters:
- *    - in: query
- *      name: page
- *      required: false
- *      description: Page number of top rated TV series list. Default is 1.
- *      schema:
- *       type: integer
- *       example: 1
- *   responses:
- *    '200':
- *     description: Get top rated TV shows successfully
- *     content:
- *      application/json:
- *       schema:
- *        type: object
- *        properties:
- *         message:
- *          type: string
- *          example: Get top rated TV shows successfully.
- *         data:
- *          $ref: '#/components/schemas/authResponseSchema'
- *        pagination:
- *          $ref: '#/components/schemas/paginationSchema'
- *    '422':
- *     description: Invalid value or missing field
- */
 tmdbRouter.get(
   '/top-rated/:topRatedType?',
   zodValidator(topRatedParamsSchema, 'params'),

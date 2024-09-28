@@ -28,17 +28,31 @@ export const zodValidator = (
       next()
     } catch (error) {
       if (error instanceof ZodError) {
-        next(
-          new EntityError({
-            message: `Validation error occurred in ${location}`,
-            errors: error.errors.map((error) => ({
-              code: error.code,
-              message: error.message,
-              path: error.path.join('.'),
+        if (location === 'body') {
+          next(
+            new EntityError({
+              message: `Validation error occurred in ${location}`,
+              errors: error.errors.map((error) => ({
+                code: error.code,
+                message: error.message,
+                path: error.path.join('.'),
+                location,
+              })),
+            })
+          )
+        } else {
+          next(
+            new ErrorWithStatusAndLocation({
+              message: `Error occurred in ${location}`,
+              statusCode: HttpStatusCode.BadRequest,
               location,
-            })),
-          })
-        )
+              errorInfo: error.errors.map((error) => ({
+                message: error.message,
+                path: error.path.join('.'),
+              })),
+            })
+          )
+        }
       } else {
         next(error)
       }
@@ -107,7 +121,6 @@ export const tokenValidator = (schema: Schema, tokenHandler?: (req: Request) => 
               code: error.code,
               message: error.message,
               path: error.path.join('.'),
-              location: 'body',
             })),
           })
         )

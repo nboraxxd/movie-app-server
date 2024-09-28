@@ -112,9 +112,11 @@ export const trendingParamsSchema = z
 
 export type TrendingParamsType = z.TypeOf<typeof trendingParamsSchema>
 
-export const trendingQuerySchema = z.object({
-  page: queryPageSchema,
-})
+export const trendingQuerySchema = z
+  .object({
+    page: queryPageSchema,
+  })
+  .strict({ message: 'Additional properties not allowed' })
 
 export type TrendingQueryType = z.TypeOf<typeof trendingQuerySchema>
 
@@ -145,9 +147,11 @@ export const topRatedParamsSchema = z
 
 export type TopRatedParamsType = z.TypeOf<typeof topRatedParamsSchema>
 
-export const topRatedQuerySchema = z.object({
-  page: queryPageSchema,
-})
+export const topRatedQuerySchema = z
+  .object({
+    page: queryPageSchema,
+  })
+  .strict({ message: 'Additional properties not allowed' })
 
 export type TopRatedQueryType = z.TypeOf<typeof topRatedQuerySchema>
 
