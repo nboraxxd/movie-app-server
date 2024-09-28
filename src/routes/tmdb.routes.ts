@@ -3,7 +3,12 @@ import { Router } from 'express'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
 
-import { discoverController, trendingController, topRatedController } from '@/controllers/tmdb.controllers'
+import {
+  discoverController,
+  trendingController,
+  topRatedController,
+  getMovieDetailController,
+} from '@/controllers/tmdb.controllers'
 import {
   discoverParamsSchema,
   discoverQuerySchema,
@@ -11,6 +16,7 @@ import {
   trendingQuerySchema,
   topRatedQuerySchema,
   topRatedParamsSchema,
+  movieParamsSchema,
 } from '@/schemas/tmdb.schema'
 
 const tmdbRouter = Router()
@@ -83,6 +89,12 @@ tmdbRouter.get(
   zodValidator(topRatedParamsSchema, 'params'),
   zodValidator(topRatedQuerySchema, 'query'),
   wrapRequestHandler(topRatedController)
+)
+
+tmdbRouter.get(
+  '/movies/:movieId',
+  zodValidator(movieParamsSchema, 'params'),
+  wrapRequestHandler(getMovieDetailController)
 )
 
 export default tmdbRouter

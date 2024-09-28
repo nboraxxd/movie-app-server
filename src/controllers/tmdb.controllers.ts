@@ -11,6 +11,8 @@ import {
   TopRatedResponseType,
   TopRatedQueryType,
   TopRatedParamsType,
+  MovieParamsType,
+  MovieDetailResponseType,
 } from '@/schemas/tmdb.schema'
 
 export const discoverController = async (
@@ -60,4 +62,15 @@ export const topRatedController = async (
   const { data, pagination } = await tmdbService.topRated({ topRatedType, page })
 
   return res.json({ message: 'Get top rated list successfully', data, pagination })
+}
+
+export const getMovieDetailController = async (
+  req: Request<MovieParamsType>,
+  res: Response<MovieDetailResponseType>
+) => {
+  const { movieId } = req.params
+
+  const data = await tmdbService.getMovieDetail(movieId)
+
+  return res.json({ message: 'Get movie detail successfully', data })
 }

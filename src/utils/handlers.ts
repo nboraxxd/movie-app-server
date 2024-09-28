@@ -7,7 +7,7 @@ type Func<P, Q> = (
 ) => Promise<Response<any, Record<string, any>>>
 
 export function wrapRequestHandler<P, Q>(func: Func<P, Q>) {
-  return async (req: Request<P, any, any, Q, Record<string, any>>, res: Response, next: NextFunction) => {
+  return async (req: Request<P | any, any, any, Q, Record<string, any>>, res: Response, next: NextFunction) => {
     try {
       await func(req, res, next)
     } catch (error) {

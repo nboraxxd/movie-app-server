@@ -2,6 +2,85 @@ import z from 'zod'
 import { queryPageSchema, paginationResponseSchema } from '@/schemas/common.schema'
 
 /* TMDB schema */
+const tmdbGenreSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+})
+
+const tmdbProductionCompanySchema = z.object({
+  id: z.number(),
+  logo_path: z.string().nullable(),
+  name: z.string(),
+  origin_country: z.string(),
+})
+
+const tmdbProductionCountrySchema = z.object({
+  iso_3166_1: z.string(),
+  name: z.string(),
+})
+
+const tmdbSpokenLanguageSchema = z.object({
+  english_name: z.string(),
+  iso_639_1: z.string(),
+  name: z.string(),
+})
+
+const tmdbCastSchema = z.object({
+  adult: z.boolean(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  known_for_department: z.string(),
+  name: z.string(),
+  original_name: z.string(),
+  popularity: z.number(),
+  profile_path: z.string().nullable(),
+  cast_id: z.number(),
+  character: z.string(),
+  credit_id: z.string(),
+  order: z.number(),
+})
+
+const tmdbCrewSchema = z.object({
+  adult: z.boolean(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  known_for_department: z.string(),
+  name: z.string(),
+  original_name: z.string(),
+  popularity: z.number(),
+  profile_path: z.string().nullable(),
+  credit_id: z.string(),
+  department: z.string(),
+  job: z.string(),
+})
+
+const tmdbVideoSchema = z.object({
+  iso_639_1: z.string(),
+  iso_3166_1: z.string(),
+  name: z.string(),
+  key: z.string(),
+  site: z.string(),
+  size: z.number(),
+  type: z.string(),
+  official: z.boolean(),
+  published_at: z.string(),
+  id: z.string(),
+})
+
+const tmdbReleaseDateSchema = z.object({
+  iso_3166_1: z.string(),
+  release_dates: z.array(
+    z.object({
+      certification: z.string(),
+      descriptors: z.array(z.string()),
+      iso_639_1: z.string(),
+      note: z.string(),
+      release_date: z.string(),
+      type: z.number(),
+    })
+  ),
+})
+
 export const tmdbMovieResult = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().nullable(),
@@ -20,6 +99,8 @@ export const tmdbMovieResult = z.object({
   vote_count: z.number(),
 })
 
+// const tmdbTvCastSchema = tmdbCastSchema.omit({ cast_id: true })
+
 export const tmdbTvResult = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().nullable(),
@@ -37,6 +118,40 @@ export const tmdbTvResult = z.object({
   vote_average: z.number(),
   vote_count: z.number(),
 })
+
+export const tmdbMovieDetailResponseSchema = tmdbMovieResult.omit({ media_type: true, genre_ids: true }).extend({
+  belongs_to_collection: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      poster_path: z.string().nullable(),
+      backdrop_path: z.string().nullable(),
+    })
+    .nullable(),
+  budget: z.number(),
+  genres: z.array(tmdbGenreSchema),
+  homepage: z.string().nullable(),
+  imdb_id: z.string().nullable(),
+  production_companies: z.array(tmdbProductionCompanySchema),
+  production_countries: z.array(tmdbProductionCountrySchema),
+  revenue: z.number(),
+  runtime: z.number().nullable(),
+  spoken_languages: z.array(tmdbSpokenLanguageSchema),
+  status: z.string(),
+  tagline: z.string().nullable(),
+  credits: z.object({
+    cast: z.array(tmdbCastSchema),
+    crew: z.array(tmdbCrewSchema),
+  }),
+  videos: z.object({
+    results: z.array(tmdbVideoSchema),
+  }),
+  release_dates: z.object({
+    results: z.array(tmdbReleaseDateSchema),
+  }),
+})
+
+export type TMDBMovieDetailResponseType = z.TypeOf<typeof tmdbMovieDetailResponseSchema>
 
 /* Discover schema */
 const discoverySortBySchema = z.enum(
@@ -138,7 +253,7 @@ export const trendingResponseSchema = z.object({
 
 export type TrendingResponseType = z.TypeOf<typeof trendingResponseSchema>
 
-/** Top Rated schema */
+/* Top Rated schema */
 export const topRatedParamsSchema = z
   .object({
     topRatedType: z.enum(['movie', 'tv'], { message: 'Media type must be movie or tv' }).default('movie'),
@@ -171,3 +286,19 @@ export const topRatedResponseSchema = z.object({
 })
 
 export type TopRatedResponseType = z.TypeOf<typeof topRatedResponseSchema>
+
+/* Movies schema */
+export const movieParamsSchema = z.object({
+  movieId: z.coerce.number({ message: 'Movie ID must be a number' }).int({ message: 'Movie ID must be an integer' }),
+})
+
+export type MovieParamsType = z.TypeOf<typeof movieParamsSchema>
+
+export const movieDetailResponseSchema = z.object({
+  message: z.string(),
+  data: tmdbMovieDetailResponseSchema.omit({ release_dates: true }).extend({
+    certification: z.string().nullable(),
+  }),
+})
+
+export type MovieDetailResponseType = z.TypeOf<typeof movieDetailResponseSchema>

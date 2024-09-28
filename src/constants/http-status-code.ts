@@ -9,3 +9,5 @@ export const HttpStatusCode = {
   TooManyRequests: 429,
   InternalServerError: 500,
 } as const
+
+export type TStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode]

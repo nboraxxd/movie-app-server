@@ -1,3 +1,5 @@
+import omit from 'lodash/omit'
+
 import http from '@/utils/http'
 import envVariables from '@/schemas/env-variables.schema'
 import {
@@ -10,6 +12,7 @@ import {
   TMDBTopRatedResponseType,
   TopRatedParamsType,
   TopRatedQueryType,
+  TMDBMovieDetailResponseType,
 } from '@/schemas/tmdb.schema'
 
 class TMDBService {
@@ -107,6 +110,24 @@ class TMDBService {
       }),
       pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
     }
+  }
+
+  async getMovieDetail(movieId: number) {
+    const response = await http.get<TMDBMovieDetailResponseType>(`/movie/${movieId}`, {
+      params: { append_to_response: 'release_dates,credits,videos' },
+    })
+
+    const certification =
+      response.release_dates.results.find((item) => item.iso_3166_1 === 'US')?.release_dates[0].certification || null
+
+    const backdropFullPath = response.backdrop_path
+      ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${response.backdrop_path}`
+      : null
+    const posterFullPath = response.poster_path
+      ? `${envVariables.TMDB_IMAGE_W600_H900_URL}${response.poster_path}`
+      : null
+
+    return { ...omit(response, ['release_dates']), certification, backdropFullPath, posterFullPath }
   }
 }
 
