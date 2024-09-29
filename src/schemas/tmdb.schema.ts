@@ -7,6 +7,8 @@ const tmdbGenreSchema = z.object({
   name: z.string(),
 })
 
+export type TMDBGenreType = z.TypeOf<typeof tmdbGenreSchema>
+
 const tmdbProductionCompanySchema = z.object({
   id: z.number(),
   logo_path: z.string().nullable(),
@@ -54,6 +56,8 @@ const tmdbCrewSchema = z.object({
   job: z.string(),
 })
 
+export type TMDBCrewType = z.TypeOf<typeof tmdbCrewSchema>
+
 const tmdbVideoSchema = z.object({
   iso_639_1: z.string(),
   iso_3166_1: z.string(),
@@ -81,7 +85,7 @@ const tmdbReleaseDateSchema = z.object({
   ),
 })
 
-export const tmdbMovieResult = z.object({
+export const tmdbMovieResultSchema = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().nullable(),
   genre_ids: z.array(z.number()),
@@ -101,7 +105,7 @@ export const tmdbMovieResult = z.object({
 
 // const tmdbTvCastSchema = tmdbCastSchema.omit({ cast_id: true })
 
-export const tmdbTvResult = z.object({
+export const tmdbTvResultSchema = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().nullable(),
   first_air_date: z.string(),
@@ -119,7 +123,7 @@ export const tmdbTvResult = z.object({
   vote_count: z.number(),
 })
 
-export const tmdbMovieDetailResponseSchema = tmdbMovieResult.omit({ media_type: true, genre_ids: true }).extend({
+export const tmdbMovieDetailResponseSchema = tmdbMovieResultSchema.omit({ media_type: true, genre_ids: true }).extend({
   belongs_to_collection: z
     .object({
       id: z.number(),
@@ -202,7 +206,7 @@ export type DiscoverQueryType = z.TypeOf<typeof discoverQuerySchema>
 // total_pages và total_results dùng snake_case vì dữ liệu trả về từ TMDB có dạng snake_case
 export const tmdbDiscoverResponseSchema = z.object({
   page: z.number(),
-  results: z.array(tmdbMovieResult.omit({ media_type: true })),
+  results: z.array(tmdbMovieResultSchema.omit({ media_type: true })),
   total_pages: z.number(),
   total_results: z.number(),
 })
@@ -238,7 +242,7 @@ export type TrendingQueryType = z.TypeOf<typeof trendingQuerySchema>
 // total_pages và total_results dùng snake_case vì dữ liệu trả về từ TMDB có dạng snake_case
 export const tmdbTrendingResponseSchema = z.object({
   page: z.number(),
-  results: z.array(z.union([tmdbMovieResult, tmdbTvResult])),
+  results: z.array(z.union([tmdbMovieResultSchema, tmdbTvResultSchema])),
   total_pages: z.number(),
   total_results: z.number(),
 })
@@ -272,7 +276,9 @@ export type TopRatedQueryType = z.TypeOf<typeof topRatedQuerySchema>
 
 export const tmdbTopRatedResponseSchema = z.object({
   page: z.number(),
-  results: z.array(tmdbMovieResult.omit({ media_type: true }).merge(tmdbTvResult.omit({ media_type: true }))),
+  results: z.array(
+    tmdbMovieResultSchema.omit({ media_type: true }).merge(tmdbTvResultSchema.omit({ media_type: true }))
+  ),
   total_pages: z.number(),
   total_results: z.number(),
 })
@@ -281,7 +287,7 @@ export type TMDBTopRatedResponseType = z.TypeOf<typeof tmdbTopRatedResponseSchem
 
 export const topRatedResponseSchema = z.object({
   message: z.string(),
-  data: z.array(z.union([tmdbMovieResult, tmdbTvResult])),
+  data: z.array(z.union([tmdbMovieResultSchema, tmdbTvResultSchema])),
   pagination: paginationResponseSchema,
 })
 

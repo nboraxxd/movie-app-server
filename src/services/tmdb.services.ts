@@ -120,6 +120,15 @@ class TMDBService {
     const certification =
       response.release_dates.results.find((item) => item.iso_3166_1 === 'US')?.release_dates[0].certification || null
 
+    const formattedCrew = response.credits.crew.map((item) => {
+      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
+      return { ...item, profile_path: profileFullPath }
+    })
+    const formattedCast = response.credits.cast.map((item) => {
+      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
+      return { ...item, profile_path: profileFullPath }
+    })
+
     const backdropFullPath = response.backdrop_path
       ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${response.backdrop_path}`
       : null
@@ -127,7 +136,13 @@ class TMDBService {
       ? `${envVariables.TMDB_IMAGE_W600_H900_URL}${response.poster_path}`
       : null
 
-    return { ...omit(response, ['release_dates']), certification, backdropFullPath, posterFullPath }
+    return {
+      ...omit(response, ['release_dates']),
+      credits: { crew: formattedCrew, cast: formattedCast },
+      certification,
+      backdrop_path: backdropFullPath,
+      poster_path: posterFullPath,
+    }
   }
 }
 
