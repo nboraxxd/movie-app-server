@@ -13,6 +13,7 @@ import {
   TopRatedParamsType,
   TopRatedQueryType,
   TMDBMovieDetailResponseType,
+  TMDBMovieRecommendationsResponseType,
 } from '@/schemas/tmdb.schema'
 
 class TMDBService {
@@ -142,6 +143,22 @@ class TMDBService {
       certification,
       backdrop_path: backdropFullPath,
       poster_path: posterFullPath,
+    }
+  }
+
+  async getRecommendedMovies(movieId: number) {
+    const response = await http.get<TMDBMovieRecommendationsResponseType>(`/movie/${movieId}/recommendations`)
+
+    return {
+      data: response.results.map((item) => {
+        const backdropFullPath = item.backdrop_path
+          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
+          : null
+        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+
+        return { ...item, backdrop_path: backdropFullPath, poster_path: posterFullPath }
+      }),
+      pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
     }
   }
 }

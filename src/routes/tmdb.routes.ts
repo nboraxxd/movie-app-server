@@ -8,6 +8,7 @@ import {
   trendingController,
   topRatedController,
   getMovieDetailController,
+  getRecommendedMoviesController,
 } from '@/controllers/tmdb.controllers'
 import {
   discoverParamsSchema,
@@ -95,6 +96,12 @@ tmdbRouter.get(
   '/movies/:movieId',
   zodValidator(movieParamsSchema, 'params'),
   wrapRequestHandler(getMovieDetailController)
+)
+
+tmdbRouter.get(
+  '/movies/:movieId/recommended',
+  zodValidator(movieParamsSchema, 'params'),
+  wrapRequestHandler(getRecommendedMoviesController)
 )
 
 export default tmdbRouter

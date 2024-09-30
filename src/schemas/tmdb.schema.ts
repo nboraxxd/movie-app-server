@@ -136,6 +136,7 @@ export const tmdbMovieDetailResponseSchema = tmdbMovieResultSchema.omit({ media_
   genres: z.array(tmdbGenreSchema),
   homepage: z.string().nullable(),
   imdb_id: z.string().nullable(),
+  origin_country: z.array(z.string()),
   production_companies: z.array(tmdbProductionCompanySchema),
   production_countries: z.array(tmdbProductionCountrySchema),
   revenue: z.number(),
@@ -308,3 +309,20 @@ export const movieDetailResponseSchema = z.object({
 })
 
 export type MovieDetailResponseType = z.TypeOf<typeof movieDetailResponseSchema>
+
+export const tmdbMovieRecommendationsResponseSchema = z.object({
+  page: z.number(),
+  results: z.array(z.union([tmdbMovieResultSchema, tmdbTvResultSchema])),
+  total_pages: z.number(),
+  total_results: z.number(),
+})
+
+export type TMDBMovieRecommendationsResponseType = z.TypeOf<typeof tmdbMovieRecommendationsResponseSchema>
+
+export const recommendedMoviesResponseSchema = z.object({
+  message: z.string(),
+  data: tmdbMovieRecommendationsResponseSchema.shape.results,
+  pagination: paginationResponseSchema,
+})
+
+export type RecommendedMoviesResponseType = z.TypeOf<typeof recommendedMoviesResponseSchema>
