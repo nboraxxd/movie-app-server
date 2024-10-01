@@ -44,6 +44,13 @@ export const trendingController = async (
   const { trendingType, timeWindow } = req.params
   const { page } = req.query
 
+  const tokenPayload = req.decodedAuthorization
+
+  if (tokenPayload) {
+    const { userId } = tokenPayload
+    console.log('🔥 ~ userId:', userId)
+  }
+
   const { data, pagination } = await tmdbService.trending({
     trendingType,
     timeWindow,

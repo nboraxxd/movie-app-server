@@ -3,12 +3,11 @@ import { Schema, ZodError } from 'zod'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
 
-import { verifyToken } from '@/utils/jwt'
+import { decodeAuthorizationToken } from '@/utils/jwt'
 import { capitalizeFirstLetter } from '@/utils/common'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { EntityError, ErrorWithStatusAndLocation } from '@/models/errors'
 import { authorizationSchema } from '@/schemas/auth.schema'
-import envVariables from '@/schemas/env-variables.schema'
 
 export type ValidationLocation = 'body' | 'params' | 'query' | 'headers'
 
@@ -60,22 +59,27 @@ export const zodValidator = (
   }
 }
 
-export const requireLoginValidator = () => {
+export const loginValidator = (isOptional = false) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const accessToken = req.headers.authorization?.split('Bearer ')[1]
 
-      const { authorization: parsedAccessToken } = await authorizationSchema.parseAsync({ authorization: accessToken })
-
-      const decodedAuthorization = await verifyToken({
-        token: parsedAccessToken,
-        jwtKey: envVariables.JWT_SECRET_ACCESS_TOKEN,
-      })
-
-      req.decodedAuthorization = decodedAuthorization
+      if (!isOptional) {
+        const { authorization: parsedAccessToken } = await authorizationSchema.parseAsync({
+          authorization: accessToken,
+        })
+        await decodeAuthorizationToken(parsedAccessToken, req)
+      } else if (isOptional && accessToken) {
+        await decodeAuthorizationToken(accessToken, req)
+      }
 
       next()
     } catch (error) {
+      if (isOptional) {
+        next()
+        return
+      }
+
       if (error instanceof ZodError) {
         next(
           new ErrorWithStatusAndLocation({

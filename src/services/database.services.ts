@@ -32,6 +32,10 @@ class DatabaseService {
   get refreshTokens() {
     return this.db.collection('refresh_tokens')
   }
+
+  get favorites() {
+    return this.db.collection('favorites')
+  }
 }
 
 // Create a new object of the DatabaseService class

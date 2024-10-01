@@ -50,6 +50,15 @@ export async function decodeEmailVerifyToken(req: Request<ParamsDictionary, any,
   req.decodedEmailVerifyToken = decodedEmailVerifyToken
 }
 
+export async function decodeAuthorizationToken(token: string, req: Request) {
+  const decodedAuthorizationToken = await verifyToken({
+    token,
+    jwtKey: envVariables.JWT_SECRET_ACCESS_TOKEN,
+  })
+
+  req.decodedAuthorization = decodedAuthorizationToken
+}
+
 export async function decodeRefreshToken(req: Request<ParamsDictionary, any, RefreshTokenType>) {
   const decodedEmailVerifyToken = await verifyToken({
     token: req.body.refreshToken,

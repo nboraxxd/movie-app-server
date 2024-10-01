@@ -9,6 +9,7 @@ import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
 import usersRouter from '@/routes/users.routes'
 import authRouter from '@/routes/auth.routes'
 import tmdbRouter from '@/routes/tmdb.routes'
+import favoritesRouter from '@/routes/favorites.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -29,6 +30,8 @@ app.use('/users', usersRouter)
 app.use('/auth', authRouter)
 
 app.use('/tmdb', tmdbRouter)
+
+app.use('/favorites', favoritesRouter)
 
 app.use(defaultErrorHandler)
 
