@@ -7,6 +7,7 @@ import { zodValidator, authorizationValidator, tokenValidator } from '@/middlewa
 import {
   loginController,
   logoutController,
+  refreshTokenController,
   registerController,
   resendEmailVerificationController,
   verifyEmailController,
@@ -170,6 +171,44 @@ authRouter.post(
   '/login',
   zodValidator(loginBodySchema, 'body', authService.validateUserLogin),
   wrapRequestHandler(loginController)
+)
+
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *  post:
+ *   tags:
+ *   - auth
+ *   summary: Refresh token
+ *   description: Refresh token using refresh token
+ *   operationId: refresh-token
+ *   requestBody:
+ *    description: Refresh token
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#/components/schemas/refreshTokenSchema'
+ *   responses:
+ *    '200':
+ *     description: Refresh token successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Refresh token successful
+ *         data:
+ *          $ref: '#/components/schemas/dataAuthResponseSchema'
+ *    '401':
+ *     description: Unauthorized
+ */
+authRouter.post(
+  '/refresh-token',
+  tokenValidator(refreshTokenSchema, authService.validateRefreshTokenRequest),
+  wrapRequestHandler(refreshTokenController)
 )
 
 /**

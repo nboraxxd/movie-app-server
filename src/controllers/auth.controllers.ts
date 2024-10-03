@@ -79,6 +79,17 @@ export const loginController = async (
   return res.json({ message: 'Login successful', data: result })
 }
 
+export const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, RefreshTokenType>,
+  res: Response<AuthResponseType>
+) => {
+  const { exp, userId } = req.decodedRefreshToken as TokenPayload
+
+  const result = await authService.refreshToken({ exp, userId })
+
+  return res.json({ message: 'Refresh token successful', data: result })
+}
+
 export const logoutController = async (
   req: Request<ParamsDictionary, any, RefreshTokenType>,
   res: Response<MessageResponseType>

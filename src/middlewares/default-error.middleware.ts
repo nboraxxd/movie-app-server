@@ -1,8 +1,8 @@
+import omit from 'lodash/omit'
 import { HttpStatusCode } from 'axios'
 import { NextFunction, Request, Response } from 'express'
 
 import { ErrorWithStatus } from '@/models/errors'
-import { omit } from 'lodash'
 
 export function defaultErrorHandler(err: any, _req: Request, res: Response, _next: NextFunction) {
   console.log('🍓 ERROR:', err.message)

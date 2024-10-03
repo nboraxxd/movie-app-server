@@ -1,6 +1,8 @@
 import z from 'zod'
 import { ObjectId } from 'mongodb'
 import { Request } from 'express'
+import omitBy from 'lodash/omitBy'
+import isUndefined from 'lodash/isUndefined'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import User from '@/models/user.model'
@@ -10,10 +12,10 @@ import { TokenPayload } from '@/types/token.type'
 import { TokenType } from '@/constants/type'
 import { EMAIL_TEMPLATES } from '@/constants/email-templates'
 import { HttpStatusCode } from '@/constants/http-status-code'
-import { signToken } from '@/utils/jwt'
+import { signToken, verifyToken } from '@/utils/jwt'
 import { sendEmail } from '@/utils/mailgun'
 import { hashPassword } from '@/utils/crypto'
-import { EmailVerifyTokenType, LoginBodyType } from '@/schemas/auth.schema'
+import { EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas/auth.schema'
 import { RegisterBodyType } from '@/schemas/auth.schema'
 import envVariables from '@/schemas/env-variables.schema'
 import databaseService from '@/services/database.services'
@@ -30,13 +32,25 @@ class AuthService {
     })
   }
 
-  async signRefreshToken(userId: string) {
+  async signRefreshToken(userId: string, exp?: number) {
     return signToken({
-      payload: { userId, tokenType: TokenType.RefreshToken },
+      payload: omitBy(
+        {
+          userId,
+          tokenType: TokenType.RefreshToken,
+          exp,
+        },
+        isUndefined
+      ),
       privateKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
-      options: {
-        expiresIn: envVariables.JWT_REFRESH_TOKEN_EXPIRES_IN,
-      },
+      options: exp ? undefined : { expiresIn: envVariables.JWT_REFRESH_TOKEN_EXPIRES_IN },
+    })
+  }
+
+  private decodeRefreshToken(token: string) {
+    return verifyToken({
+      token,
+      jwtKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
     })
   }
 
@@ -105,11 +119,13 @@ class AuthService {
       this.signRefreshToken(userId.toHexString()),
     ])
 
+    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
+
     await Promise.all([
       databaseService.users.insertOne(
         new User({ _id: userId, email, name, password: hashPassword(password), email_verify_token: emailVerifyToken })
       ),
-      databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: userId, token: refreshToken })),
+      databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: userId, token: refreshToken, iat, exp })),
       this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
     ])
 
@@ -181,13 +197,16 @@ class AuthService {
 
   async verifyEmail(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
+    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
 
     await Promise.all([
       databaseService.users.updateOne(
         { _id: new ObjectId(userId) },
         { $set: { email_verify_token: null }, $currentDate: { updated_at: true } }
       ),
-      databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken })),
+      databaseService.refreshTokens.insertOne(
+        new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken, iat, exp })
+      ),
     ])
 
     return { accessToken, refreshToken }
@@ -215,12 +234,52 @@ class AuthService {
 
   async login(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
+    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
 
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken })
+      new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken, iat, exp })
     )
 
     return { accessToken, refreshToken }
+  }
+
+  async validateRefreshTokenRequest(req: Request<ParamsDictionary, any, RefreshTokenType>) {
+    const [decodedRefreshToken, findAndDeleteResult] = await Promise.all([
+      await verifyToken({
+        token: req.body.refreshToken,
+        jwtKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
+      }),
+      databaseService.refreshTokens.findOneAndDelete({ token: req.body.refreshToken }),
+    ])
+
+    if (findAndDeleteResult === null) {
+      throw new ErrorWithStatus({
+        message: 'Invalid refresh token',
+        statusCode: HttpStatusCode.Unauthorized,
+      })
+    }
+
+    req.decodedRefreshToken = decodedRefreshToken
+  }
+
+  async refreshToken({ exp, userId }: { exp: number; userId: string }) {
+    const [newAccessToken, newRefreshToken] = await Promise.all([
+      this.signAccessToken(userId),
+      this.signRefreshToken(userId, exp),
+    ])
+
+    const decodedRefreshToken = await this.decodeRefreshToken(newRefreshToken)
+
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        user_id: new ObjectId(userId),
+        token: newRefreshToken,
+        iat: decodedRefreshToken.iat,
+        exp: decodedRefreshToken.exp,
+      })
+    )
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken }
   }
 
   async logout(refreshToken: string) {
