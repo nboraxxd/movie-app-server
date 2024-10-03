@@ -1,7 +1,9 @@
 import omit from 'lodash/omit'
+import { ObjectId } from 'mongodb'
 
 import http from '@/utils/http'
 import envVariables from '@/schemas/env-variables.schema'
+import databaseService from '@/services/database.services'
 import {
   DiscoverQueryType,
   DiscoverParamsType,
@@ -17,8 +19,40 @@ import {
 } from '@/schemas/tmdb.schema'
 
 class TMDBService {
-  async discover(payload: DiscoverParamsType & DiscoverQueryType) {
-    const { mediaType, includeAdult, includeVideo, page, sortBy, voteAverageGte, voteAverageLte, withGenres } = payload
+  async getMediaFavoritesMap(payload: { medias: Array<{ id: number; type: 'movie' | 'tv' }>; userId?: string }) {
+    const { medias, userId } = payload
+
+    const mediaFavoritesMap: Record<number, Array<'movie' | 'tv'>> = {}
+
+    if (userId) {
+      const favoriteRecords = await databaseService.favorites
+        .find(
+          {
+            user_id: new ObjectId(userId),
+            $or: medias.map((media) => ({
+              media_id: media.id,
+              type: media.type,
+            })),
+          },
+          { projection: { media_id: 1, type: 1 } }
+        )
+        .toArray()
+
+      for (const { media_id, type } of favoriteRecords) {
+        if (media_id in mediaFavoritesMap) {
+          mediaFavoritesMap[media_id].push(type)
+        } else {
+          mediaFavoritesMap[media_id] = [type]
+        }
+      }
+    }
+
+    return mediaFavoritesMap
+  }
+
+  async discover(payload: DiscoverParamsType & DiscoverQueryType & { userId?: string }) {
+    const { mediaType, includeAdult, includeVideo, page, sortBy, voteAverageGte, voteAverageLte, withGenres, userId } =
+      payload
 
     const response = await http.get<TMDBDiscoverResponseType>(`/discover/${mediaType}`, {
       params: {
@@ -32,24 +66,9 @@ class TMDBService {
       },
     })
 
-    return {
-      data: response.results.map((item) => {
-        const backdropFullPath = item.backdrop_path
-          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-          : null
-        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
-
-        return { ...item, backdrop_path: backdropFullPath, poster_path: posterFullPath }
-      }),
-      pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
-    }
-  }
-
-  async trending(payload: TrendingParamsType & TrendingQueryType) {
-    const { timeWindow, trendingType, page } = payload
-
-    const response = await http.get<TMDBTrendingResponseType>(`/trending/${trendingType}/${timeWindow}`, {
-      params: { page },
+    const mediaFavoritesMap = await this.getMediaFavoritesMap({
+      medias: response.results.map((item) => ({ id: item.id, type: mediaType })),
+      userId,
     })
 
     return {
@@ -59,14 +78,55 @@ class TMDBService {
           : null
         const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
 
-        return { ...item, backdrop_path: backdropFullPath, poster_path: posterFullPath }
+        return {
+          ...item,
+          backdrop_path: backdropFullPath,
+          poster_path: posterFullPath,
+          is_favorite: userId ? (mediaFavoritesMap[item.id]?.includes(mediaType) ?? false) : null,
+        }
       }),
       pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
     }
   }
 
-  async topRated({ topRatedType, page }: TopRatedParamsType & TopRatedQueryType) {
+  async trending(payload: TrendingParamsType & TrendingQueryType & { userId?: string }) {
+    const { timeWindow, trendingType, page, userId } = payload
+
+    const response = await http.get<TMDBTrendingResponseType>(`/trending/${trendingType}/${timeWindow}`, {
+      params: { page },
+    })
+
+    const mediaFavoritesMap = await this.getMediaFavoritesMap({
+      medias: response.results.map((item) => ({ id: item.id, type: item.media_type })),
+      userId,
+    })
+
+    console.log(mediaFavoritesMap)
+    return {
+      data: response.results.map((item) => {
+        const backdropFullPath = item.backdrop_path
+          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
+          : null
+        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+
+        return {
+          ...item,
+          backdrop_path: backdropFullPath,
+          poster_path: posterFullPath,
+          is_favorite: userId ? (mediaFavoritesMap[item.id]?.includes(item.media_type) ?? false) : null,
+        }
+      }),
+      pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
+    }
+  }
+
+  async topRated({ topRatedType, page, userId }: TopRatedParamsType & TopRatedQueryType & { userId?: string }) {
     const response = await http.get<TMDBTopRatedResponseType>(`/${topRatedType}/top_rated`, { params: { page } })
+
+    const mediaFavoritesMap = await this.getMediaFavoritesMap({
+      medias: response.results.map((item) => ({ id: item.id, type: topRatedType })),
+      userId,
+    })
 
     return {
       data: response.results.map((item) => {
@@ -96,6 +156,7 @@ class TMDBService {
               backdrop_path: backdropFullPath,
               poster_path: posterFullPath,
               media_type: topRatedType,
+              is_favorite: userId ? (mediaFavoritesMap[item.id]?.includes(topRatedType) ?? false) : null,
               ...rest,
             }
           : {
@@ -106,6 +167,7 @@ class TMDBService {
               backdrop_path: backdropFullPath,
               poster_path: posterFullPath,
               media_type: topRatedType,
+              is_favorite: userId ? (mediaFavoritesMap[item.id]?.includes(topRatedType) ?? false) : null,
               ...rest,
             }
       }),

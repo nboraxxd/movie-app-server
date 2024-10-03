@@ -1,6 +1,8 @@
-import { Db, MongoClient } from 'mongodb'
+import { Collection, Db, MongoClient } from 'mongodb'
 
 import User from '@/models/user.model'
+import Favorite from '@/models/favorite.model'
+import RefreshToken from '@/models/refresh-token.model'
 import envVariables from '@/schemas/env-variables.schema'
 
 const uri = `mongodb+srv://${envVariables.DB_USERNAME}:${envVariables.DB_PASSWORD}@movie-app-singapore.s0ve5.mongodb.net/?retryWrites=true&w=majority&appName=${envVariables.DB_CLUSTER}`
@@ -25,15 +27,15 @@ class DatabaseService {
     }
   }
 
-  get users() {
+  get users(): Collection<User> {
     return this.db.collection<User>('users')
   }
 
-  get refreshTokens() {
+  get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection('refresh_tokens')
   }
 
-  get favorites() {
+  get favorites(): Collection<Favorite> {
     return this.db.collection('favorites')
   }
 }

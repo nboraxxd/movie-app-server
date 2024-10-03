@@ -10,6 +10,7 @@ import usersRouter from '@/routes/users.routes'
 import authRouter from '@/routes/auth.routes'
 import tmdbRouter from '@/routes/tmdb.routes'
 import favoritesRouter from '@/routes/favorites.routes'
+import { authorizationValidator } from '@/middlewares/validators.middleware'
 
 const app = express()
 const port = envVariables.PORT
@@ -29,7 +30,7 @@ app.use('/users', usersRouter)
 
 app.use('/auth', authRouter)
 
-app.use('/tmdb', tmdbRouter)
+app.use('/tmdb', authorizationValidator({ isLoginRequired: false }), tmdbRouter)
 
 app.use('/favorites', favoritesRouter)
 

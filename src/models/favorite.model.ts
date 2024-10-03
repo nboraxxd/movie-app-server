@@ -6,10 +6,8 @@ type FavoriteType = {
   media_id: number
   title: string
   type: 'movie' | 'tv'
-  poster_path: string
-  backdrop_path: string
+  poster_path: string | null
   release_date: string
-  vote_average: number
   created_at?: Date
 }
 
@@ -19,10 +17,8 @@ export default class Favorite {
   media_id: number
   title: string
   type: 'movie' | 'tv'
-  poster_path: string
-  backdrop_path: string
+  poster_path: string | null
   release_date: string
-  vote_average: number
   created_at: Date
 
   constructor(favorite: FavoriteType) {
@@ -32,9 +28,7 @@ export default class Favorite {
     this.title = favorite.title
     this.type = favorite.type
     this.poster_path = favorite.poster_path
-    this.backdrop_path = favorite.backdrop_path
     this.release_date = favorite.release_date
-    this.vote_average = favorite.vote_average
     this.created_at = favorite.created_at || new Date()
   }
 }

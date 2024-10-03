@@ -4,7 +4,7 @@ import usersService from '@/services/users.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { decodeEmailVerifyToken, decodeRefreshToken } from '@/utils/jwt'
 import { emailVerifyTokenSchema, loginBodySchema, refreshTokenSchema } from '@/schemas/auth.schema'
-import { zodValidator, loginValidator, tokenValidator } from '@/middlewares/validators.middleware'
+import { zodValidator, authorizationValidator, tokenValidator } from '@/middlewares/validators.middleware'
 import {
   loginController,
   logoutController,
@@ -14,7 +14,11 @@ import {
 
 const authRouter = Router()
 
-authRouter.post('/resend-email-verification', loginValidator(), wrapRequestHandler(resendEmailVerificationController))
+authRouter.post(
+  '/resend-email-verification',
+  authorizationValidator({ isLoginRequired: true }),
+  wrapRequestHandler(resendEmailVerificationController)
+)
 
 authRouter.post(
   '/verify-email',
@@ -30,7 +34,7 @@ authRouter.post(
 
 authRouter.post(
   '/logout',
-  loginValidator(),
+  authorizationValidator({ isLoginRequired: true }),
   tokenValidator(refreshTokenSchema, decodeRefreshToken),
   wrapRequestHandler(logoutController)
 )

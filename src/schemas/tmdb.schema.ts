@@ -252,7 +252,16 @@ export type TMDBTrendingResponseType = z.TypeOf<typeof tmdbTrendingResponseSchem
 
 export const trendingResponseSchema = z.object({
   message: z.string(),
-  data: tmdbTrendingResponseSchema.shape.results,
+  data: z.array(
+    z.union([
+      tmdbMovieResultSchema.extend({
+        is_favorite: z.boolean().nullable(),
+      }),
+      tmdbTvResultSchema.extend({
+        is_favorite: z.boolean().nullable(),
+      }),
+    ])
+  ),
   pagination: paginationResponseSchema,
 })
 

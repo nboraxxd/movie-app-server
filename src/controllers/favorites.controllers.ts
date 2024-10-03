@@ -1,24 +1,33 @@
-import { FavoriteBodyType } from '@/schemas/favorite.schema'
-import favoritesService from '@/services/favorites.services'
-import { TokenPayload } from '@/types/token.type'
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
-export const favoriteController = async (req: Request<ParamsDictionary, any, FavoriteBodyType>, res: Response<any>) => {
-  const { backdropPath, mediaId, posterPath, releaseDate, title, type, voteAverage } = req.body
+import { TokenPayload } from '@/types/token.type'
+import { AddFavoriteBodyType, AddFavoriteResponseType } from '@/schemas/favorite.schema'
+import favoritesService from '@/services/favorites.services'
+
+export const addFavoriteController = async (
+  req: Request<ParamsDictionary, any, AddFavoriteBodyType>,
+  res: Response<AddFavoriteResponseType>
+) => {
+  const { mediaId, posterPath, releaseDate, title, type } = req.body
 
   const { userId } = req.decodedAuthorization as TokenPayload
 
-  const result = await favoritesService.addFavorite({
-    backdropPath,
+  const { data, isNew } = await favoritesService.addFavoriteMedia({
     mediaId,
     posterPath,
     releaseDate,
     title,
     type,
     userId,
-    voteAverage,
   })
 
-  return res.json({ message: 'Favorite added successfully', data: result })
+  if (!isNew) {
+    return res.json({ message: 'Media already added to favorites', data: null })
+  }
+
+  return res.json({
+    message: 'Favorite added successfully',
+    data: { ...data, _id: data._id.toHexString(), user_id: data.user_id.toHexString() },
+  })
 }

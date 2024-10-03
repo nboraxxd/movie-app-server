@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
-import { loginValidator, zodValidator } from '@/middlewares/validators.middleware'
+import { zodValidator } from '@/middlewares/validators.middleware'
 
 import {
   discoverController,
@@ -82,7 +82,6 @@ tmdbRouter.get(
   '/trending/:trendingType?/:timeWindow?',
   zodValidator(trendingParamsSchema, 'params'),
   zodValidator(trendingQuerySchema, 'query'),
-  loginValidator(true),
   wrapRequestHandler(trendingController)
 )
 

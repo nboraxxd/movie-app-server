@@ -23,6 +23,8 @@ export const discoverController = async (
   const { mediaType } = req.params
   const { page, includeAdult, includeVideo, sortBy, voteAverageGte, voteAverageLte, withGenres } = req.query
 
+  const tokenPayload = req.decodedAuthorization
+
   const { data, pagination } = await tmdbService.discover({
     page,
     mediaType,
@@ -32,6 +34,7 @@ export const discoverController = async (
     withGenres,
     voteAverageGte,
     voteAverageLte,
+    userId: tokenPayload?.userId,
   })
 
   return res.json({ message: 'Get discover list successfully', data, pagination })
@@ -46,15 +49,11 @@ export const trendingController = async (
 
   const tokenPayload = req.decodedAuthorization
 
-  if (tokenPayload) {
-    const { userId } = tokenPayload
-    console.log('🔥 ~ userId:', userId)
-  }
-
   const { data, pagination } = await tmdbService.trending({
     trendingType,
     timeWindow,
     page,
+    userId: tokenPayload?.userId,
   })
 
   return res.json({ message: 'Get trending list successfully', data, pagination })
@@ -67,7 +66,9 @@ export const topRatedController = async (
   const { topRatedType } = req.params
   const { page } = req.query
 
-  const { data, pagination } = await tmdbService.topRated({ topRatedType, page })
+  const tokenPayload = req.decodedAuthorization
+
+  const { data, pagination } = await tmdbService.topRated({ topRatedType, page, userId: tokenPayload?.userId })
 
   return res.json({ message: 'Get top rated list successfully', data, pagination })
 }

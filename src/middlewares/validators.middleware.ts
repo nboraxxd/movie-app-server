@@ -59,23 +59,23 @@ export const zodValidator = (
   }
 }
 
-export const loginValidator = (isOptional = false) => {
+export const authorizationValidator = ({ isLoginRequired }: { isLoginRequired: boolean }) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const accessToken = req.headers.authorization?.split('Bearer ')[1]
 
-      if (!isOptional) {
+      if (isLoginRequired) {
         const { authorization: parsedAccessToken } = await authorizationSchema.parseAsync({
           authorization: accessToken,
         })
         await decodeAuthorizationToken(parsedAccessToken, req)
-      } else if (isOptional && accessToken) {
+      } else if (!isLoginRequired && accessToken) {
         await decodeAuthorizationToken(accessToken, req)
       }
 
       next()
     } catch (error) {
-      if (isOptional) {
+      if (!isLoginRequired) {
         next()
         return
       }
