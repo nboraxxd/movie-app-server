@@ -14,7 +14,7 @@ export type ValidationLocation = 'body' | 'params' | 'query' | 'headers'
 export const zodValidator = (
   schema: Schema,
   location: ValidationLocation,
-  customHandler?: (arg: Request) => Promise<void>
+  customHandler?: (req: Request) => Promise<void>
 ) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
@@ -59,7 +59,13 @@ export const zodValidator = (
   }
 }
 
-export const authorizationValidator = ({ isLoginRequired }: { isLoginRequired: boolean }) => {
+export const authorizationValidator = ({
+  isLoginRequired,
+  customHandler,
+}: {
+  isLoginRequired: boolean
+  customHandler?: (req: Request) => Promise<void>
+}) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const accessToken = req.headers.authorization?.split('Bearer ')[1]
@@ -71,6 +77,10 @@ export const authorizationValidator = ({ isLoginRequired }: { isLoginRequired: b
         await decodeAuthorizationToken(parsedAccessToken, req)
       } else if (!isLoginRequired && accessToken) {
         await decodeAuthorizationToken(accessToken, req)
+      }
+
+      if (customHandler) {
+        await customHandler(req)
       }
 
       next()
@@ -104,13 +114,21 @@ export const authorizationValidator = ({ isLoginRequired }: { isLoginRequired: b
   }
 }
 
-export const tokenValidator = (schema: Schema, tokenHandler?: (req: Request) => Promise<void>) => {
+export const tokenValidator = (
+  schema: Schema,
+  tokenHandler?: (req: Request) => Promise<void>,
+  customHandler?: (req: Request) => Promise<void>
+) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.body = await schema.parseAsync(req.body)
 
       if (tokenHandler) {
         await tokenHandler(req)
+      }
+
+      if (customHandler) {
+        await customHandler(req)
       }
 
       next()

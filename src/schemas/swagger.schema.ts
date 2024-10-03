@@ -1,7 +1,3 @@
-import z from 'zod'
-
-import { emailSchema, passwordSchema } from '@/schemas/common.schema'
-
 /**
  * @swagger
  * components:
@@ -11,7 +7,7 @@ import { emailSchema, passwordSchema } from '@/schemas/common.schema'
  *    - name
  *    - email
  *    - password
- *    - confirm_password
+ *    - confirmPassword
  *    type: object
  *    properties:
  *     name:
@@ -19,26 +15,26 @@ import { emailSchema, passwordSchema } from '@/schemas/common.schema'
  *      example: Bruce Wayne
  *     email:
  *      type: string
- *      example: bruce@wayne.dc
+ *      example: brucewayne@wayne-ent.dc
  *     password:
  *      type: string
  *      format: password
  *      example: Abcd12345@#
- *     confirm_password:
+ *     confirmPassword:
  *      type: string
  *      format: password
  *      example: Abcd12345@#
  *
- *   VerifyEmailReqBody:
+ *   emailVerifyTokenSchema:
  *    required:
- *    - email_verify_token
+ *    - emailVerifyToken
  *    type: object
  *    properties:
- *     email_verify_token:
+ *     emailVerifyToken:
  *      type: string
  *      example: eyJhbGciOiJIUzI1N...
  *
- *   LoginReqBody:
+ *   loginBodySchema:
  *    required:
  *    - email
  *    - password
@@ -46,18 +42,18 @@ import { emailSchema, passwordSchema } from '@/schemas/common.schema'
  *    properties:
  *     email:
  *      type: string
- *      example: bruce@wayne.dc
+ *      example: brucewayne@wayne-ent.dc
  *     password:
  *      type: string
  *      format: password
  *      example: Abcd12345@#
  *
- *   LogoutReqBody:
+ *   refreshTokenSchema:
  *    required:
- *    - refresh_token
+ *    - refreshToken
  *    type: object
  *    properties:
- *     refresh_token:
+ *     refreshToken:
  *      type: string
  *      example: eyJhbGciOiJIUzI1N...
  *
@@ -83,7 +79,7 @@ import { emailSchema, passwordSchema } from '@/schemas/common.schema'
  *    required:
  *    - forgot_password_token
  *    - password
- *    - confirm_password
+ *    - confirmPassword
  *    type: object
  *    properties:
  *     forgot_password_token:
@@ -93,7 +89,7 @@ import { emailSchema, passwordSchema } from '@/schemas/common.schema'
  *      type: string
  *      format: password
  *      example: Abcd12345@#
- *     confirm_password:
+ *     confirmPassword:
  *      type: string
  *      format: password
  *      example: Abcd12345@#
@@ -108,7 +104,7 @@ import { emailSchema, passwordSchema } from '@/schemas/common.schema'
  *      type: string
  *      example: https://brucewayne.dc/avatar.jpg
  *
- *   authResponseSchema:
+ *   dataAuthResponseSchema:
  *    type: object
  *    properties:
  *     access_token:
@@ -210,25 +206,3 @@ import { emailSchema, passwordSchema } from '@/schemas/common.schema'
  *      type: string
  *      example: https://brucewayne.dc/cover.jpg
  */
-
-export const registerBodySchema = z
-  .object({
-    name: z.string({ required_error: 'Name is required' }).trim(),
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: z
-      .string({ required_error: 'confirmPassword is required' })
-      .min(6, { message: 'confirmPassword must be at least 6 characters' }),
-  })
-  .strict({ message: 'Additional properties not allowed' })
-  .superRefine(({ confirmPassword, password }, ctx) => {
-    if (password !== confirmPassword) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Passwords do not match',
-        path: ['confirmPassword'],
-      })
-    }
-  })
-
-export type RegisterBodyType = z.TypeOf<typeof registerBodySchema>

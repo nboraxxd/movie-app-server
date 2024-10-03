@@ -195,9 +195,7 @@ class TMDBService {
     const backdropFullPath = response.backdrop_path
       ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${response.backdrop_path}`
       : null
-    const posterFullPath = response.poster_path
-      ? `${envVariables.TMDB_IMAGE_W600_H900_URL}${response.poster_path}`
-      : null
+    const posterFullPath = response.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${response.poster_path}` : null
 
     return {
       ...omit(response, ['release_dates']),

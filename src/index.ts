@@ -6,7 +6,6 @@ import { openapiSpecification } from '@/utils/swagger'
 import envVariables from '@/schemas/env-variables.schema'
 import databaseService from '@/services/database.services'
 import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
-import usersRouter from '@/routes/users.routes'
 import authRouter from '@/routes/auth.routes'
 import tmdbRouter from '@/routes/tmdb.routes'
 import favoritesRouter from '@/routes/favorites.routes'
@@ -25,8 +24,6 @@ app.use(cors({ origin: '*' }))
 app.use(express.json())
 
 app.use('/api', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
-
-app.use('/users', usersRouter)
 
 app.use('/auth', authRouter)
 

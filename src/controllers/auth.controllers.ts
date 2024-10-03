@@ -8,34 +8,36 @@ import { TokenPayload } from '@/types/token.type'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { calculateRemainingTimeInSeconds } from '@/utils/common'
 import authService from '@/services/auth.services'
-import usersService from '@/services/users.services'
 import User from '@/models/user.model'
 import { ErrorWithStatus } from '@/models/errors'
 import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
-import { AuthResponseType, EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas/auth.schema'
+import {
+  AuthResponseType,
+  EmailVerifyTokenType,
+  LoginBodyType,
+  RefreshTokenType,
+  RegisterBodyType,
+} from '@/schemas/auth.schema'
+
+export const registerController = async (
+  req: Request<ParamsDictionary, any, RegisterBodyType>,
+  res: Response<AuthResponseType>
+) => {
+  const { email, name, password } = req.body
+
+  const result = await authService.register({ email, name, password })
+
+  return res
+    .status(HttpStatusCode.Created)
+    .json({ message: 'Please check your email to verify your account', data: result })
+}
 
 export const resendEmailVerificationController = async (req: Request, res: Response<MessageResponseType>) => {
-  const { userId } = req.decodedAuthorization as TokenPayload
-
-  const user = await usersService.findById(userId)
-
-  if (!user) {
-    throw new ErrorWithStatus({
-      message: 'User not found',
-      statusCode: HttpStatusCode.NotFound,
-    })
-  }
-
-  if (user.email_verify_token === null) {
-    throw new ErrorWithStatus({
-      message: 'Account has been verified',
-      statusCode: HttpStatusCode.BadRequest,
-    })
-  }
+  const { email_verify_token, email, name, _id } = req.user as User
 
   const decodedEmailVerifyToken = await verifyToken({
-    token: user.email_verify_token,
+    token: email_verify_token as string,
     jwtKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
   })
 
@@ -50,9 +52,9 @@ export const resendEmailVerificationController = async (req: Request, res: Respo
     })
   }
 
-  await authService.resendEmailVerification({ email: user.email, name: user.name, userId: user._id })
+  await authService.resendEmailVerification({ email, name, userId: _id as ObjectId })
 
-  return res.json({ message: 'Please check your email to verify your account.' })
+  return res.json({ message: 'Please check your email to verify your account' })
 }
 
 export const verifyEmailController = async (
@@ -61,25 +63,9 @@ export const verifyEmailController = async (
 ) => {
   const { userId } = req.decodedEmailVerifyToken as TokenPayload
 
-  const user = await usersService.findById(userId)
-
-  if (!user) {
-    throw new ErrorWithStatus({
-      message: 'User not found',
-      statusCode: HttpStatusCode.NotFound,
-    })
-  }
-
-  if (user.email_verify_token === null) {
-    throw new ErrorWithStatus({
-      message: 'Account has been verified',
-      statusCode: HttpStatusCode.BadRequest,
-    })
-  }
-
   const result = await authService.verifyEmail(userId)
 
-  return res.json({ message: 'Email verified successfully', data: result })
+  return res.json({ message: 'Verify email successful', data: result })
 }
 
 export const loginController = async (

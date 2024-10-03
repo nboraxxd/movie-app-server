@@ -33,7 +33,6 @@ const envSchema = z.object({
   TMDB_API_URL: z.string(),
   TMDB_IMAGE_ORIGINAL_URL: z.string(),
   TMDB_IMAGE_W500_URL: z.string(),
-  TMDB_IMAGE_W600_H900_URL: z.string(),
   TMDB_IMAGE_W276_H350_URL: z.string(),
   TMDB_READ_ACCESS_TOKEN: z.string(),
 })

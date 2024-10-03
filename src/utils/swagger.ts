@@ -17,8 +17,8 @@ const options: swaggerJSDoc.Options = {
     ],
     tags: [
       {
-        name: 'users',
-        description: 'Operations about users',
+        name: 'auth',
+        description: 'Operations about authentication',
       },
     ],
     components: {
@@ -31,7 +31,7 @@ const options: swaggerJSDoc.Options = {
       },
     },
   },
-  apis: ['./src/routes/*.routes.ts', './src/schemas/*.schema.ts'],
+  apis: ['./src/routes/*.routes.ts', './src/schemas/swagger.schema.ts'],
 }
 
 export const openapiSpecification = swaggerJSDoc(options)
