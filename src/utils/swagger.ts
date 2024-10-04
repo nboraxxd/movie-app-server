@@ -20,6 +20,10 @@ const options: swaggerJSDoc.Options = {
         name: 'auth',
         description: 'Operations about authentication',
       },
+      {
+        name: 'profile',
+        description: 'Operations about profile',
+      },
     ],
     components: {
       securitySchemes: {

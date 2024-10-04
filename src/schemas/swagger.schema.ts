@@ -114,7 +114,7 @@
  *      type: string
  *      example: eyJhbGciOiJIUzI1N...
  *
- *   SuccessGetMe:
+ *   userSchema:
  *    type: object
  *    properties:
  *     _id:
@@ -125,46 +125,22 @@
  *      example: Bruce Wayne
  *     email:
  *      type: string
- *      example: bruce@wayne.dc
- *     date_of_birth:
- *      type: string
- *      format: ISO 8601
- *      example: 1970-02-19T08:46:24.000Z
- *     verify:
- *      type: number
- *      enum: [0, 1, 2]
- *      example: 1
- *     tweeter_circle:
- *      type: array
- *      items:
- *       type: string
- *      example: [123abc..., 456def...]
- *     bio:
- *      type: string
- *      example: I'm rich
- *     location:
- *      type: string
- *      example: Gotham City
- *     website:
- *      type: string
- *      example: https://brucewayne.dc
- *     username:
- *      type: string
- *      example: bruce_wayne
+ *      example: brucewayne@wayne-ent.dc
  *     avatar:
  *      type: string
- *      example: https://brucewayne.dc/avatar.jpg
- *     cover_photo:
- *      type: string
- *      example: https://brucewayne.dc/cover.jpg
+ *      nullable: true
+ *      example: https://www.wayne-ent.dc/brucewayne.jpg
+ *     is_verified:
+ *      type: boolean
+ *      example: true
  *     created_at:
  *      type: string
  *      format: ISO 8601
- *      example: 2021-02-19T08:46:24.000Z
+ *      example: 2025-02-19T08:46:24.000Z
  *     updated_at:
  *      type: string
  *      format: ISO 8601
- *      example: 2021-02-19T08:46:24.000Z
+ *      example: 2025-02-19T08:46:24.000Z
  *
  *   SuccessGetUserProfile:
  *    type: object

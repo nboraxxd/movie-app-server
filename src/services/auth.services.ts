@@ -19,7 +19,7 @@ import { EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas
 import { RegisterBodyType } from '@/schemas/auth.schema'
 import envVariables from '@/schemas/env-variables.schema'
 import databaseService from '@/services/database.services'
-import usersService from '@/services/users.services'
+import profileService from '@/services/profile.services'
 
 class AuthService {
   async signAccessToken(userId: string) {
@@ -91,7 +91,7 @@ class AuthService {
   }
 
   async validateUserRegister(req: Request<ParamsDictionary, any, RegisterBodyType>) {
-    const user = await usersService.findByEmail(req.body.email)
+    const user = await profileService.findByEmail(req.body.email)
 
     if (user) {
       throw new EntityError({
@@ -135,7 +135,7 @@ class AuthService {
   async validateUserResendEmailVerification(req: Request<ParamsDictionary, any, EmailVerifyTokenType>) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
-    const user = await usersService.findById(userId)
+    const user = await profileService.findById(userId)
 
     if (!user) {
       throw new ErrorWithStatus({
@@ -171,7 +171,7 @@ class AuthService {
   async validateUserVerifyEmail(req: Request<ParamsDictionary, any, EmailVerifyTokenType>) {
     const { userId } = req.decodedEmailVerifyToken as TokenPayload
 
-    const user = await usersService.findById(userId)
+    const user = await profileService.findById(userId)
 
     if (!user) {
       throw new ErrorWithStatus({
@@ -213,7 +213,7 @@ class AuthService {
   }
 
   async validateUserLogin(req: Request<ParamsDictionary, any, LoginBodyType>) {
-    const user = await usersService.findByEmail(req.body.email)
+    const user = await profileService.findByEmail(req.body.email)
 
     if (!user || user.password !== hashPassword(req.body.password)) {
       throw new EntityError({

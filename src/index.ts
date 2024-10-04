@@ -10,6 +10,7 @@ import authRouter from '@/routes/auth.routes'
 import tmdbRouter from '@/routes/tmdb.routes'
 import favoritesRouter from '@/routes/favorites.routes'
 import { authorizationValidator } from '@/middlewares/validators.middleware'
+import profileRouter from '@/routes/profile.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -26,6 +27,8 @@ app.use(express.json())
 app.use('/api', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 
 app.use('/auth', authRouter)
+
+app.use('/profile', authorizationValidator({ isLoginRequired: true }), profileRouter)
 
 app.use('/tmdb', authorizationValidator({ isLoginRequired: false }), tmdbRouter)
 
