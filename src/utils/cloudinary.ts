@@ -13,7 +13,15 @@ cloudinary.config({
 
 export async function uploadToCloudinary(file: Express.Multer.File) {
   try {
-    const result = await cloudinary.uploader.upload(file.path, { folder: envVariables.CLOUDINARY_FOLDER })
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: envVariables.CLOUDINARY_FOLDER,
+      transformation: {
+        fetch_format: 'auto',
+        quality: 'auto',
+        width: 300,
+        crop: 'limit',
+      },
+    })
 
     fs.unlink(file.path, (err) => {
       if (err) {

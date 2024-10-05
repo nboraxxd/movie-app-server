@@ -39,6 +39,43 @@ const profileRouter = Router()
  */
 profileRouter.get('/', wrapRequestHandler(getProfileController))
 
+/**
+ * @swagger
+ * /profile/upload-avatar:
+ *  post:
+ *   tags:
+ *   - profile
+ *   summary: Upload avatar
+ *   description: Upload user avatar
+ *   operationId: upload-avatar
+ *   security:
+ *    - bearerAuth: []
+ *   requestBody:
+ *    description: Avatar file
+ *    required: true
+ *    content:
+ *     multipart/form-data:
+ *      schema:
+ *       $ref: '#/components/schemas/avatarFileSchema'
+ *   responses:
+ *    '200':
+ *     description: Upload avatar successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Upload avatar successful
+ *         data:
+ *          type: string
+ *          example: https://www.wayne-ent.dc/brucewayne.jpg
+ *    '401':
+ *     description: Unauthorized
+ *    '422':
+ *     description: Invalid value or missing field
+ */
 profileRouter.post(
   '/upload-avatar',
   fileValidator(uploadAvatar),

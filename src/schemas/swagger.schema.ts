@@ -94,6 +94,14 @@
  *      format: password
  *      example: Abcd12345@#
  *
+ *   avatarFileSchema:
+ *    type: object
+ *    properties:
+ *     avatar:
+ *      type: string
+ *      format: binary
+ *      example: avatar.jpg
+ *
  *   UpdateMeReqBody:
  *    type: object
  *    properties:
@@ -102,7 +110,7 @@
  *      example: Bruce Wayne
  *     avatar:
  *      type: string
- *      example: https://brucewayne.dc/avatar.jpg
+ *      example: https://www.wayne-ent.dc/brucewayne.jpg
  *
  *   dataAuthResponseSchema:
  *    type: object
