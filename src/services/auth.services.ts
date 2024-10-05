@@ -123,7 +123,7 @@ class AuthService {
 
     await Promise.all([
       databaseService.users.insertOne(
-        new User({ _id: userId, email, name, password: hashPassword(password), email_verify_token: emailVerifyToken })
+        new User({ _id: userId, email, name, password: hashPassword(password), emailVerifyToken })
       ),
       databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: userId, token: refreshToken, iat, exp })),
       this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
@@ -144,7 +144,7 @@ class AuthService {
       })
     }
 
-    if (user.email_verify_token === null) {
+    if (user.emailVerifyToken === null) {
       throw new ErrorWithStatus({
         message: 'Account has been verified',
         statusCode: HttpStatusCode.BadRequest,
@@ -180,14 +180,14 @@ class AuthService {
       })
     }
 
-    if (user.email_verify_token === null) {
+    if (user.emailVerifyToken === null) {
       throw new ErrorWithStatus({
         message: 'Account has been verified',
         statusCode: HttpStatusCode.BadRequest,
       })
     }
 
-    if (user.email_verify_token !== req.body.emailVerifyToken) {
+    if (user.emailVerifyToken !== req.body.emailVerifyToken) {
       throw new ErrorWithStatus({
         message: 'Invalid email verify token',
         statusCode: HttpStatusCode.Unauthorized,

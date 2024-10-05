@@ -2,15 +2,16 @@ import cors from 'cors'
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 
+import { initFolder } from '@/utils/files'
 import { openapiSpecification } from '@/utils/swagger'
 import envVariables from '@/schemas/env-variables.schema'
 import databaseService from '@/services/database.services'
+import { authorizationValidator } from '@/middlewares/validators.middleware'
 import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
 import authRouter from '@/routes/auth.routes'
 import tmdbRouter from '@/routes/tmdb.routes'
-import favoritesRouter from '@/routes/favorites.routes'
-import { authorizationValidator } from '@/middlewares/validators.middleware'
 import profileRouter from '@/routes/profile.routes'
+import favoritesRouter from '@/routes/favorites.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -20,6 +21,9 @@ databaseService.connect()
 
 // Quy định CORS
 app.use(cors({ origin: '*' }))
+
+// tạo folder uploads
+initFolder()
 
 // parse json của client gởi lên, chuyển thành dạnh object để xử lý
 app.use(express.json())

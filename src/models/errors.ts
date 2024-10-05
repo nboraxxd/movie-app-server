@@ -1,15 +1,31 @@
+import multer from 'multer'
 import { ZodIssueCode } from 'zod'
 import { HttpStatusCode, TStatusCode } from '@/constants/http-status-code'
 import { ValidationLocation } from '@/middlewares/validators.middleware'
 
-type ErrorsType = { code: ZodIssueCode; message: string; path: string; location: ValidationLocation }[]
+type ErrorsType = {
+  code: ZodIssueCode | multer.ErrorCode
+  message: string
+  path: string
+  location: ValidationLocation
+}[]
 
 export class ErrorWithStatus extends Error {
   statusCode: TStatusCode
+  errorInfo?: Record<string, any>
 
-  constructor({ message, statusCode }: { message: string; statusCode: TStatusCode }) {
+  constructor({
+    message,
+    statusCode,
+    errorInfo,
+  }: {
+    message: string
+    statusCode: TStatusCode
+    errorInfo?: Record<string, any>
+  }) {
     super(message)
     this.statusCode = statusCode
+    this.errorInfo = errorInfo
   }
 }
 

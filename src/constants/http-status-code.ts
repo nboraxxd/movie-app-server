@@ -5,6 +5,8 @@ export const HttpStatusCode = {
   Unauthorized: 401,
   Forbidden: 403,
   NotFound: 404,
+  PayloadTooLarge: 413,
+  UnsupportedMediaType: 415,
   UnprocessableEntity: 422,
   TooManyRequests: 429,
   InternalServerError: 500,

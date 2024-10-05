@@ -34,10 +34,10 @@ export const registerController = async (
 }
 
 export const resendEmailVerificationController = async (req: Request, res: Response<MessageResponseType>) => {
-  const { email_verify_token, email, name, _id } = req.user as User
+  const { emailVerifyToken, email, name, _id } = req.user as User
 
   const decodedEmailVerifyToken = await verifyToken({
-    token: email_verify_token as string,
+    token: emailVerifyToken as string,
     jwtKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
   })
 

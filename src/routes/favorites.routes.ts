@@ -10,7 +10,7 @@ const favoritesRouter = Router()
 favoritesRouter.post(
   '/',
   authorizationValidator({ isLoginRequired: true }),
-  zodValidator(addFavoriteBodySchema, 'body'),
+  zodValidator({ schema: addFavoriteBodySchema, location: 'body' }),
   wrapRequestHandler(addFavoriteController)
 )
 

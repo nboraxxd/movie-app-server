@@ -1,24 +1,31 @@
+import z from 'zod'
+import multer from 'multer'
 import omit from 'lodash/omit'
-import { Schema, ZodError } from 'zod'
 import { JsonWebTokenError } from 'jsonwebtoken'
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import { decodeAuthorizationToken } from '@/utils/jwt'
 import { capitalizeFirstLetter } from '@/utils/common'
+import { authorizationSchema } from '@/schemas/auth.schema'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { EntityError, ErrorWithStatusAndLocation } from '@/models/errors'
-import { authorizationSchema } from '@/schemas/auth.schema'
 
-export type ValidationLocation = 'body' | 'params' | 'query' | 'headers'
+export type ValidationLocation = 'body' | 'params' | 'query' | 'headers' | 'file'
 
-export const zodValidator = (
-  schema: Schema,
-  location: ValidationLocation,
+export const zodValidator = ({
+  schema,
+  location,
+  customPath,
+  customHandler,
+}: {
+  schema: z.Schema
+  location: ValidationLocation
+  customPath?: string
   customHandler?: (req: Request) => Promise<void>
-) => {
+}) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
-      req[location] = await schema.parseAsync(req[location])
+      await schema.parseAsync(req[location])
 
       if (customHandler) {
         await customHandler(req)
@@ -26,15 +33,15 @@ export const zodValidator = (
 
       next()
     } catch (error) {
-      if (error instanceof ZodError) {
-        if (location === 'body') {
+      if (error instanceof z.ZodError) {
+        if (location === 'body' || location === 'file') {
           next(
             new EntityError({
               message: `Validation error occurred in ${location}`,
               errors: error.errors.map((error) => ({
                 code: error.code,
                 message: error.message,
-                path: error.path.join('.'),
+                path: customPath ?? error.path.join('.'),
                 location,
               })),
             })
@@ -90,7 +97,7 @@ export const authorizationValidator = ({
         return
       }
 
-      if (error instanceof ZodError) {
+      if (error instanceof z.ZodError) {
         next(
           new ErrorWithStatusAndLocation({
             message: error.errors.map((error) => error.message).join(', '),
@@ -115,7 +122,7 @@ export const authorizationValidator = ({
 }
 
 export const tokenValidator = (
-  schema: Schema,
+  schema: z.Schema,
   tokenHandler?: (req: Request) => Promise<void>,
   customHandler?: (req: Request) => Promise<void>
 ) => {
@@ -133,7 +140,7 @@ export const tokenValidator = (
 
       next()
     } catch (error) {
-      if (error instanceof ZodError) {
+      if (error instanceof z.ZodError) {
         next(
           new ErrorWithStatusAndLocation({
             message: error.errors.map((error) => error.message).join(', '),
@@ -159,5 +166,22 @@ export const tokenValidator = (
         next(error)
       }
     }
+  }
+}
+
+export const fileValidator = (uploadFile: RequestHandler) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    uploadFile(req, res, (error: any) => {
+      if (error instanceof multer.MulterError) {
+        next(
+          new EntityError({
+            message: 'File validation error occurred',
+            errors: [{ code: error.code, message: error.message, location: 'file', path: error.field || '' }],
+          })
+        )
+      } else {
+        next(error)
+      }
+    })
   }
 }

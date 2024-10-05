@@ -7,9 +7,9 @@ export const getProfileResponseSchema = z.object({
     name: z.string(),
     email: z.string(),
     avatar: z.string().nullable(),
-    is_verified: z.boolean(),
-    created_at: z.date(),
-    updated_at: z.date(),
+    isVerified: z.boolean(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
   }),
 })
 

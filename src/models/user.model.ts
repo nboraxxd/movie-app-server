@@ -5,11 +5,11 @@ type UserType = {
   name: string
   email: string
   password: string
-  email_verify_token?: string
-  forgot_password_token?: string
+  emailVerifyToken?: string
+  forgotPasswordToken?: string
   avatar?: string
-  created_at?: Date
-  updated_at?: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export default class User {
@@ -17,11 +17,11 @@ export default class User {
   name: string
   email: string
   password: string
-  email_verify_token: string | null
-  forgot_password_token: string | null
+  emailVerifyToken: string | null
+  forgotPasswordToken: string | null
   avatar: string | null
-  created_at: Date
-  updated_at: Date
+  createdAt: Date
+  updatedAt: Date
 
   constructor(user: UserType) {
     const currentDate = new Date()
@@ -30,10 +30,10 @@ export default class User {
     this.name = user.name
     this.email = user.email
     this.password = user.password
-    this.email_verify_token = user.email_verify_token || null
-    this.forgot_password_token = user.forgot_password_token || null
+    this.emailVerifyToken = user.emailVerifyToken || null
+    this.forgotPasswordToken = user.forgotPasswordToken || null
     this.avatar = user.avatar || null
-    this.created_at = user.created_at || currentDate
-    this.updated_at = user.updated_at || currentDate
+    this.createdAt = user.createdAt || currentDate
+    this.updatedAt = user.updatedAt || currentDate
   }
 }

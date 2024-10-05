@@ -24,8 +24,8 @@ const tmdbRouter = Router()
 
 tmdbRouter.get(
   '/discover/:mediaType',
-  zodValidator(discoverParamsSchema, 'params'),
-  zodValidator(discoverQuerySchema, 'query'),
+  zodValidator({ schema: discoverParamsSchema, location: 'params' }),
+  zodValidator({ schema: discoverQuerySchema, location: 'query' }),
   wrapRequestHandler(discoverController)
 )
 
@@ -80,27 +80,27 @@ tmdbRouter.get(
  */
 tmdbRouter.get(
   '/trending/:trendingType?/:timeWindow?',
-  zodValidator(trendingParamsSchema, 'params'),
-  zodValidator(trendingQuerySchema, 'query'),
+  zodValidator({ schema: trendingParamsSchema, location: 'params' }),
+  zodValidator({ schema: trendingQuerySchema, location: 'query' }),
   wrapRequestHandler(trendingController)
 )
 
 tmdbRouter.get(
   '/top-rated/:topRatedType?',
-  zodValidator(topRatedParamsSchema, 'params'),
-  zodValidator(topRatedQuerySchema, 'query'),
+  zodValidator({ schema: topRatedParamsSchema, location: 'params' }),
+  zodValidator({ schema: topRatedQuerySchema, location: 'query' }),
   wrapRequestHandler(topRatedController)
 )
 
 tmdbRouter.get(
   '/movies/:movieId',
-  zodValidator(movieParamsSchema, 'params'),
+  zodValidator({ schema: movieParamsSchema, location: 'params' }),
   wrapRequestHandler(getMovieDetailController)
 )
 
 tmdbRouter.get(
   '/movies/:movieId/recommended',
-  zodValidator(movieParamsSchema, 'params'),
+  zodValidator({ schema: movieParamsSchema, location: 'params' }),
   wrapRequestHandler(getRecommendedMoviesController)
 )
 

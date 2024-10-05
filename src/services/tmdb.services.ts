@@ -101,7 +101,6 @@ class TMDBService {
       userId,
     })
 
-    console.log(mediaFavoritesMap)
     return {
       data: response.results.map((item) => {
         const backdropFullPath = item.backdrop_path

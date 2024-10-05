@@ -35,6 +35,12 @@ const envSchema = z.object({
   TMDB_IMAGE_W500_URL: z.string(),
   TMDB_IMAGE_W276_H350_URL: z.string(),
   TMDB_READ_ACCESS_TOKEN: z.string(),
+
+  CLOUDINARY_FOLDER: z.string(),
+  CLOUDINARY_CLOUD_NAME: z.string(),
+  CLOUDINARY_API_KEY: z.string(),
+  CLOUDINARY_SECRET_KEY: z.string(),
+  CLOUDINARY_AVATAR_SIZE_LIMIT: z.coerce.number(),
 })
 
 const envProject = envSchema.safeParse(process.env)

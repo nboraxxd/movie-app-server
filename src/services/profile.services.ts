@@ -24,9 +24,9 @@ class ProfileService {
       })
     }
 
-    return omit({ ...user, _id: user._id.toHexString(), is_verified: user.email_verify_token === null }, [
-      'email_verify_token',
-      'forgot_password_token',
+    return omit({ ...user, _id: user._id.toHexString(), isVerified: user.emailVerifyToken === null }, [
+      'emailVerifyToken',
+      'forgotPasswordToken',
       'password',
     ])
   }

@@ -130,7 +130,7 @@
  *      type: string
  *      nullable: true
  *      example: https://www.wayne-ent.dc/brucewayne.jpg
- *     is_verified:
+ *     isVerified:
  *      type: boolean
  *      example: true
  *     created_at:
