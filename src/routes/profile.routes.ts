@@ -2,9 +2,10 @@ import { Router } from 'express'
 
 import { uploadAvatar } from '@/utils/multer'
 import { wrapRequestHandler } from '@/utils/handlers'
-import { fileValidator, zodValidator } from '@/middlewares/validators.middleware'
-import { getProfileController, uploadAvatarController } from '@/controllers/profile.controllers'
 import { avatarSchema } from '@/schemas/files.schema'
+import { authorizationValidator, fileValidator, zodValidator } from '@/middlewares/validators.middleware'
+import { getProfileController, uploadAvatarController } from '@/controllers/profile.controllers'
+import authService from '@/services/auth.services'
 
 const profileRouter = Router()
 
@@ -37,7 +38,7 @@ const profileRouter = Router()
  *    '404':
  *     description: User not found
  */
-profileRouter.get('/', wrapRequestHandler(getProfileController))
+profileRouter.get('/', authorizationValidator({ isLoginRequired: true }), wrapRequestHandler(getProfileController))
 
 /**
  * @swagger
@@ -78,6 +79,7 @@ profileRouter.get('/', wrapRequestHandler(getProfileController))
  */
 profileRouter.post(
   '/upload-avatar',
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.checkUserVerification }),
   fileValidator(uploadAvatar),
   zodValidator({ schema: avatarSchema, customPath: 'avatar', location: 'file' }),
   wrapRequestHandler(uploadAvatarController)

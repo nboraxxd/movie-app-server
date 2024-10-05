@@ -4,12 +4,13 @@ import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
 import { addFavoriteController } from '@/controllers/favorites.controllers'
 import { addFavoriteBodySchema } from '@/schemas/favorite.schema'
+import authService from '@/services/auth.services'
 
 const favoritesRouter = Router()
 
 favoritesRouter.post(
   '/',
-  authorizationValidator({ isLoginRequired: true }),
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.checkUserVerification }),
   zodValidator({ schema: addFavoriteBodySchema, location: 'body' }),
   wrapRequestHandler(addFavoriteController)
 )

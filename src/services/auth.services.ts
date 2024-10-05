@@ -232,6 +232,26 @@ class AuthService {
     req.user = user
   }
 
+  async checkUserVerification(req: Request) {
+    const { userId } = req.decodedAuthorization as TokenPayload
+
+    const user = await profileService.findById(userId)
+
+    if (!user) {
+      throw new ErrorWithStatus({
+        message: 'User not found',
+        statusCode: HttpStatusCode.NotFound,
+      })
+    }
+
+    if (user.emailVerifyToken !== null) {
+      throw new ErrorWithStatus({
+        message: 'Email has not been verified',
+        statusCode: HttpStatusCode.Forbidden,
+      })
+    }
+  }
+
   async login(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
     const { iat, exp } = await this.decodeRefreshToken(refreshToken)

@@ -32,7 +32,7 @@ app.use('/api', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 
 app.use('/auth', authRouter)
 
-app.use('/profile', authorizationValidator({ isLoginRequired: true }), profileRouter)
+app.use('/profile', profileRouter)
 
 app.use('/tmdb', authorizationValidator({ isLoginRequired: false }), tmdbRouter)
 
