@@ -250,6 +250,8 @@ class AuthService {
         statusCode: HttpStatusCode.Forbidden,
       })
     }
+
+    req.user = user
   }
 
   async login(userId: string) {

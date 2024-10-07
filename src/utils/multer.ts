@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 export const uploadAvatar = multer({
   storage,
   limits: { fileSize: envVariables.CLOUDINARY_AVATAR_SIZE_LIMIT, files: 1 },
-  fileFilter(_req, file, cb) {
+  fileFilter(req, file, cb) {
     const filetypes = /jpeg|jpg|png/
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
     const mimetype = filetypes.test(file.mimetype)
@@ -28,7 +28,7 @@ export const uploadAvatar = multer({
     if (mimetype && extname) {
       return cb(null, true)
     } else {
-      cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'avatar'))
+      cb(null, false)
     }
   },
 }).single('avatar')

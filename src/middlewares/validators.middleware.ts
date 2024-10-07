@@ -25,6 +25,7 @@ export const zodValidator = ({
 }) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
+      console.log('🔥 ~ return ~ req[location]:', req[location])
       const parsedData = await schema.parseAsync(req[location])
       req[location] = {
         ...req[location],
@@ -175,7 +176,7 @@ export const tokenValidator = (
 
 export const fileValidator = (uploadFile: RequestHandler) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    uploadFile(req, res, (error: any) => {
+    uploadFile(req, res, (error) => {
       if (error instanceof multer.MulterError) {
         next(
           new EntityError({
