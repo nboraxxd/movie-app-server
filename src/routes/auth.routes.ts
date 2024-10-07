@@ -66,7 +66,7 @@ authRouter.post(
  *   - auth
  *   summary: Resend email verification
  *   description: Resend email verification using authorization token
- *   operationId: resend-email-verification
+ *   operationId: resendEmailVerification
  *   security:
  *    - bearerAuth: []
  *   responses:
@@ -103,7 +103,7 @@ authRouter.post(
  *   - auth
  *   summary: Verify email
  *   description: Verify email using email verify token
- *   operationId: verify-email
+ *   operationId: verifyEmail
  *   requestBody:
  *    description: Email verify token
  *    required: true
@@ -189,7 +189,7 @@ authRouter.post(
  *   - auth
  *   summary: Refresh token
  *   description: Refresh token using refresh token
- *   operationId: refresh-token
+ *   operationId: refreshToken
  *   requestBody:
  *    description: Refresh token
  *    required: true

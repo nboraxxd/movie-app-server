@@ -17,7 +17,7 @@ const profileRouter = Router()
  *   - profile
  *   summary: Get profile
  *   description: Get user profile by token
- *   operationId: get-profile
+ *   operationId: getProfile
  *   security:
  *    - bearerAuth: []
  *   responses:
@@ -32,7 +32,7 @@ const profileRouter = Router()
  *          type: string
  *          example: Get profile successful
  *         data:
- *          $ref: '#/components/schemas/userSchema'
+ *          $ref: '#/components/schemas/dataGetProfileResponseSchema'
  *    '401':
  *     description: Unauthorized
  *    '404':
@@ -48,7 +48,7 @@ profileRouter.get('/', authorizationValidator({ isLoginRequired: true }), wrapRe
  *   - profile
  *   summary: Upload avatar
  *   description: Upload user avatar
- *   operationId: upload-avatar
+ *   operationId: uploadAvatar
  *   security:
  *    - bearerAuth: []
  *   requestBody:

@@ -57,44 +57,9 @@
  *      type: string
  *      example: eyJhbGciOiJIUzI1N...
  *
- *   ForgotPasswordReqBody:
- *    required:
- *    - email
- *    type: object
- *    properties:
- *     email:
- *      type: string
- *      example: bruce@wayne.dc
- *
- *   VerifyForgotPasswordReqBody:
- *    required:
- *    - forgot_password_token
- *    type: object
- *    properties:
- *     forgot_password_token:
- *      type: string
- *      example: eyJhbGciOiJIUzI1N...
- *
- *   ResetPasswordReqBody:
- *    required:
- *    - forgot_password_token
- *    - password
- *    - confirmPassword
- *    type: object
- *    properties:
- *     forgot_password_token:
- *      type: string
- *      example: eyJhbGciOiJIUzI1N...
- *     password:
- *      type: string
- *      format: password
- *      example: Abcd12345@#
- *     confirmPassword:
- *      type: string
- *      format: password
- *      example: Abcd12345@#
- *
  *   avatarFileSchema:
+ *    required:
+ *    - avatar
  *    type: object
  *    properties:
  *     avatar:
@@ -102,27 +67,17 @@
  *      format: binary
  *      example: avatar.jpg
  *
- *   UpdateMeReqBody:
- *    type: object
- *    properties:
- *     name:
- *      type: string
- *      example: Bruce Wayne
- *     avatar:
- *      type: string
- *      example: https://www.wayne-ent.dc/brucewayne.jpg
- *
  *   dataAuthResponseSchema:
  *    type: object
  *    properties:
- *     access_token:
+ *     accessToken:
  *      type: string
  *      example: eyJhbGciOiJIUzI1N...
- *     refresh_token:
+ *     refreshToken:
  *      type: string
  *      example: eyJhbGciOiJIUzI1N...
  *
- *   userSchema:
+ *   dataGetProfileResponseSchema:
  *    type: object
  *    properties:
  *     _id:
@@ -141,52 +96,344 @@
  *     isVerified:
  *      type: boolean
  *      example: true
- *     created_at:
+ *     createdAt:
  *      type: string
  *      format: ISO 8601
  *      example: 2025-02-19T08:46:24.000Z
- *     updated_at:
+ *     updatedAt:
  *      type: string
  *      format: ISO 8601
  *      example: 2025-02-19T08:46:24.000Z
  *
- *   SuccessGetUserProfile:
+ *   paginationResponseSchema:
  *    type: object
  *    properties:
- *     _id:
+ *     currentPage:
+ *      type: integer
+ *      example: 1
+ *     totalPages:
+ *      type: integer
+ *      example: 10
+ *     count:
+ *      type: integer
+ *      example: 100
+ *
+ *   mediaItemSchema:
+ *    type: object
+ *    properties:
+ *     adult:
+ *      type: boolean
+ *      example: false
+ *     backdropPath:
  *      type: string
- *      example: 123abc...
- *     name:
- *      type: string
- *      example: Bruce Wayne
- *     email:
- *      type: string
- *      example: bruce@wayne.dc
- *     date_of_birth:
- *      type: string
- *      format: ISO 8601
- *      example: 1970-02-19T08:46:24.000Z
- *     tweeter_circle:
+ *      nullable: true
+ *      example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *     genreIds:
  *      type: array
  *      items:
- *       type: string
- *      example: [123abc..., 456def...]
- *     bio:
+ *       type: integer
+ *      example: [878, 53, 18, 27]
+ *     id:
+ *      type: integer
+ *      example: 1125510
+ *     originalLanguage:
  *      type: string
- *      example: I'm rich
- *     location:
+ *      example: "es"
+ *     originalTitle:
  *      type: string
- *      example: Gotham City
- *     website:
+ *      example: "El hoyo 2"
+ *     isFavorite:
+ *      type: boolean
+ *      nullable: true
+ *      example: false
+ *     overview:
  *      type: string
- *      example: https://brucewayne.dc
- *     username:
+ *      example: "After a mysterious..."
+ *     popularity:
+ *      type: number
+ *      format: float
+ *      example: 477.147
+ *     posterPath:
  *      type: string
- *      example: bruce_wayne
- *     avatar:
+ *      example: "https://image.tmdb.org/t/p/w500/izuzUb0sDokqp9o8utVfsrSJuy5.jpg"
+ *     releaseDate:
  *      type: string
- *      example: https://brucewayne.dc/avatar.jpg
- *     cover_photo:
+ *      format: date
+ *      example: "2024-09-27"
+ *     title:
  *      type: string
- *      example: https://brucewayne.dc/cover.jpg
+ *      example: "The Platform 2"
+ *     video:
+ *      type: boolean
+ *      example: false
+ *     voteAverage:
+ *      type: number
+ *      format: float
+ *      example: 5.7
+ *     voteCount:
+ *      type: integer
+ *      example: 219
+ *
+ *   dataTrendingResponseSchema:
+ *    type: array
+ *    items:
+ *     allOf:
+ *      - $ref: '#/components/schemas/mediaItemSchema'
+ *      - type: object
+ *        properties:
+ *         mediaType:
+ *          type: string
+ *          enum:
+ *          - movie
+ *          - tv
+ *          example: "movie"
+ *
+ *   dataDiscoverMoviesResponseSchema:
+ *    type: array
+ *    items:
+ *     $ref: '#/components/schemas/mediaItemSchema'
+ *
+ *   dataTopRatedMoviesResponseSchema:
+ *    type: array
+ *    items:
+ *     $ref: '#/components/schemas/mediaItemSchema'
+ *
+ *   movieDetailDataSchema:
+ *    allOf:
+ *     - $ref: '#/components/schemas/mediaItemSchema'
+ *     - type: object
+ *       properties:
+ *        belongsToCollection:
+ *         type: object
+ *         properties:
+ *          id:
+ *           type: integer
+ *           example: 123
+ *          name:
+ *           type: string
+ *           example: "The Dark Knight Collection"
+ *          posterPath:
+ *           type: string
+ *           nullable: true
+ *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *          backdropPath:
+ *           type: string
+ *           nullable: true
+ *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *        budget:
+ *         type: integer
+ *         example: 185000000
+ *        genres:
+ *         type: array
+ *         items:
+ *          type: object
+ *          properties:
+ *           id:
+ *            type: integer
+ *            example: 28
+ *           name:
+ *            type: string
+ *            example: "Action"
+ *         example: [{ "id": 28, "name": "Action" }]
+ *        homepage:
+ *         type: string
+ *         nullable: true
+ *         example: "https://www.thedarkknight.com"
+ *        imdbId:
+ *         type: string
+ *         nullable: true
+ *         example: "https://www.thedarkknight.com"
+ *        originalCountry:
+ *         type: array
+ *         items:
+ *          type: string
+ *         example: ["US", "GB"]
+ *        productionCompanies:
+ *         type: array
+ *         items:
+ *          type: object
+ *          properties:
+ *           id:
+ *            type: integer
+ *            example: 28
+ *           name:
+ *            type: string
+ *            example: "Action"
+ *           logoPath:
+ *            type: string
+ *            nullable: true
+ *            example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *           originCountry:
+ *            type: string
+ *            example: "US"
+ *        productionCountries:
+ *         type: array
+ *         items:
+ *          type: object
+ *          properties:
+ *           name:
+ *            type: string
+ *            example: "Action"
+ *           iso31661:
+ *            type: string
+ *            example: "US"
+ *        revenue:
+ *         type: integer
+ *         example: 1000000000
+ *        runtime:
+ *         type: integer
+ *         nullable: true
+ *         example: 152
+ *        spokenLanguages:
+ *         type: array
+ *         items:
+ *          type: object
+ *          properties:
+ *           name:
+ *            type: string
+ *            example: "English"
+ *           iso6391:
+ *            type: string
+ *            example: "en"
+ *           englishName:
+ *            type: string
+ *            example: "English"
+ *        status:
+ *         type: string
+ *         example: "Released"
+ *        tagline:
+ *         type: string
+ *         nullable: true
+ *         example: "Why so serious?"
+ *        credits:
+ *         type: object
+ *         properties:
+ *          cast:
+ *           type: array
+ *           items:
+ *            type: object
+ *            properties:
+ *             adult:
+ *              type: boolean
+ *              example: false
+ *             gender:
+ *              type: integer
+ *              nullable: true
+ *              example: 2
+ *             id:
+ *              type: integer
+ *              example: 123
+ *             knownForDepartment:
+ *              type: string
+ *              example: "Acting"
+ *             name:
+ *              type: string
+ *              example: "Christian Bale"
+ *             originalName:
+ *              type: string
+ *              example: "Christian Bale"
+ *             popularity:
+ *              type: number
+ *              format: float
+ *              example: 10.0
+ *             profilePath:
+ *              type: string
+ *              nullable: true
+ *              example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *             castId:
+ *              type: integer
+ *              example: 1
+ *             character:
+ *              type: string
+ *              example: "Bruce Wayne / Batman"
+ *             creditId:
+ *              type: string
+ *              example: "52fe4232c3a36847f800b579"
+ *             order:
+ *              type: integer
+ *              example: 0
+ *          crew:
+ *           type: array
+ *           items:
+ *            type: object
+ *            properties:
+ *             adult:
+ *              type: boolean
+ *              example: false
+ *             gender:
+ *              type: integer
+ *              nullable: true
+ *              example: 2
+ *             id:
+ *              type: integer
+ *              example: 123
+ *             knownForDepartment:
+ *              type: string
+ *              example: "Directing"
+ *             name:
+ *              type: string
+ *              example: "Christopher Nolan"
+ *             originalName:
+ *              type: string
+ *              example: "Christopher Nolan"
+ *             popularity:
+ *              type: number
+ *              format: float
+ *              example: 10.0
+ *             profilePath:
+ *              type: string
+ *              nullable: true
+ *              example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *             creditId:
+ *              type: string
+ *              example: "52fe4232c3a36847f800b579"
+ *             department:
+ *              type: string
+ *              example: "Directing"
+ *             job:
+ *              type: string
+ *              example: "Director"
+ *        videos:
+ *         type: object
+ *         properties:
+ *          results:
+ *           type: array
+ *           items:
+ *            type: object
+ *            properties:
+ *             id:
+ *              type: string
+ *              example: "5f4c3b7e9251410034f3e3b4"
+ *             iso6391:
+ *              type: string
+ *              example: "en"
+ *             iso31661:
+ *              type: string
+ *              example: "US"
+ *             name:
+ *              type: string
+ *              example: "The Dark Knight"
+ *             key:
+ *              type: string
+ *              example: "5f4c3b7e9251410034f3e3b4"
+ *             site:
+ *              type: string
+ *              example: "YouTube"
+ *             size:
+ *              type: integer
+ *              example: 1080
+ *             type:
+ *              type: string
+ *              example: "Trailer"
+ *             official:
+ *              type: boolean
+ *              example: true
+ *             publishedAt:
+ *              type: string
+ *              format: date-time
+ *              example: "2024-09-27T08:46:24.000Z"
+ *        certification:
+ *         type: string
+ *         nullable: true
+ *         example: "PG-13"
  */

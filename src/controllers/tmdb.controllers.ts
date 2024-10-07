@@ -19,5 +19,5 @@ export const trendingController = async (
     userId: tokenPayload?.userId,
   })
 
-  return res.json({ message: 'Get trending list successfully', data, pagination })
+  return res.json({ message: 'Get trending list successful', data, pagination })
 }

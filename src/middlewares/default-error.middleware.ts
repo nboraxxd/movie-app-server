@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express'
 import { ErrorWithStatus } from '@/models/errors'
 
 export function defaultErrorHandler(err: any, _req: Request, res: Response, _next: NextFunction) {
-  console.log('🍓 ERROR:', err)
+  console.log('🍓 ERROR:', err.message)
 
   if (err instanceof ErrorWithStatus) {
     const { statusCode, message, ...rest } = err

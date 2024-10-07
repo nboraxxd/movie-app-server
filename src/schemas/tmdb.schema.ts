@@ -103,12 +103,18 @@ const discoverySortBySchema = z.enum(
 
 export const discoverQuerySchema = z
   .object({
-    includeAdult: z.boolean().optional(),
-    includeVideo: z.boolean().optional(),
+    includeAdult: z
+      .string()
+      .refine((value) => value === 'true' || value === 'false', { message: 'includeAdult must be true or false' })
+      .optional(),
+    includeVideo: z
+      .string()
+      .refine((value) => value === 'true' || value === 'false', { message: 'includeVideo must be true or false' })
+      .optional(),
     page: queryPageSchema,
     sortBy: discoverySortBySchema.optional(),
-    voteAverageGte: z.number().optional(),
-    voteAverageLte: z.number().optional(),
+    voteAverageGte: z.coerce.number().optional(),
+    voteAverageLte: z.coerce.number().optional(),
     withGenres: z
       .string()
       .regex(/^(\d+)(,\d+)*$/)
@@ -340,7 +346,7 @@ export type TMDBTrendingResponseType = z.TypeOf<typeof tmdbTrendingResponseSchem
 
 export const trendingParamsSchema = z
   .object({
-    trendingType: z.enum(['all', 'movie', 'tv'], { message: 'Media type must be all, movie or tv' }).default('all'),
+    trendingType: z.enum(['all', 'movie', 'tv'], { message: 'Media type must be all, movie or tv' }),
     timeWindow: z.enum(['day', 'week'], { message: 'Time window must be day or week' }).default('day'),
   })
   .strict({ message: 'Additional properties not allowed' })

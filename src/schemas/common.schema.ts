@@ -17,7 +17,6 @@ export const queryPageSchema = z.coerce
   .int({ message: 'Page must be an integer' })
   .positive({ message: 'Page must be a positive number' })
   .default(1)
-  .optional()
 
 export const messageResponseSchema = z.object({
   message: z.string(),
