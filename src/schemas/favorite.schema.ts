@@ -2,13 +2,13 @@ import z from 'zod'
 
 const favoriteCollectionSchema = z.object({
   _id: z.string(),
-  user_id: z.string(),
-  media_id: z.number(),
+  userId: z.string(),
+  mediaId: z.number(),
   title: z.string(),
   type: z.enum(['movie', 'tv']),
-  poster_path: z.string().nullable(),
-  release_date: z.string(),
-  created_at: z.date(),
+  posterPath: z.string().nullable(),
+  releaseDate: z.string(),
+  createdAt: z.date(),
 })
 
 export type FavoriteCollectionType = z.TypeOf<typeof favoriteCollectionSchema>

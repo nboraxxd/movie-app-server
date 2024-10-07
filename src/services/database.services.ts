@@ -32,7 +32,7 @@ class DatabaseService {
   }
 
   get refreshTokens(): Collection<RefreshToken> {
-    return this.db.collection('refresh_tokens')
+    return this.db.collection('refreshTokens')
   }
 
   get favorites(): Collection<Favorite> {

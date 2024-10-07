@@ -2,32 +2,22 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-
+import { getMovieDetailParamsSchema } from '@/schemas/tmdb-movies.schema'
 import {
-  discoverController,
-  trendingController,
-  topRatedController,
-  getMovieDetailController,
-  getRecommendedMoviesController,
-} from '@/controllers/tmdb.controllers'
-import {
-  discoverParamsSchema,
   discoverQuerySchema,
+  topRatedQuerySchema,
   trendingParamsSchema,
   trendingQuerySchema,
-  topRatedQuerySchema,
-  topRatedParamsSchema,
-  movieParamsSchema,
 } from '@/schemas/tmdb.schema'
+import { trendingController } from '@/controllers/tmdb.controllers'
+import {
+  discoverMoviesController,
+  getMovieDetailController,
+  getRecommendedMoviesController,
+  topRatedMoviesController,
+} from '@/controllers/tmdb-movies.controllers'
 
 const tmdbRouter = Router()
-
-tmdbRouter.get(
-  '/discover/:mediaType',
-  zodValidator({ schema: discoverParamsSchema, location: 'params' }),
-  zodValidator({ schema: discoverQuerySchema, location: 'query' }),
-  wrapRequestHandler(discoverController)
-)
 
 /**
  * @swagger
@@ -86,21 +76,26 @@ tmdbRouter.get(
 )
 
 tmdbRouter.get(
-  '/top-rated/:topRatedType?',
-  zodValidator({ schema: topRatedParamsSchema, location: 'params' }),
+  '/movies/discover',
+  zodValidator({ schema: discoverQuerySchema, location: 'query' }),
+  wrapRequestHandler(discoverMoviesController)
+)
+
+tmdbRouter.get(
+  '/movies/top-rated',
   zodValidator({ schema: topRatedQuerySchema, location: 'query' }),
-  wrapRequestHandler(topRatedController)
+  wrapRequestHandler(topRatedMoviesController)
 )
 
 tmdbRouter.get(
   '/movies/:movieId',
-  zodValidator({ schema: movieParamsSchema, location: 'params' }),
+  zodValidator({ schema: getMovieDetailParamsSchema, location: 'params' }),
   wrapRequestHandler(getMovieDetailController)
 )
 
 tmdbRouter.get(
   '/movies/:movieId/recommended',
-  zodValidator({ schema: movieParamsSchema, location: 'params' }),
+  zodValidator({ schema: getMovieDetailParamsSchema, location: 'params' }),
   wrapRequestHandler(getRecommendedMoviesController)
 )
 

@@ -28,6 +28,6 @@ export const addFavoriteController = async (
 
   return res.json({
     message: 'Favorite added successfully',
-    data: { ...data, _id: data._id.toHexString(), user_id: data.user_id.toHexString() },
+    data: { ...data, _id: data._id.toHexString(), userId: data.userId.toHexString() },
   })
 }

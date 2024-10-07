@@ -2,33 +2,33 @@ import { ObjectId } from 'mongodb'
 
 type FavoriteType = {
   _id?: ObjectId
-  user_id: ObjectId
-  media_id: number
+  userId: ObjectId
+  mediaId: number
   title: string
   type: 'movie' | 'tv'
-  poster_path: string | null
-  release_date: string
-  created_at?: Date
+  posterPath: string | null
+  releaseDate: string
+  createdAt?: Date
 }
 
 export default class Favorite {
   _id?: ObjectId
-  user_id: ObjectId
-  media_id: number
+  userId: ObjectId
+  mediaId: number
   title: string
   type: 'movie' | 'tv'
-  poster_path: string | null
-  release_date: string
-  created_at: Date
+  posterPath: string | null
+  releaseDate: string
+  createdAt: Date
 
   constructor(favorite: FavoriteType) {
     this._id = favorite._id
-    this.user_id = favorite.user_id
-    this.media_id = favorite.media_id
+    this.userId = favorite.userId
+    this.mediaId = favorite.mediaId
     this.title = favorite.title
     this.type = favorite.type
-    this.poster_path = favorite.poster_path
-    this.release_date = favorite.release_date
-    this.created_at = favorite.created_at || new Date()
+    this.posterPath = favorite.posterPath
+    this.releaseDate = favorite.releaseDate
+    this.createdAt = favorite.createdAt || new Date()
   }
 }
