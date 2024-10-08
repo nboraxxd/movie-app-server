@@ -41,6 +41,8 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string(),
   CLOUDINARY_SECRET_KEY: z.string(),
   CLOUDINARY_AVATAR_SIZE_LIMIT: z.coerce.number(),
+
+  DOMAIN_ALLOW_LIST: z.string(),
 })
 
 const envProject = envSchema.safeParse(process.env)

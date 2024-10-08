@@ -20,7 +20,7 @@ const port = envVariables.PORT
 databaseService.connect()
 
 // Quy định CORS
-app.use(cors({ origin: '*' }))
+app.use(cors({ origin: envVariables.DOMAIN_ALLOW_LIST.split(', '), optionsSuccessStatus: 200 }))
 
 // tạo folder uploads
 initFolder()
