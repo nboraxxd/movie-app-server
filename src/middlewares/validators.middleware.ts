@@ -185,7 +185,7 @@ export const fileValidator = (uploadFile: RequestHandler) => {
           })
         )
       } else {
-        next(error)
+        next()
       }
     })
   }

@@ -15,6 +15,7 @@ export const getProfileController = async (req: Request, res: Response<GetProfil
 
 export const uploadAvatarController = async (req: Request, res: Response) => {
   const file = req.file as Express.Multer.File
+  console.log('🔥 ~ uploadAvatarController ~ file:', file)
 
   const result = await uploadToCloudinary(file)
 
