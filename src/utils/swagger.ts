@@ -25,8 +25,12 @@ const options: swaggerJSDoc.Options = {
         description: 'Operations about profile',
       },
       {
-        name: 'tmdb',
-        description: 'Operations about The Movie Database (TMDB)',
+        name: 'trending',
+        description: 'Operations about trending',
+      },
+      {
+        name: 'movies',
+        description: 'Operations about movies',
       },
       {
         name: 'favorites',

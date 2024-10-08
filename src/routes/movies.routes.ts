@@ -2,86 +2,23 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { getMovieDetailParamsSchema } from '@/schemas/tmdb-movies.schema'
-import {
-  discoverQuerySchema,
-  topRatedQuerySchema,
-  trendingParamsSchema,
-  trendingQuerySchema,
-} from '@/schemas/tmdb.schema'
-import { trendingController } from '@/controllers/tmdb.controllers'
+import { getMovieDetailParamsSchema } from '@/schemas/movies.schema'
+import { discoverQuerySchema, topRatedQuerySchema } from '@/schemas/common-media.schema'
 import {
   discoverMoviesController,
   getMovieDetailController,
   getRecommendedMoviesController,
   topRatedMoviesController,
-} from '@/controllers/tmdb-movies.controllers'
+} from '@/controllers/movies.controllers'
 
-const tmdbRouter = Router()
-
-/**
- * @swagger
- * /tmdb/trending/{trendingType}/{timeWindow}:
- *  get:
- *   tags:
- *   - tmdb
- *   summary: Get trending list
- *   description: Get trending list of movies and TV shows by time window
- *   operationId: trending
- *   parameters:
- *    - in: path
- *      name: trendingType
- *      required: true
- *      description: Type of trending list (all, movie, tv).
- *      schema:
- *       type: string
- *       example: all
- *    - in: path
- *      name: timeWindow
- *      required: false
- *      description: Time window of trending list (day, week). Default is day.
- *      schema:
- *       type: string
- *       example: day
- *    - in: query
- *      name: page
- *      required: false
- *      description: Page number of trending list. If not provided, page 1 will be used.
- *      schema:
- *       type: integer
- *       nullable: true
- *       example: null
- *   responses:
- *    '200':
- *     description: Get trending list successful
- *     content:
- *      application/json:
- *       schema:
- *        type: object
- *        properties:
- *         message:
- *          type: string
- *          example: Get trending list successful
- *         data:
- *          $ref: '#/components/schemas/dataTrendingResponseSchema'
- *         pagination:
- *          $ref: '#/components/schemas/paginationResponseSchema'
- *    '400':
- *     description: Bad request
- */
-tmdbRouter.get(
-  '/trending/:trendingType/:timeWindow?',
-  zodValidator({ schema: trendingParamsSchema, location: 'params' }),
-  zodValidator({ schema: trendingQuerySchema, location: 'query' }),
-  wrapRequestHandler(trendingController)
-)
+const moviesRouter = Router()
 
 /**
  * @swagger
- * /tmdb/movies/discover:
+ * /discover:
  *  get:
  *   tags:
- *   - tmdb
+ *   - movies
  *   summary: Get discover movies
  *   description: Get discover movies by query parameters
  *   operationId: discoverMovies
@@ -172,18 +109,18 @@ tmdbRouter.get(
  *    '400':
  *     description: Bad request
  */
-tmdbRouter.get(
-  '/movies/discover',
+moviesRouter.get(
+  '/discover',
   zodValidator({ schema: discoverQuerySchema, location: 'query' }),
   wrapRequestHandler(discoverMoviesController)
 )
 
 /**
  * @swagger
- * /tmdb/movies/top-rated:
+ * /top-rated:
  *  get:
  *   tags:
- *   - tmdb
+ *   - movies
  *   summary: Get top rated movies
  *   description: Get top rated movies with page number
  *   operationId: topRatedMovies
@@ -213,18 +150,18 @@ tmdbRouter.get(
  *    '400':
  *     description: Bad request
  */
-tmdbRouter.get(
-  '/movies/top-rated',
+moviesRouter.get(
+  '/top-rated',
   zodValidator({ schema: topRatedQuerySchema, location: 'query' }),
   wrapRequestHandler(topRatedMoviesController)
 )
 
 /**
  * @swagger
- * /tmdb/movies/{movieId}:
+ * /{movieId}:
  *  get:
  *   tags:
- *   - tmdb
+ *   - movies
  *   summary: Get movie detail
  *   description: Get movie detail by movie ID
  *   operationId: movieDetail
@@ -252,18 +189,18 @@ tmdbRouter.get(
  *    '400':
  *     description: Bad request
  */
-tmdbRouter.get(
-  '/movies/:movieId',
+moviesRouter.get(
+  '/:movieId',
   zodValidator({ schema: getMovieDetailParamsSchema, location: 'params' }),
   wrapRequestHandler(getMovieDetailController)
 )
 
 /**
  * @swagger
- * /tmdb/movies/{movieId}/recommended:
+ * /{movieId}/recommended:
  *  get:
  *   tags:
- *   - tmdb
+ *   - movies
  *   summary: Get recommended movies
  *   description: Get recommended movies by movie ID
  *   operationId: recommendedMovies
@@ -293,10 +230,10 @@ tmdbRouter.get(
  *    '400':
  *     description: Bad request
  */
-tmdbRouter.get(
-  '/movies/:movieId/recommended',
+moviesRouter.get(
+  '/:movieId/recommended',
   zodValidator({ schema: getMovieDetailParamsSchema, location: 'params' }),
   wrapRequestHandler(getRecommendedMoviesController)
 )
 
-export default tmdbRouter
+export default moviesRouter

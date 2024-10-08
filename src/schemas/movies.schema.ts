@@ -8,10 +8,10 @@ import {
   productionCountrySchema,
   spokenLanguageSchema,
   videoSchema,
-} from '@/schemas/tmdb.schema'
-import { tvDataSchema } from '@/schemas/tmdb-tv.schema'
+} from '@/schemas/common-media.schema'
+import { tvDataSchema } from '@/schemas/tv.schema'
 
-/* Common schema */
+/* Common movies schema */
 export const movieDataSchema = z.object({
   adult: z.boolean(),
   backdropPath: z.string().nullable(),

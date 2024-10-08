@@ -1,9 +1,7 @@
 import z from 'zod'
-import { queryPageSchema, paginationResponseSchema } from '@/schemas/common.schema'
-import { movieDataSchema } from '@/schemas/tmdb-movies.schema'
-import { tvDataSchema } from '@/schemas/tmdb-tv.schema'
+import { queryPageSchema } from '@/schemas/common.schema'
 
-/* Common schema */
+/* Common media schema */
 export const genreSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -132,7 +130,7 @@ export const topRatedQuerySchema = z
 
 export type TopRatedQueryType = z.TypeOf<typeof topRatedQuerySchema>
 
-/* TMDB server common schema */
+/* Common TMDB schema */
 const tmdbGenreSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -334,7 +332,7 @@ export type TMDBTopRatedTvResponseType = z.TypeOf<typeof tmdbTopRatedTvResponseS
 
 // const tmdbTvCastSchema = tmdbCastSchema.omit({ cast_id: true })
 
-/* Trending schema */
+/* TMDB trending schema */
 export const tmdbTrendingResponseSchema = z.object({
   page: z.number(),
   results: z.array(z.union([tmdbMovieResultSchema, tmdbTvResultSchema])),
@@ -343,28 +341,3 @@ export const tmdbTrendingResponseSchema = z.object({
 })
 
 export type TMDBTrendingResponseType = z.TypeOf<typeof tmdbTrendingResponseSchema>
-
-export const trendingParamsSchema = z
-  .object({
-    trendingType: z.enum(['all', 'movie', 'tv'], { message: 'Media type must be all, movie or tv' }),
-    timeWindow: z.enum(['day', 'week'], { message: 'Time window must be day or week' }).default('day'),
-  })
-  .strict({ message: 'Additional properties not allowed' })
-
-export type TrendingParamsType = z.TypeOf<typeof trendingParamsSchema>
-
-export const trendingQuerySchema = z
-  .object({
-    page: queryPageSchema,
-  })
-  .strict({ message: 'Additional properties not allowed' })
-
-export type TrendingQueryType = z.TypeOf<typeof trendingQuerySchema>
-
-export const trendingResponseSchema = z.object({
-  message: z.string(),
-  data: z.array(z.union([movieDataSchema, tvDataSchema])),
-  pagination: paginationResponseSchema,
-})
-
-export type TrendingResponseType = z.TypeOf<typeof trendingResponseSchema>

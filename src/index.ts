@@ -9,9 +9,10 @@ import databaseService from '@/services/database.services'
 import { authorizationValidator } from '@/middlewares/validators.middleware'
 import { defaultErrorHandler } from '@/middlewares/default-error.middleware'
 import authRouter from '@/routes/auth.routes'
-import tmdbRouter from '@/routes/tmdb.routes'
+import trendingRouter from '@/routes/trending.routes'
 import profileRouter from '@/routes/profile.routes'
 import favoritesRouter from '@/routes/favorites.routes'
+import moviesRouter from '@/routes/movies.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -34,7 +35,9 @@ app.use('/auth', authRouter)
 
 app.use('/profile', profileRouter)
 
-app.use('/tmdb', authorizationValidator({ isLoginRequired: false }), tmdbRouter)
+app.use('/trending', authorizationValidator({ isLoginRequired: false }), trendingRouter)
+
+app.use('/movies', authorizationValidator({ isLoginRequired: false }), moviesRouter)
 
 app.use('/favorites', favoritesRouter)
 

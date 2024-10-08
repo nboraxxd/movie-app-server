@@ -1,15 +1,15 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
-import tmdbMoviesService from '@/services/tmdb-movies.services'
-import { DiscoverQueryType, TopRatedQueryType } from '@/schemas/tmdb.schema'
+import moviesService from '@/services/movies.services'
+import { DiscoverQueryType, TopRatedQueryType } from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesResponseType,
   MovieDetailResponseType,
   GetMovieDetailParamsType,
   TopRatedMoviesResponseType,
   RecommendedMoviesResponseType,
-} from '@/schemas/tmdb-movies.schema'
+} from '@/schemas/movies.schema'
 
 export const discoverMoviesController = async (
   req: Request<ParamsDictionary, any, any, DiscoverQueryType>,
@@ -19,7 +19,7 @@ export const discoverMoviesController = async (
 
   const tokenPayload = req.decodedAuthorization
 
-  const { data, pagination } = await tmdbMoviesService.discoverMovies({
+  const { data, pagination } = await moviesService.discoverMovies({
     page,
     includeAdult,
     includeVideo,
@@ -41,7 +41,7 @@ export const topRatedMoviesController = async (
 
   const tokenPayload = req.decodedAuthorization
 
-  const { data, pagination } = await tmdbMoviesService.topRatedMovies({ page, userId: tokenPayload?.userId })
+  const { data, pagination } = await moviesService.topRatedMovies({ page, userId: tokenPayload?.userId })
 
   return res.json({ message: 'Get top rated movies list successful', data, pagination })
 }
@@ -54,7 +54,7 @@ export const getMovieDetailController = async (
 
   const tokenPayload = req.decodedAuthorization
 
-  const data = await tmdbMoviesService.getMovieDetail({ movieId, userId: tokenPayload?.userId })
+  const data = await moviesService.getMovieDetail({ movieId, userId: tokenPayload?.userId })
 
   return res.json({ message: 'Get movie detail successful', data })
 }
@@ -67,7 +67,7 @@ export const getRecommendedMoviesController = async (
 
   const tokenPayload = req.decodedAuthorization
 
-  const { data, pagination } = await tmdbMoviesService.getRecommendedMovies({ movieId, userId: tokenPayload?.userId })
+  const { data, pagination } = await moviesService.getRecommendedMovies({ movieId, userId: tokenPayload?.userId })
 
   return res.json({ message: 'Get recommended movies successful', data, pagination })
 }

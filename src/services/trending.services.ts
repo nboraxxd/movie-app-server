@@ -1,16 +1,12 @@
 import http from '@/utils/http'
 import favoritesService from '@/services/favorites.services'
-import { TVDataType } from '@/schemas/tmdb-tv.schema'
 import envVariables from '@/schemas/env-variables.schema'
-import { MovieDataType } from '@/schemas/tmdb-movies.schema'
-import {
-  TrendingParamsType,
-  TrendingQueryType,
-  TMDBTrendingResponseType,
-  TrendingResponseType,
-} from '@/schemas/tmdb.schema'
+import { TVDataType } from '@/schemas/tv.schema'
+import { MovieDataType } from '@/schemas/movies.schema'
+import { TMDBTrendingResponseType } from '@/schemas/common-media.schema'
+import { TrendingParamsType, TrendingQueryType, TrendingResponseType } from '@/schemas/trending.shema'
 
-class TMDBService {
+class TrendingService {
   async trending(
     payload: TrendingParamsType & TrendingQueryType & { userId?: string }
   ): Promise<Omit<TrendingResponseType, 'message'>> {
@@ -78,5 +74,5 @@ class TMDBService {
   }
 }
 
-const tmdbService = new TMDBService()
-export default tmdbService
+const trendingService = new TrendingService()
+export default trendingService

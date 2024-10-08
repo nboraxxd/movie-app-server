@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 
-import tmdbService from '@/services/tmdb.services'
-import { TrendingParamsType, TrendingQueryType, TrendingResponseType } from '@/schemas/tmdb.schema'
+import trendingService from '@/services/trending.services'
+import { TrendingParamsType, TrendingQueryType, TrendingResponseType } from '@/schemas/trending.shema'
 
 export const trendingController = async (
   req: Request<TrendingParamsType, any, any, TrendingQueryType>,
@@ -12,7 +12,7 @@ export const trendingController = async (
 
   const tokenPayload = req.decodedAuthorization
 
-  const { data, pagination } = await tmdbService.trending({
+  const { data, pagination } = await trendingService.trending({
     trendingType,
     timeWindow,
     page,

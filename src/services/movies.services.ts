@@ -14,17 +14,17 @@ import {
   SpokenLanguageType,
   VideoType,
   TMDBRecommendedMoviesResponseType,
-} from '@/schemas/tmdb.schema'
+} from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesResponseType,
   MovieDataType,
   MovieDetailDataType,
   RecommendedMoviesResponseType,
   TopRatedMoviesResponseType,
-} from '@/schemas/tmdb-movies.schema'
-import { TVDataType } from '@/schemas/tmdb-tv.schema'
+} from '@/schemas/movies.schema'
+import { TVDataType } from '@/schemas/tv.schema'
 
-class TMDBMoviesService {
+class MoviesService {
   async discoverMovies(
     payload: DiscoverQueryType & { userId?: string }
   ): Promise<Omit<DiscoverMoviesResponseType, 'message'>> {
@@ -295,5 +295,5 @@ class TMDBMoviesService {
   }
 }
 
-const tmdbMoviesService = new TMDBMoviesService()
-export default tmdbMoviesService
+const moviesService = new MoviesService()
+export default moviesService
