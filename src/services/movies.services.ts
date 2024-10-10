@@ -48,7 +48,7 @@ class MoviesService {
     })
 
     return {
-      data: response.results.map<Omit<MovieDataType, 'mediaType'>>(({ backdrop_path, poster_path, ...item }) => {
+      data: response.results.map<MovieDataType>(({ backdrop_path, poster_path, ...item }) => {
         const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
         const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
 
@@ -56,6 +56,7 @@ class MoviesService {
           adult: item.adult,
           genreIds: item.genre_ids,
           id: item.id,
+          mediaType: 'movie',
           originalLanguage: item.original_language,
           originalTitle: item.original_title,
           overview: item.overview,
@@ -86,7 +87,7 @@ class MoviesService {
     })
 
     return {
-      data: response.results.map<Omit<MovieDataType, 'mediaType'>>(({ backdrop_path, poster_path, ...item }) => {
+      data: response.results.map<MovieDataType>(({ backdrop_path, poster_path, ...item }) => {
         const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
         const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
 
@@ -95,8 +96,9 @@ class MoviesService {
           genreIds: item.genre_ids,
           backdropPath: backdropFullPath,
           id: item.id,
-          originalLanguage: item.original_language,
           isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes('movie') ?? false) : null,
+          mediaType: 'movie',
+          originalLanguage: item.original_language,
           originalTitle: item.original_title,
           overview: item.overview,
           popularity: item.popularity,

@@ -26,7 +26,7 @@ export type TVDataType = z.TypeOf<typeof tvDataSchema>
 /* Discover tv schema */
 export const discoverTvsResponseSchema = z.object({
   message: z.string(),
-  data: z.array(tvDataSchema.omit({ mediaType: true })),
+  data: z.array(tvDataSchema),
   pagination: paginationResponseSchema,
 })
 

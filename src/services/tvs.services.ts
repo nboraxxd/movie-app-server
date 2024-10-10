@@ -17,7 +17,7 @@ class TVsService {
     })
 
     return {
-      data: response.results.map<Omit<TVDataType, 'mediaType'>>(({ backdrop_path, poster_path, ...item }) => {
+      data: response.results.map<TVDataType>(({ backdrop_path, poster_path, ...item }) => {
         const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
         const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
 
@@ -34,6 +34,7 @@ class TVsService {
           posterPath: posterFullPath,
           firstAirDate: item.first_air_date,
           name: item.name,
+          mediaType: 'tv',
           originalCountry: item.original_country,
           voteAverage: item.vote_average,
           voteCount: item.vote_count,

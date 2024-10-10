@@ -69,7 +69,7 @@ export type MovieDetailDataType = z.TypeOf<typeof movieDetailDataSchema>
 /* Discover movies schema */
 export const discoverMoviesResponseSchema = z.object({
   message: z.string(),
-  data: z.array(movieDataSchema.omit({ mediaType: true })),
+  data: z.array(movieDataSchema),
   pagination: paginationResponseSchema,
 })
 
