@@ -25,7 +25,6 @@ export const zodValidator = ({
 }) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
-      console.log('🔥 ~ return ~ req[location]:', req[location])
       const parsedData = await schema.parseAsync(req[location])
       req[location] = {
         ...req[location],

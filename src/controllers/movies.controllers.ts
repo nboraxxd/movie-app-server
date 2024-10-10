@@ -30,7 +30,7 @@ export const discoverMoviesController = async (
     userId: tokenPayload?.userId,
   })
 
-  return res.json({ message: 'Get discover movies list successful', data, pagination })
+  return res.json({ message: 'Get discover movie list successful', data, pagination })
 }
 
 export const topRatedMoviesController = async (
@@ -43,7 +43,7 @@ export const topRatedMoviesController = async (
 
   const { data, pagination } = await moviesService.topRatedMovies({ page, userId: tokenPayload?.userId })
 
-  return res.json({ message: 'Get top rated movies list successful', data, pagination })
+  return res.json({ message: 'Get top rated movie list successful', data, pagination })
 }
 
 export const getMovieDetailController = async (

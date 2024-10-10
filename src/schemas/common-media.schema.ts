@@ -2,6 +2,10 @@ import z from 'zod'
 import { queryPageSchema } from '@/schemas/common.schema'
 
 /* Common media schema */
+export const mediaTypeSchema = z.enum(['movie', 'tv'], { message: 'Invalid media type' })
+
+export type MediaType = z.TypeOf<typeof mediaTypeSchema>
+
 export const genreSchema = z.object({
   id: z.number(),
   name: z.string(),

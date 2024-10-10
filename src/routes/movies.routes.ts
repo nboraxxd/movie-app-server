@@ -15,7 +15,7 @@ const moviesRouter = Router()
 
 /**
  * @swagger
- * /discover:
+ * /movies/discover:
  *  get:
  *   tags:
  *   - movies
@@ -93,7 +93,7 @@ const moviesRouter = Router()
  *       example: popularity.desc
  *   responses:
  *    '200':
- *     description: Get discover movies list successful
+ *     description: Get discover movie list successful
  *     content:
  *      application/json:
  *       schema:
@@ -101,7 +101,7 @@ const moviesRouter = Router()
  *        properties:
  *         message:
  *          type: string
- *          example: Get discover movies list successful
+ *          example: Get discover movie list successful
  *         data:
  *          $ref: '#/components/schemas/dataDiscoverMoviesResponseSchema'
  *         pagination:
@@ -117,7 +117,7 @@ moviesRouter.get(
 
 /**
  * @swagger
- * /top-rated:
+ * /movies/top-rated:
  *  get:
  *   tags:
  *   - movies
@@ -128,13 +128,13 @@ moviesRouter.get(
  *    - in: query
  *      name: page
  *      required: false
- *      description: Page number of trending list. If not provided, page 1 will be used.
+ *      description: Page number of top rated list. If not provided, page 1 will be used.
  *      schema:
  *       type: integer
  *       example: null
  *   responses:
  *    '200':
- *     description: Get top rated movies list successful
+ *     description: Get top rated movie list successful
  *     content:
  *      application/json:
  *       schema:
@@ -142,7 +142,7 @@ moviesRouter.get(
  *        properties:
  *         message:
  *          type: string
- *          example: Get top rated movies list successful
+ *          example: Get top rated movie list successful
  *         data:
  *          $ref: '#/components/schemas/dataTopRatedMoviesResponseSchema'
  *         pagination:
@@ -158,7 +158,7 @@ moviesRouter.get(
 
 /**
  * @swagger
- * /{movieId}:
+ * /movies/{movieId}:
  *  get:
  *   tags:
  *   - movies
@@ -197,7 +197,7 @@ moviesRouter.get(
 
 /**
  * @swagger
- * /{movieId}/recommended:
+ * /movies/{movieId}/recommended:
  *  get:
  *   tags:
  *   - movies

@@ -9,7 +9,7 @@ const trendingRouter = Router()
 
 /**
  * @swagger
- * /tmdb/trending/{trendingType}/{timeWindow}:
+ * /trending/{trendingType}/{timeWindow}:
  *  get:
  *   tags:
  *   - trending
@@ -58,7 +58,7 @@ const trendingRouter = Router()
  *     description: Bad request
  */
 trendingRouter.get(
-  '/trending/:trendingType/:timeWindow?',
+  '/:trendingType/:timeWindow?',
   zodValidator({ schema: trendingParamsSchema, location: 'params' }),
   zodValidator({ schema: trendingQuerySchema, location: 'query' }),
   wrapRequestHandler(trendingController)

@@ -11,7 +11,7 @@ import {
 } from '@/schemas/common-media.schema'
 import { tvDataSchema } from '@/schemas/tv.schema'
 
-/* Common movies schema */
+/* Common schema */
 export const movieDataSchema = z.object({
   adult: z.boolean(),
   backdropPath: z.string().nullable(),

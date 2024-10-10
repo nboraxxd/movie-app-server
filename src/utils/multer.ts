@@ -1,10 +1,11 @@
 import path from 'path'
 import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
-import envVariables from '@/schemas/env-variables.schema'
+
+import { AVATAR_SIZE_LIMIT } from '@/constants'
 
 export const uploadAvatar = multer({
-  limits: { fileSize: envVariables.CLOUDINARY_AVATAR_SIZE_LIMIT },
+  limits: { fileSize: AVATAR_SIZE_LIMIT },
   fileFilter(_req, file, cb) {
     const filetypes = /jpeg|jpg|png/
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase())

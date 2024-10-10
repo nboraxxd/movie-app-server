@@ -13,6 +13,7 @@ import trendingRouter from '@/routes/trending.routes'
 import profileRouter from '@/routes/profile.routes'
 import favoritesRouter from '@/routes/favorites.routes'
 import moviesRouter from '@/routes/movies.routes'
+import tvsRouter from '@/routes/tvs.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -38,6 +39,8 @@ app.use('/profile', profileRouter)
 app.use('/trending', authorizationValidator({ isLoginRequired: false }), trendingRouter)
 
 app.use('/movies', authorizationValidator({ isLoginRequired: false }), moviesRouter)
+
+app.use('/tvs', authorizationValidator({ isLoginRequired: false }), tvsRouter)
 
 app.use('/favorites', favoritesRouter)
 

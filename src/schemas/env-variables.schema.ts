@@ -40,7 +40,6 @@ const envSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string(),
   CLOUDINARY_API_KEY: z.string(),
   CLOUDINARY_SECRET_KEY: z.string(),
-  CLOUDINARY_AVATAR_SIZE_LIMIT: z.coerce.number(),
 
   DOMAIN_ALLOW_LIST: z.string(),
 })

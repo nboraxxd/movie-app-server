@@ -24,15 +24,15 @@ export const tvDataSchema = z.object({
 export type TVDataType = z.TypeOf<typeof tvDataSchema>
 
 /* Discover tv schema */
-export const discoverTvResponseSchema = z.object({
+export const discoverTvsResponseSchema = z.object({
   message: z.string(),
   data: z.array(tvDataSchema.omit({ mediaType: true })),
   pagination: paginationResponseSchema,
 })
 
-export type DiscoverTvResponseType = z.TypeOf<typeof discoverTvResponseSchema>
+export type DiscoverTvsResponseType = z.TypeOf<typeof discoverTvsResponseSchema>
 
 /* Top rated tv schema */
-export const topRatedTvResponseSchema = discoverTvResponseSchema
+export const topRatedTvsResponseSchema = discoverTvsResponseSchema
 
-export type TopRatedTvResponseType = z.TypeOf<typeof topRatedTvResponseSchema>
+export type TopRatedTvsResponseType = z.TypeOf<typeof topRatedTvsResponseSchema>

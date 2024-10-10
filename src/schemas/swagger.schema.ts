@@ -118,7 +118,7 @@
  *      type: integer
  *      example: 100
  *
- *   mediaItemSchema:
+ *   movieItemSchema:
  *    type: object
  *    properties:
  *     adult:
@@ -174,11 +174,69 @@
  *      type: integer
  *      example: 219
  *
+ *   tvItemSchema:
+ *    type: object
+ *    properties:
+ *     adult:
+ *      type: boolean
+ *      example: false
+ *     backdropPath:
+ *      type: string
+ *      nullable: true
+ *      example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *     firstAirDate:
+ *      type: string
+ *      format: date
+ *      example: "2024-09-27"
+ *     genreIds:
+ *      type: array
+ *      items:
+ *       type: integer
+ *      example: [878, 53, 18, 27]
+ *     id:
+ *      type: integer
+ *      example: 1125510
+ *     name:
+ *      type: string
+ *      example: "The Platform 2"
+ *     originalCountry:
+ *      type: array
+ *      items:
+ *       type: string
+ *       example: ["US", "GB"]
+ *     originalLanguage:
+ *      type: string
+ *      example: "es"
+ *     originalName:
+ *      type: string
+ *      example: "El hoyo 2"
+ *     isFavorite:
+ *      type: boolean
+ *      nullable: true
+ *      example: false
+ *     overview:
+ *      type: string
+ *      example: "After a mysterious..."
+ *     popularity:
+ *      type: number
+ *      format: float
+ *      example: 477.147
+ *     posterPath:
+ *      type: string
+ *      example: "https://image.tmdb.org/t/p/w500/izuzUb0sDokqp9o8utVfsrSJuy5.jpg"
+ *     voteAverage:
+ *      type: number
+ *      format: float
+ *      example: 5.7
+ *     voteCount:
+ *      type: integer
+ *      example: 219
+ *
  *   dataTrendingResponseSchema:
  *    type: array
  *    items:
  *     allOf:
- *      - $ref: '#/components/schemas/mediaItemSchema'
+ *      - $ref: '#/components/schemas/movieItemSchema'
  *      - type: object
  *        properties:
  *         mediaType:
@@ -191,16 +249,16 @@
  *   dataDiscoverMoviesResponseSchema:
  *    type: array
  *    items:
- *     $ref: '#/components/schemas/mediaItemSchema'
+ *     $ref: '#/components/schemas/movieItemSchema'
  *
  *   dataTopRatedMoviesResponseSchema:
  *    type: array
  *    items:
- *     $ref: '#/components/schemas/mediaItemSchema'
+ *     $ref: '#/components/schemas/movieItemSchema'
  *
  *   movieDetailDataSchema:
  *    allOf:
- *     - $ref: '#/components/schemas/mediaItemSchema'
+ *     - $ref: '#/components/schemas/movieItemSchema'
  *     - type: object
  *       properties:
  *        belongsToCollection:
@@ -436,4 +494,9 @@
  *         type: string
  *         nullable: true
  *         example: "PG-13"
+ *
+ *   dataTopRatedTvsResponseSchema:
+ *    type: array
+ *    items:
+ *     $ref: '#/components/schemas/tvItemSchema'
  */

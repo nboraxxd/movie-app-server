@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import { uploadAvatar } from '@/utils/multer'
 import { wrapRequestHandler } from '@/utils/handlers'
-import { avatarSchema } from '@/schemas/files.schema'
+import { avatarSchema } from '@/schemas/profile.schema'
 import { authorizationValidator, fileValidator, zodValidator } from '@/middlewares/validators.middleware'
 import { getProfileController, uploadAvatarController } from '@/controllers/profile.controllers'
 import authService from '@/services/auth.services'
