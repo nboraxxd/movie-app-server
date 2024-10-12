@@ -1,8 +1,7 @@
 import z from 'zod'
-import { paginationResponseSchema } from '@/schemas/common.schema'
+import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
 import {
-  castSchema,
-  crewSchema,
+  discoverySortBySchema,
   genreSchema,
   productionCompanySchema,
   productionCountrySchema,
@@ -12,6 +11,39 @@ import {
 import { tvDataSchema } from '@/schemas/tv.schema'
 
 /* Common schema */
+export const movieCastSchema = z.object({
+  adult: z.boolean(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  knownForDepartment: z.string(),
+  name: z.string(),
+  originalName: z.string(),
+  popularity: z.number(),
+  profilePath: z.string().nullable(),
+  castId: z.number(),
+  character: z.string(),
+  creditId: z.string(),
+  order: z.number(),
+})
+
+export type MovieCastType = z.TypeOf<typeof movieCastSchema>
+
+export const movieCrewSchema = z.object({
+  adult: z.boolean(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  knownForDepartment: z.string(),
+  name: z.string(),
+  originalName: z.string(),
+  popularity: z.number(),
+  profilePath: z.string().nullable(),
+  creditId: z.string(),
+  department: z.string(),
+  job: z.string(),
+})
+
+export type MovieCrewType = z.TypeOf<typeof movieCrewSchema>
+
 export const movieDataSchema = z.object({
   adult: z.boolean(),
   backdropPath: z.string().nullable(),
@@ -55,8 +87,8 @@ export const movieDetailDataSchema = movieDataSchema.omit({ mediaType: true, gen
   status: z.string(),
   tagline: z.string().nullable(),
   credits: z.object({
-    cast: z.array(castSchema),
-    crew: z.array(crewSchema),
+    cast: z.array(movieCastSchema),
+    crew: z.array(movieCrewSchema),
   }),
   videos: z.object({
     results: z.array(videoSchema),
@@ -67,6 +99,29 @@ export const movieDetailDataSchema = movieDataSchema.omit({ mediaType: true, gen
 export type MovieDetailDataType = z.TypeOf<typeof movieDetailDataSchema>
 
 /* Discover movies schema */
+export const discoverMoviesQuerySchema = z
+  .object({
+    includeAdult: z
+      .string()
+      .refine((value) => value === 'true' || value === 'false', { message: 'includeAdult must be true or false' })
+      .optional(),
+    includeVideo: z
+      .string()
+      .refine((value) => value === 'true' || value === 'false', { message: 'includeVideo must be true or false' })
+      .optional(),
+    page: queryPageSchema.optional(),
+    sortBy: discoverySortBySchema.optional(),
+    voteAverageGte: z.coerce.number().optional(),
+    voteAverageLte: z.coerce.number().optional(),
+    withGenres: z
+      .string()
+      .regex(/^(\d+)(,\d+)*$/)
+      .optional(),
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type DiscoverMoviesQueryType = z.TypeOf<typeof discoverMoviesQuerySchema>
+
 export const discoverMoviesResponseSchema = z.object({
   message: z.string(),
   data: z.array(movieDataSchema),

@@ -2,8 +2,8 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { getMovieDetailParamsSchema } from '@/schemas/movies.schema'
-import { discoverQuerySchema, topRatedQuerySchema } from '@/schemas/common-media.schema'
+import { topRatedQuerySchema } from '@/schemas/common-media.schema'
+import { discoverMoviesQuerySchema, getMovieDetailParamsSchema } from '@/schemas/movies.schema'
 import {
   discoverMoviesController,
   getMovieDetailController,
@@ -111,7 +111,7 @@ const moviesRouter = Router()
  */
 moviesRouter.get(
   '/discover',
-  zodValidator({ schema: discoverQuerySchema, location: 'query' }),
+  zodValidator({ schema: discoverMoviesQuerySchema, location: 'query' }),
   wrapRequestHandler(discoverMoviesController)
 )
 
@@ -201,8 +201,8 @@ moviesRouter.get(
  *  get:
  *   tags:
  *   - movies
- *   summary: Get recommended movies
- *   description: Get recommended movies by movie ID
+ *   summary: Get recommended
+ *   description: Get recommended by movie ID
  *   operationId: recommendedMovies
  *   parameters:
  *    - in: path
@@ -214,7 +214,7 @@ moviesRouter.get(
  *       example: 155
  *   responses:
  *    '200':
- *     description: Get recommended movies successful
+ *     description: Get recommended successful
  *     content:
  *      application/json:
  *       schema:
@@ -222,9 +222,9 @@ moviesRouter.get(
  *        properties:
  *         message:
  *          type: string
- *          example: Get recommended movies successful
+ *          example: Get recommended successful
  *         data:
- *          $ref: '#/components/schemas/dataRecommendedMoviesResponseSchema'
+ *          $ref: '#/components/schemas/dataRecommendedResponseSchema'
  *         pagination:
  *          $ref: '#/components/schemas/paginationResponseSchema'
  *    '400':

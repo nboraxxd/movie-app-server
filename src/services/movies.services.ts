@@ -1,14 +1,12 @@
 import http from '@/utils/http'
 import favoritesService from '@/services/favorites.services'
 import envVariables from '@/schemas/env-variables.schema'
+import { TVDataType } from '@/schemas/tv.schema'
 import {
-  DiscoverQueryType,
   TMDBDiscoverMovieResponseType,
   TMDBTopRatedMoviesResponseType,
   TopRatedQueryType,
   TMDBMovieDetailResponseType,
-  CrewType,
-  CastType,
   ProductionCompanyType,
   ProductionCountryType,
   SpokenLanguageType,
@@ -16,17 +14,19 @@ import {
   TMDBRecommendedMoviesResponseType,
 } from '@/schemas/common-media.schema'
 import {
+  DiscoverMoviesQueryType,
   DiscoverMoviesResponseType,
+  MovieCastType,
+  MovieCrewType,
   MovieDataType,
   MovieDetailDataType,
   RecommendedMoviesResponseType,
   TopRatedMoviesResponseType,
 } from '@/schemas/movies.schema'
-import { TVDataType } from '@/schemas/tv.schema'
 
 class MoviesService {
   async discoverMovies(
-    payload: DiscoverQueryType & { userId?: string }
+    payload: DiscoverMoviesQueryType & { userId?: string }
   ): Promise<Omit<DiscoverMoviesResponseType, 'message'>> {
     const { includeAdult, includeVideo, page, sortBy, voteAverageGte, voteAverageLte, withGenres, userId } = payload
 
@@ -127,7 +127,7 @@ class MoviesService {
     const certification =
       response.release_dates.results.find((item) => item.iso_3166_1 === 'US')?.release_dates[0].certification || null
 
-    const formattedCrew = response.credits.crew.map<CrewType>((item) => {
+    const formattedCrew = response.credits.crew.map<MovieCrewType>((item) => {
       const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
 
       return {
@@ -144,7 +144,7 @@ class MoviesService {
         profilePath: profileFullPath,
       }
     })
-    const formattedCast = response.credits.cast.map<CastType>((item) => {
+    const formattedCast = response.credits.cast.map<MovieCastType>((item) => {
       const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
 
       return {

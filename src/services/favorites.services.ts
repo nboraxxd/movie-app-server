@@ -2,13 +2,14 @@ import { ObjectId, WithId } from 'mongodb'
 
 import Favorite from '@/models/favorite.model'
 import databaseService from '@/services/database.services'
+import { MediaType } from '@/schemas/common-media.schema'
 import { AddFavoriteBodyType } from '@/schemas/favorite.schema'
 
 class FavoritesService {
-  async getMediaFavoritesMap(payload: { medias: Array<{ id: number; type: 'movie' | 'tv' }>; userId?: string }) {
+  async getMediaFavoritesMap(payload: { medias: Array<{ id: number; type: MediaType }>; userId?: string }) {
     const { medias, userId } = payload
 
-    const mediaFavoritesMap: Record<number, Array<'movie' | 'tv'>> = {}
+    const mediaFavoritesMap: Record<number, Array<MediaType>> = {}
 
     if (userId) {
       const favoriteRecords = await databaseService.favorites

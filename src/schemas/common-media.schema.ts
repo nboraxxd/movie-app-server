@@ -35,39 +35,6 @@ export const spokenLanguageSchema = z.object({
 
 export type SpokenLanguageType = z.TypeOf<typeof spokenLanguageSchema>
 
-export const castSchema = z.object({
-  adult: z.boolean(),
-  gender: z.number().nullable(),
-  id: z.number(),
-  knownForDepartment: z.string(),
-  name: z.string(),
-  originalName: z.string(),
-  popularity: z.number(),
-  profilePath: z.string().nullable(),
-  castId: z.number(),
-  character: z.string(),
-  creditId: z.string(),
-  order: z.number(),
-})
-
-export type CastType = z.TypeOf<typeof castSchema>
-
-export const crewSchema = z.object({
-  adult: z.boolean(),
-  gender: z.number().nullable(),
-  id: z.number(),
-  knownForDepartment: z.string(),
-  name: z.string(),
-  originalName: z.string(),
-  popularity: z.number(),
-  profilePath: z.string().nullable(),
-  creditId: z.string(),
-  department: z.string(),
-  job: z.string(),
-})
-
-export type CrewType = z.TypeOf<typeof crewSchema>
-
 export const videoSchema = z.object({
   iso6391: z.string(),
   iso31661: z.string(),
@@ -83,7 +50,7 @@ export const videoSchema = z.object({
 
 export type VideoType = z.TypeOf<typeof videoSchema>
 
-const discoverySortBySchema = z.enum(
+export const discoverySortBySchema = z.enum(
   [
     'original_title.asc',
     'original_title.desc',
@@ -102,29 +69,6 @@ const discoverySortBySchema = z.enum(
   ],
   { message: 'Invalid sort by value' }
 )
-
-export const discoverQuerySchema = z
-  .object({
-    includeAdult: z
-      .string()
-      .refine((value) => value === 'true' || value === 'false', { message: 'includeAdult must be true or false' })
-      .optional(),
-    includeVideo: z
-      .string()
-      .refine((value) => value === 'true' || value === 'false', { message: 'includeVideo must be true or false' })
-      .optional(),
-    page: queryPageSchema,
-    sortBy: discoverySortBySchema.optional(),
-    voteAverageGte: z.coerce.number().optional(),
-    voteAverageLte: z.coerce.number().optional(),
-    withGenres: z
-      .string()
-      .regex(/^(\d+)(,\d+)*$/)
-      .optional(),
-  })
-  .strict({ message: 'Additional properties not allowed' })
-
-export type DiscoverQueryType = z.TypeOf<typeof discoverQuerySchema>
 
 export const topRatedQuerySchema = z
   .object({
@@ -160,7 +104,7 @@ const tmdbSpokenLanguageSchema = z.object({
   name: z.string(),
 })
 
-const tmdbCastSchema = z.object({
+const tmdbMovieCastSchema = z.object({
   adult: z.boolean(),
   gender: z.number().nullable(),
   id: z.number(),
@@ -175,7 +119,7 @@ const tmdbCastSchema = z.object({
   order: z.number(),
 })
 
-const tmdbCrewSchema = z.object({
+const tmdbMovieCrewSchema = z.object({
   adult: z.boolean(),
   gender: z.number().nullable(),
   id: z.number(),
@@ -189,7 +133,45 @@ const tmdbCrewSchema = z.object({
   job: z.string(),
 })
 
-export type TMDBCrewType = z.TypeOf<typeof tmdbCrewSchema>
+const tmdbTvCastSchema = z.object({
+  adult: z.boolean(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  known_for_department: z.string(),
+  name: z.string(),
+  order: z.number(),
+  original_name: z.string(),
+  popularity: z.number(),
+  profile_path: z.string().nullable(),
+  roles: z.array(
+    z.object({
+      credit_id: z.string(),
+      character: z.string(),
+      episode_count: z.number(),
+    })
+  ),
+  total_episode_count: z.number(),
+})
+
+const tmdbTvCrewSchema = z.object({
+  adult: z.boolean(),
+  department: z.string(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  jobs: z.array(
+    z.object({
+      credit_id: z.string(),
+      job: z.string(),
+      episode_count: z.number(),
+    })
+  ),
+  known_for_department: z.string(),
+  name: z.string(),
+  original_name: z.string(),
+  popularity: z.number(),
+  profile_path: z.string().nullable(),
+  total_episode_count: z.number(),
+})
 
 const tmdbVideoSchema = z.object({
   iso_639_1: z.string(),
@@ -218,6 +200,24 @@ const tmdbReleaseDateSchema = z.object({
   ),
 })
 
+const tmdbEpisodeToAir = z
+  .object({
+    id: z.number(),
+    name: z.string(),
+    overview: z.string(),
+    vote_average: z.number(),
+    vote_count: z.number(),
+    air_date: z.string(),
+    episode_number: z.number(),
+    episode_type: z.string(),
+    production_code: z.string(),
+    runtime: z.number(),
+    season_number: z.number(),
+    show_id: z.number(),
+    still_path: z.string().nullable(),
+  })
+  .nullable()
+
 export const tmdbMovieResultSchema = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().nullable(),
@@ -235,6 +235,8 @@ export const tmdbMovieResultSchema = z.object({
   vote_average: z.number(),
   vote_count: z.number(),
 })
+
+export type TMDBMovieResultType = z.TypeOf<typeof tmdbMovieResultSchema>
 
 export const tmdbTvResultSchema = z.object({
   adult: z.boolean(),
@@ -254,8 +256,9 @@ export const tmdbTvResultSchema = z.object({
   vote_count: z.number(),
 })
 
+export type TMDBTvResultType = z.TypeOf<typeof tmdbTvResultSchema>
+
 /* TMDB movie server schema */
-export type TMDBMovieResultType = z.TypeOf<typeof tmdbMovieResultSchema>
 
 export const tmdbDiscoverMovieResponseSchema = z.object({
   page: z.number(),
@@ -297,8 +300,8 @@ export const tmdbMovieDetailResponseSchema = tmdbMovieResultSchema.omit({ media_
   status: z.string(),
   tagline: z.string().nullable(),
   credits: z.object({
-    cast: z.array(tmdbCastSchema),
-    crew: z.array(tmdbCrewSchema),
+    cast: z.array(tmdbMovieCastSchema),
+    crew: z.array(tmdbMovieCrewSchema),
   }),
   videos: z.object({
     results: z.array(tmdbVideoSchema),
@@ -320,8 +323,6 @@ export const tmdbRecommendedMoviesResponseSchema = z.object({
 export type TMDBRecommendedMoviesResponseType = z.TypeOf<typeof tmdbRecommendedMoviesResponseSchema>
 
 /* TMDB tv server schema */
-export type TMDBTvResultType = z.TypeOf<typeof tmdbTvResultSchema>
-
 export const tmdbDiscoverTvResponseSchema = tmdbDiscoverMovieResponseSchema.omit({ results: true }).extend({
   results: z.array(tmdbTvResultSchema.omit({ media_type: true })),
 })
@@ -334,7 +335,76 @@ export const tmdbTopRatedTvResponseSchema = tmdbTopRatedMoviesResponseSchema.omi
 
 export type TMDBTopRatedTvResponseType = z.TypeOf<typeof tmdbTopRatedTvResponseSchema>
 
-// const tmdbTvCastSchema = tmdbCastSchema.omit({ cast_id: true })
+export const tmdbTvDetailResponseSchema = tmdbTvResultSchema.omit({ media_type: true, genre_ids: true }).extend({
+  created_by: z.array(
+    z.object({
+      id: z.number(),
+      credit_id: z.string(),
+      name: z.string(),
+      original_name: z.string(),
+      gender: z.number().nullable(),
+      profile_path: z.string().nullable(),
+    })
+  ),
+  episode_run_time: z.array(z.number()),
+  genres: z.array(tmdbGenreSchema),
+  homepage: z.string().nullable(),
+  in_production: z.boolean(),
+  languages: z.array(z.string()),
+  last_air_date: z.string(),
+  last_episode_to_air: tmdbEpisodeToAir,
+  next_episode_to_air: tmdbEpisodeToAir,
+  networks: z.array(
+    z.object({
+      name: z.string(),
+      id: z.number(),
+      logo_path: z.string().nullable(),
+      original_country: z.string(),
+    })
+  ),
+  number_of_episodes: z.number(),
+  number_of_seasons: z.number(),
+  production_companies: z.array(tmdbProductionCompanySchema),
+  production_countries: z.array(tmdbProductionCountrySchema),
+  seasons: z.array(
+    z.object({
+      air_date: z.string().nullable(),
+      episode_count: z.number(),
+      id: z.number(),
+      name: z.string(),
+      overview: z.string(),
+      poster_path: z.string().nullable(),
+      season_number: z.number(),
+      vote_average: z.number(),
+    })
+  ),
+  spoken_languages: z.array(tmdbSpokenLanguageSchema),
+  status: z.string(),
+  type: z.string(),
+  tagline: z.string().nullable(),
+  videos: z.object({
+    results: z.array(tmdbVideoSchema),
+  }),
+  content_ratings: z.object({
+    results: z.array(
+      z.object({
+        descriptors: z.array(z.string()),
+        iso_3166_1: z.string(),
+        rating: z.string(),
+      })
+    ),
+  }),
+  aggregate_credits: z.object({
+    cast: z.array(tmdbTvCastSchema),
+    crew: z.array(tmdbTvCrewSchema),
+  }),
+})
+
+export type TMDBTvDetailResponseType = z.TypeOf<typeof tmdbTvDetailResponseSchema>
+
+export const tmdbRecommendedTvsResponseSchema = tmdbRecommendedMoviesResponseSchema
+
+export type TMDBRecommendedTvsResponseType = z.TypeOf<typeof tmdbRecommendedTvsResponseSchema>
 
 /* TMDB trending schema */
 export const tmdbTrendingResponseSchema = z.object({

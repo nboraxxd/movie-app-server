@@ -2,17 +2,18 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import moviesService from '@/services/movies.services'
-import { DiscoverQueryType, TopRatedQueryType } from '@/schemas/common-media.schema'
+import { TopRatedQueryType } from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesResponseType,
   MovieDetailResponseType,
   GetMovieDetailParamsType,
   TopRatedMoviesResponseType,
   RecommendedMoviesResponseType,
+  DiscoverMoviesQueryType,
 } from '@/schemas/movies.schema'
 
 export const discoverMoviesController = async (
-  req: Request<ParamsDictionary, any, any, DiscoverQueryType>,
+  req: Request<ParamsDictionary, any, any, DiscoverMoviesQueryType>,
   res: Response<DiscoverMoviesResponseType>
 ) => {
   const { page, includeAdult, includeVideo, sortBy, voteAverageGte, voteAverageLte, withGenres } = req.query
@@ -69,5 +70,5 @@ export const getRecommendedMoviesController = async (
 
   const { data, pagination } = await moviesService.getRecommendedMovies({ movieId, userId: tokenPayload?.userId })
 
-  return res.json({ message: 'Get recommended movies successful', data, pagination })
+  return res.json({ message: 'Get recommended successful', data, pagination })
 }
