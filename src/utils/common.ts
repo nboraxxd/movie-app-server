@@ -13,3 +13,15 @@ export function calculateRemainingTimeInSeconds(futureTime: Date) {
   const remainingTimeInMs = futureTime.getTime() - now.getTime()
   return Math.ceil(remainingTimeInMs / 1000)
 }
+
+export const escapeHtml = (text: string) => {
+  const map: Record<string, string> = {
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    "'": '&#39;',
+    '"': '&quot;',
+    '/': '&#47;',
+  }
+  return text.replace(/[<>&'"\\/]/g, (char: string): string => map[char])
+}
