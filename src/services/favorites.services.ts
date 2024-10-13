@@ -25,11 +25,11 @@ class FavoritesService {
         )
         .toArray()
 
-      for (const { mediaId, type } of favoriteRecords) {
+      for (const { mediaId, mediaType } of favoriteRecords) {
         if (mediaId in mediaFavoritesMap) {
-          mediaFavoritesMap[mediaId].push(type)
+          mediaFavoritesMap[mediaId].push(mediaType)
         } else {
-          mediaFavoritesMap[mediaId] = [type]
+          mediaFavoritesMap[mediaId] = [mediaType]
         }
       }
     }
@@ -38,7 +38,7 @@ class FavoritesService {
   }
 
   async addFavoriteMedia(payload: AddFavoriteBodyType & { userId: string }) {
-    const { mediaId, posterPath, releaseDate, title, type, userId } = payload
+    const { mediaId, mediaPoster, mediaReleaseDate, mediaTitle, mediaType, userId } = payload
 
     const favorite = await databaseService.favorites.findOneAndUpdate(
       { mediaId, userId: new ObjectId(userId) },
@@ -47,10 +47,10 @@ class FavoritesService {
           _id: new ObjectId(),
           userId: new ObjectId(userId),
           mediaId,
-          title,
-          type,
-          posterPath,
-          releaseDate,
+          mediaPoster,
+          mediaReleaseDate,
+          mediaTitle,
+          mediaType,
         }),
       },
       {

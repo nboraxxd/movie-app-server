@@ -9,16 +9,16 @@ export const addFavoriteController = async (
   req: Request<ParamsDictionary, any, AddFavoriteBodyType>,
   res: Response<AddFavoriteResponseType>
 ) => {
-  const { mediaId, posterPath, releaseDate, title, type } = req.body
+  const { mediaId, mediaPoster, mediaReleaseDate, mediaTitle, mediaType } = req.body
 
   const { userId } = req.decodedAuthorization as TokenPayload
 
   const { data, isNew } = await favoritesService.addFavoriteMedia({
     mediaId,
-    posterPath,
-    releaseDate,
-    title,
-    type,
+    mediaPoster,
+    mediaReleaseDate,
+    mediaTitle,
+    mediaType,
     userId,
   })
 
