@@ -7,7 +7,12 @@ import databaseService from '@/services/database.services'
 
 class ProfileService {
   async findById(userId: string) {
-    return databaseService.users.findOne({ _id: new ObjectId(userId) })
+    return databaseService.users.findOne(
+      { _id: new ObjectId(userId) },
+      {
+        projection: { password: 0, forgotPasswordToken: 0 },
+      }
+    )
   }
 
   async findByEmail(email: string) {
@@ -26,8 +31,6 @@ class ProfileService {
 
     return omit({ ...user, _id: user._id.toHexString(), isVerified: user.emailVerifyToken === null }, [
       'emailVerifyToken',
-      'forgotPasswordToken',
-      'password',
     ])
   }
 }

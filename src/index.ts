@@ -14,6 +14,7 @@ import profileRouter from '@/routes/profile.routes'
 import favoritesRouter from '@/routes/favorites.routes'
 import moviesRouter from '@/routes/movies.routes'
 import tvsRouter from '@/routes/tvs.routes'
+import commentsRouter from '@/routes/comments.routes'
 
 const app = express()
 const port = envVariables.PORT
@@ -23,6 +24,7 @@ databaseService.connect().then(() => {
   databaseService.indexUsers()
   databaseService.indexRefreshTokens()
   databaseService.indexFavorites()
+  databaseService.indexComments()
 })
 
 // Quy định CORS
@@ -47,6 +49,8 @@ app.use('/movies', authorizationValidator({ isLoginRequired: false }), moviesRou
 app.use('/tvs', authorizationValidator({ isLoginRequired: false }), tvsRouter)
 
 app.use('/favorites', favoritesRouter)
+
+app.use('/comments', commentsRouter)
 
 app.use(defaultErrorHandler)
 

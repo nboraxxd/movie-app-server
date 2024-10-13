@@ -1,9 +1,10 @@
 import { Collection, Db, MongoClient } from 'mongodb'
 
+import envVariables from '@/schemas/env-variables.schema'
 import User from '@/models/user.model'
+import Comment from '@/models/comment.model'
 import Favorite from '@/models/favorite.model'
 import RefreshToken from '@/models/refresh-token.model'
-import envVariables from '@/schemas/env-variables.schema'
 
 const uri = `mongodb+srv://${envVariables.DB_USERNAME}:${envVariables.DB_PASSWORD}@movie-app-singapore.s0ve5.mongodb.net/?retryWrites=true&w=majority&appName=${envVariables.DB_CLUSTER}`
 
@@ -28,26 +29,54 @@ class DatabaseService {
   }
 
   async indexUsers() {
-    const isExist = await this.users.indexExists('email_1')
-    if (isExist) return
+    const isExistCollection = await this.db.listCollections({ name: 'users' }).hasNext()
+    if (!isExistCollection) {
+      this.db.createCollection('users')
+    }
 
-    this.users.createIndex({ email: 1 }, { unique: true })
+    const isIndexExist = await this.users.indexExists('email_1')
+    if (!isIndexExist) {
+      this.users.createIndex({ email: 1 }, { unique: true })
+    }
   }
 
   async indexRefreshTokens() {
-    const isExist = await this.refreshTokens.indexExists(['token_1', 'exp_1'])
-    if (isExist) return
+    const isExistCollection = await this.db.listCollections({ name: 'refreshTokens' }).hasNext()
+    if (!isExistCollection) {
+      this.db.createCollection('refreshTokens')
+    }
 
-    this.refreshTokens.createIndex({ token: 1 })
-    this.refreshTokens.createIndex({ exp: 1 }, { expireAfterSeconds: 0 })
+    const isIndexExist = await this.refreshTokens.indexExists(['token_1', 'exp_1'])
+    if (!isIndexExist) {
+      this.refreshTokens.createIndex({ token: 1 })
+      this.refreshTokens.createIndex({ exp: 1 }, { expireAfterSeconds: 0 })
+    }
   }
 
   async indexFavorites() {
-    const isExist = await this.favorites.indexExists(['userId_1_mediaId_1_type_1', 'userId_1'])
-    if (isExist) return
+    const isExistCollection = await this.db.listCollections({ name: 'favorites' }).hasNext()
+    if (!isExistCollection) {
+      this.db.createCollection('favorites')
+    }
 
-    this.favorites.createIndex({ userId: 1, mediaId: 1, type: 1 })
-    this.favorites.createIndex({ userId: 1 })
+    const isIndexExist = await this.favorites.indexExists(['userId_1_mediaId_1_mediaType_1', 'userId_1'])
+    if (!isIndexExist) {
+      this.favorites.createIndex({ userId: 1, mediaId: 1, mediaType: 1 })
+      this.favorites.createIndex({ userId: 1 })
+    }
+  }
+
+  async indexComments() {
+    const isExistCollection = await this.db.listCollections({ name: 'comments' }).hasNext()
+    if (!isExistCollection) {
+      this.db.createCollection('comments')
+    }
+
+    const isIndexExist = await this.comments.indexExists(['mediaId_1_mediaType_1', 'userId_1'])
+    if (!isIndexExist) {
+      this.comments.createIndex({ mediaId: 1, mediaType: 1 })
+      this.comments.createIndex({ userId: 1 })
+    }
   }
 
   get users(): Collection<User> {
@@ -60,6 +89,10 @@ class DatabaseService {
 
   get favorites(): Collection<Favorite> {
     return this.db.collection('favorites')
+  }
+
+  get comments(): Collection<Comment> {
+    return this.db.collection('comments')
   }
 }
 

@@ -1,6 +1,6 @@
 import z from 'zod'
 
-const favoriteCollectionSchema = z.object({
+const favoriteDocumentSchema = z.object({
   _id: z.string(),
   userId: z.string(),
   mediaId: z.number(),
@@ -11,7 +11,7 @@ const favoriteCollectionSchema = z.object({
   createdAt: z.date(),
 })
 
-export type FavoriteCollectionType = z.TypeOf<typeof favoriteCollectionSchema>
+export type FavoriteDocumentType = z.TypeOf<typeof favoriteDocumentSchema>
 
 export const addFavoriteBodySchema = z
   .object({
@@ -27,7 +27,7 @@ export type AddFavoriteBodyType = z.TypeOf<typeof addFavoriteBodySchema>
 
 export const addFavoriteResponseSchema = z.object({
   message: z.string(),
-  data: z.nullable(favoriteCollectionSchema),
+  data: z.nullable(favoriteDocumentSchema),
 })
 
 export type AddFavoriteResponseType = z.TypeOf<typeof addFavoriteResponseSchema>

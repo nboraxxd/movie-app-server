@@ -1,11 +1,12 @@
 import { ObjectId } from 'mongodb'
+import { MediaType } from '@/schemas/common-media.schema'
 
 type FavoriteType = {
   _id?: ObjectId
   userId: ObjectId
   mediaId: number
   mediaTitle: string
-  mediaType: 'movie' | 'tv'
+  mediaType: MediaType
   mediaPoster: string | null
   mediaReleaseDate: string
   createdAt?: Date
@@ -16,7 +17,7 @@ export default class Favorite {
   userId: ObjectId
   mediaId: number
   mediaTitle: string
-  mediaType: 'movie' | 'tv'
+  mediaType: MediaType
   mediaPoster: string | null
   mediaReleaseDate: string
   createdAt: Date
