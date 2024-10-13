@@ -27,6 +27,29 @@ class DatabaseService {
     }
   }
 
+  async indexUsers() {
+    const isExist = await this.users.indexExists('email_1')
+    if (isExist) return
+
+    this.users.createIndex({ email: 1 }, { unique: true })
+  }
+
+  async indexRefreshTokens() {
+    const isExist = await this.refreshTokens.indexExists(['token_1', 'exp_1'])
+    if (isExist) return
+
+    this.refreshTokens.createIndex({ token: 1 })
+    this.refreshTokens.createIndex({ exp: 1 }, { expireAfterSeconds: 0 })
+  }
+
+  async indexFavorites() {
+    const isExist = await this.favorites.indexExists(['userId_1_mediaId_1_type_1', 'userId_1'])
+    if (isExist) return
+
+    this.favorites.createIndex({ userId: 1, mediaId: 1, type: 1 })
+    this.favorites.createIndex({ userId: 1 })
+  }
+
   get users(): Collection<User> {
     return this.db.collection<User>('users')
   }

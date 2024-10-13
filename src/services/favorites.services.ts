@@ -41,7 +41,7 @@ class FavoritesService {
     const { mediaId, posterPath, releaseDate, title, type, userId } = payload
 
     const favorite = await databaseService.favorites.findOneAndUpdate(
-      { media_id: mediaId, user_id: new ObjectId(userId) },
+      { mediaId, userId: new ObjectId(userId) },
       {
         $setOnInsert: new Favorite({
           _id: new ObjectId(),
@@ -67,7 +67,7 @@ class FavoritesService {
   }
 
   async getFavoritesByUserId(userId: string) {
-    return databaseService.favorites.find({ user_id: new ObjectId(userId) }).toArray()
+    return databaseService.favorites.find({ userId: new ObjectId(userId) }).toArray()
   }
 
   async getFavorite(payload: { mediaId: number; type: 'movie' | 'tv'; userId: string }) {

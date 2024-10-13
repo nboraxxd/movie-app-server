@@ -23,3 +23,7 @@ export const messageResponseSchema = z.object({
 })
 
 export type MessageResponseType = z.TypeOf<typeof messageResponseSchema>
+
+export const textSchema = z.object({
+  text: z.string(),
+})

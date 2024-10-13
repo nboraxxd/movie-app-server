@@ -861,6 +861,145 @@
  *         type: object
  *         properties:
  *          id:
- *          type: string
- *          example: "5f4c3b7e9251410034f3e3b4"
+ *           type: string
+ *           example: "5f4c3b7e9251410034f3e3b4"
+ *          iso6391:
+ *           type: string
+ *           example: "en"
+ *          iso31661:
+ *           type: string
+ *           example: "US"
+ *          name:
+ *           type: string
+ *           example: "The Dark Knight"
+ *          key:
+ *           type: string
+ *           example: "5f4c3b7e9251410034f3e3b4"
+ *          site:
+ *           type: string
+ *           example: "YouTube"
+ *          size:
+ *           type: integer
+ *           example: 1080
+ *          type:
+ *           type: string
+ *           example: "Trailer"
+ *          official:
+ *           type: boolean
+ *           example: true
+ *          publishedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2024-09-27T08:46:24.000Z"
+ *     aggregateCredits:
+ *      type: object
+ *      properties:
+ *       cast:
+ *        type: array
+ *        items:
+ *         type: object
+ *         properties:
+ *          adult:
+ *           type: boolean
+ *           example: false
+ *          gender:
+ *           type: integer
+ *           nullable: true
+ *           example: 2
+ *          id:
+ *           type: integer
+ *           example: 123
+ *          knownForDepartment:
+ *           type: string
+ *           example: "Acting"
+ *          name:
+ *           type: string
+ *           example: "Christian Bale"
+ *          order:
+ *           type: integer
+ *           example: 0
+ *          originalName:
+ *           type: string
+ *           example: "Christian Bale"
+ *          popularity:
+ *           type: number
+ *           format: float
+ *           example: 10.0
+ *          profilePath:
+ *           type: string
+ *           nullable: true
+ *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *          roles:
+ *           type: array
+ *           items:
+ *            type: object
+ *            properties:
+ *             creditId:
+ *              type: string
+ *              example: "52fe4232c3a36847f800b579"
+ *             character:
+ *              type: string
+ *              example: "Bruce Wayne / Batman"
+ *             episodeCount:
+ *              type: integer
+ *              example: 1
+ *          totalEpisodeCount:
+ *           type: integer
+ *           example: 1
+ *       crew:
+ *        type: array
+ *        items:
+ *         type: object
+ *         properties:
+ *          adult:
+ *           type: boolean
+ *           example: false
+ *          department:
+ *           type: string
+ *           example: "Directing"
+ *          gender:
+ *           type: integer
+ *           nullable: true
+ *           example: 2
+ *          id:
+ *           type: integer
+ *           example: 123
+ *          jobs:
+ *           type: array
+ *           items:
+ *            type: object
+ *            properties:
+ *             creditId:
+ *              type: string
+ *              example: "52fe4232c3a36847f800b579"
+ *             job:
+ *              type: string
+ *              example: "Director"
+ *             episodeCount:
+ *              type: integer
+ *              example: 1
+ *          knownForDepartment:
+ *           type: string
+ *           example: "Acting"
+ *          name:
+ *           type: string
+ *           example: "Christian Bale"
+ *          originalName:
+ *           type: string
+ *           example: "Christian Bale"
+ *          popularity:
+ *           type: number
+ *           format: float
+ *           example: 10.0
+ *          profilePath:
+ *           type: string
+ *           nullable: true
+ *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *          totalEpisodeCount:
+ *           type: integer
+ *           example: 1
+ *     certification:
+ *      type: string
+ *      nullable: true
+ *      example: "PG-13"
  */

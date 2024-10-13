@@ -125,7 +125,7 @@ class AuthService {
       databaseService.users.insertOne(
         new User({ _id: userId, email, name, password: hashPassword(password), emailVerifyToken })
       ),
-      databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: userId, token: refreshToken, iat, exp })),
+      databaseService.refreshTokens.insertOne(new RefreshToken({ userId, token: refreshToken, iat, exp })),
       this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
     ])
 
@@ -205,7 +205,7 @@ class AuthService {
         { $set: { email_verify_token: null }, $currentDate: { updated_at: true } }
       ),
       databaseService.refreshTokens.insertOne(
-        new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken, iat, exp })
+        new RefreshToken({ userId: new ObjectId(userId), token: refreshToken, iat, exp })
       ),
     ])
 
@@ -259,7 +259,7 @@ class AuthService {
     const { iat, exp } = await this.decodeRefreshToken(refreshToken)
 
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({ user_id: new ObjectId(userId), token: refreshToken, iat, exp })
+      new RefreshToken({ userId: new ObjectId(userId), token: refreshToken, iat, exp })
     )
 
     return { accessToken, refreshToken }
@@ -294,7 +294,7 @@ class AuthService {
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
-        user_id: new ObjectId(userId),
+        userId: new ObjectId(userId),
         token: newRefreshToken,
         iat: decodedRefreshToken.iat,
         exp: decodedRefreshToken.exp,

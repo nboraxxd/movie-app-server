@@ -19,7 +19,11 @@ const app = express()
 const port = envVariables.PORT
 
 // kết nối với database
-databaseService.connect()
+databaseService.connect().then(() => {
+  databaseService.indexUsers()
+  databaseService.indexRefreshTokens()
+  databaseService.indexFavorites()
+})
 
 // Quy định CORS
 app.use(cors({ origin: envVariables.DOMAIN_ALLOW_LIST.split(', '), optionsSuccessStatus: 200 }))
