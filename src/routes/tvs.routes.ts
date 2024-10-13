@@ -104,7 +104,7 @@ const tvsRouter = Router()
  */
 tvsRouter.get(
   '/discover',
-  zodValidator({ schema: discoverTvsQuerySchema, location: 'query' }),
+  zodValidator(discoverTvsQuerySchema, { location: 'query' }),
   wrapRequestHandler(discoverTvsController)
 )
 
@@ -145,7 +145,7 @@ tvsRouter.get(
  */
 tvsRouter.get(
   '/top-rated',
-  zodValidator({ schema: topRatedQuerySchema, location: 'query' }),
+  zodValidator(topRatedQuerySchema, { location: 'query' }),
   wrapRequestHandler(topRatedTvsController)
 )
 
@@ -184,7 +184,7 @@ tvsRouter.get(
  */
 tvsRouter.get(
   '/:tvId',
-  zodValidator({ schema: getTvDetailParamsSchema, location: 'params' }),
+  zodValidator(getTvDetailParamsSchema, { location: 'params' }),
   wrapRequestHandler(getTvDetailController)
 )
 
@@ -225,7 +225,7 @@ tvsRouter.get(
  */
 tvsRouter.get(
   '/:tvId/recommended',
-  zodValidator({ schema: getTvDetailParamsSchema, location: 'params' }),
+  zodValidator(getTvDetailParamsSchema, { location: 'params' }),
   wrapRequestHandler(getRecommendedTvsController)
 )
 

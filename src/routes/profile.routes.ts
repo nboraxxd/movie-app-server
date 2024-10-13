@@ -80,7 +80,7 @@ profileRouter.get('/', authorizationValidator({ isLoginRequired: true }), wrapRe
 profileRouter.post(
   '/upload-avatar',
   fileValidator(uploadAvatar),
-  zodValidator({ schema: avatarSchema, customPath: 'avatar', location: 'file' }),
+  zodValidator(avatarSchema, { customPath: 'avatar', location: 'file' }),
   authorizationValidator({ isLoginRequired: true, customHandler: authService.checkUserVerification }),
   wrapRequestHandler(uploadAvatarController)
 )

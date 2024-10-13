@@ -59,8 +59,8 @@ const trendingRouter = Router()
  */
 trendingRouter.get(
   '/:trendingType/:timeWindow?',
-  zodValidator({ schema: trendingParamsSchema, location: 'params' }),
-  zodValidator({ schema: trendingQuerySchema, location: 'query' }),
+  zodValidator(trendingParamsSchema, { location: 'params' }),
+  zodValidator(trendingQuerySchema, { location: 'query' }),
   wrapRequestHandler(trendingController)
 )
 

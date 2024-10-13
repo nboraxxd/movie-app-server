@@ -111,7 +111,7 @@ const moviesRouter = Router()
  */
 moviesRouter.get(
   '/discover',
-  zodValidator({ schema: discoverMoviesQuerySchema, location: 'query' }),
+  zodValidator(discoverMoviesQuerySchema, { location: 'query' }),
   wrapRequestHandler(discoverMoviesController)
 )
 
@@ -152,7 +152,7 @@ moviesRouter.get(
  */
 moviesRouter.get(
   '/top-rated',
-  zodValidator({ schema: topRatedQuerySchema, location: 'query' }),
+  zodValidator(topRatedQuerySchema, { location: 'query' }),
   wrapRequestHandler(topRatedMoviesController)
 )
 
@@ -191,7 +191,7 @@ moviesRouter.get(
  */
 moviesRouter.get(
   '/:movieId',
-  zodValidator({ schema: getMovieDetailParamsSchema, location: 'params' }),
+  zodValidator(getMovieDetailParamsSchema, { location: 'params' }),
   wrapRequestHandler(getMovieDetailController)
 )
 
@@ -232,7 +232,7 @@ moviesRouter.get(
  */
 moviesRouter.get(
   '/:movieId/recommended',
-  zodValidator({ schema: getMovieDetailParamsSchema, location: 'params' }),
+  zodValidator(getMovieDetailParamsSchema, { location: 'params' }),
   wrapRequestHandler(getRecommendedMoviesController)
 )
 

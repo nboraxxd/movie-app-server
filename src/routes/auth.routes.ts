@@ -50,11 +50,7 @@ const authRouter = Router()
  */
 authRouter.post(
   '/register',
-  zodValidator({
-    schema: registerBodySchema,
-    location: 'body',
-    customHandler: authService.validateUserRegister,
-  }),
+  zodValidator(registerBodySchema, { location: 'body', customHandler: authService.validateUserRegister }),
   wrapRequestHandler(registerController)
 )
 
@@ -173,11 +169,7 @@ authRouter.post(
  */
 authRouter.post(
   '/login',
-  zodValidator({
-    schema: loginBodySchema,
-    location: 'body',
-    customHandler: authService.validateUserLogin,
-  }),
+  zodValidator(loginBodySchema, { location: 'body', customHandler: authService.validateUserLogin }),
   wrapRequestHandler(loginController)
 )
 

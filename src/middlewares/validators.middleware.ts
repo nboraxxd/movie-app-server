@@ -5,33 +5,22 @@ import { JsonWebTokenError } from 'jsonwebtoken'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import { decodeAuthorizationToken } from '@/utils/jwt'
-import { capitalizeFirstLetter, escapeHtml } from '@/utils/common'
+import { capitalizeFirstLetter } from '@/utils/common'
 import { authorizationSchema } from '@/schemas/auth.schema'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { EntityError, ErrorWithStatusAndLocation } from '@/models/errors'
 
 export type ValidationLocation = 'body' | 'params' | 'query' | 'headers' | 'file'
 
-export const zodValidator = ({
-  schema,
-  location,
-  customPath,
-  customHandler,
-}: {
-  schema: z.Schema
-  location: ValidationLocation
-  customPath?: string
-  customHandler?: (req: Request) => Promise<void>
-}) => {
+export const zodValidator = (
+  schema: z.Schema,
+  options: { location: ValidationLocation; customPath?: string; customHandler?: (req: Request) => Promise<void> }
+) => {
+  const { location, customPath, customHandler } = options
+
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const parsedData = await schema.parseAsync(req[location])
-
-      for (const key in parsedData) {
-        if (typeof parsedData[key] === 'string') {
-          parsedData[key] = escapeHtml(parsedData[key])
-        }
-      }
 
       req[location] = {
         ...req[location],
