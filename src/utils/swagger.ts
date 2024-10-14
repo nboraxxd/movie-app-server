@@ -40,6 +40,10 @@ const options: swaggerJSDoc.Options = {
         name: 'favorites',
         description: 'Operations about favorites',
       },
+      {
+        name: 'comments',
+        description: 'Operations about comments',
+      },
     ],
     components: {
       securitySchemes: {

@@ -1002,4 +1002,98 @@
  *      type: string
  *      nullable: true
  *      example: "PG-13"
+ *
+ *   commentDataResponseSchema:
+ *    type: object
+ *    properties:
+ *     _id:
+ *      type: string
+ *      example: 123abc...
+ *     mediaId:
+ *      type: integer
+ *      example: 123
+ *     mediaTitle:
+ *      type: string
+ *      example: "The Dark Knight"
+ *     mediaType:
+ *      type: string
+ *      enum:
+ *      - movie
+ *      - tv
+ *      example: "movie"
+ *     mediaPoster:
+ *      type: string
+ *      nullable: true
+ *      example: "https://www.thedarkknight.com"
+ *     mediaReleaseDate:
+ *      type: string
+ *      format: date
+ *      example: "2024-09-27"
+ *     content:
+ *      type: string
+ *      example: "Amazing movie!"
+ *      minLength: 1
+ *      maxLength: 500
+ *     createdAt:
+ *      type: string
+ *      format: date-time
+ *      example: "2025-02-19T08:46:24.000Z"
+ *     updatedAt:
+ *      type: string
+ *      format: date-time
+ *      example: "2025-02-19T08:46:24.000Z"
+ *     user:
+ *      type: object
+ *      properties:
+ *       _id:
+ *        type: string
+ *        example: 123abc...
+ *       name:
+ *        type: string
+ *        example: Bruce Wayne
+ *       email:
+ *        type: string
+ *        example: brucewayne@wayne-ent.dc
+ *       avatar:
+ *        type: string
+ *        nullable: true
+ *        example: https://www.wayne-ent.dc/brucewayne.jpg
+ *       isVerified:
+ *        type: boolean
+ *        example: true
+ *
+ *   addCommentBodySchema:
+ *    required:
+ *    - mediaId
+ *    - mediaTitle
+ *    - mediaType
+ *    - mediaReleaseDate
+ *    - content
+ *    type: object
+ *    properties:
+ *     mediaId:
+ *      type: integer
+ *      example: 155
+ *     mediaTitle:
+ *      type: string
+ *      example: "The Dark Knight"
+ *     mediaType:
+ *      type: string
+ *      enum:
+ *      - movie
+ *      - tv
+ *      example: "movie"
+ *     mediaPoster:
+ *      type: string
+ *      nullable: true
+ *      example: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+ *     mediaReleaseDate:
+ *      type: string
+ *      format: date
+ *      example: "2008-07-16"
+ *     content:
+ *      type: string
+ *      example: "Amazing movie!"
+ *      minLength: 1
+ *      maxLength: 500
  */

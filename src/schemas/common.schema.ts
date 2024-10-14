@@ -12,6 +12,8 @@ export const paginationResponseSchema = z.object({
   count: z.number(),
 })
 
+export type PaginationResponseType = z.TypeOf<typeof paginationResponseSchema>
+
 export const queryPageSchema = z.coerce
   .number({ message: 'Page must be a number' })
   .int({ message: 'Page must be an integer' })

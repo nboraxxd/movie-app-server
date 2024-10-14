@@ -3,7 +3,13 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { TokenPayload } from '@/types/token.type'
 import commentsService from '@/services/comments.services'
-import { AddCommentBodyType, AddCommentResponseType } from '@/schemas/comments.schema'
+import {
+  AddCommentBodyType,
+  AddCommentResponseType,
+  GetCommentsByMediaParamsType,
+  GetCommentsByMediaQuery,
+  GetCommentsByMediaResponseType,
+} from '@/schemas/comments.schema'
 
 export const addCommentController = async (
   req: Request<ParamsDictionary, any, AddCommentBodyType>,
@@ -25,6 +31,36 @@ export const addCommentController = async (
 
   return res.json({
     message: 'Comment added successful',
-    data: result,
+    data: {
+      ...result,
+      _id: result._id.toHexString(),
+      user: {
+        ...result.user,
+        _id: result.user._id.toHexString(),
+      },
+    },
+  })
+}
+
+export const getCommentsByMediaController = async (
+  req: Request<GetCommentsByMediaParamsType, any, any, GetCommentsByMediaQuery>,
+  res: Response<GetCommentsByMediaResponseType>
+) => {
+  const { mediaId, mediaType } = req.params
+  const { page } = req.query
+
+  const result = await commentsService.getCommentsByMedia({ mediaId, mediaType, page })
+
+  return res.json({
+    message: 'Get comments successful',
+    data: result.data.map((comment) => ({
+      ...comment,
+      _id: comment._id.toHexString(),
+      user: {
+        ...comment.user,
+        _id: comment.user._id.toHexString(),
+      },
+    })),
+    pagination: result.pagination,
   })
 }

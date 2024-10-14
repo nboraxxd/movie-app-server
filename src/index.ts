@@ -21,10 +21,10 @@ const port = envVariables.PORT
 
 // kết nối với database
 databaseService.connect().then(() => {
-  databaseService.indexUsers()
-  databaseService.indexRefreshTokens()
-  databaseService.indexFavorites()
-  databaseService.indexComments()
+  databaseService.setupUsersCollection()
+  databaseService.setUpRefreshTokensCollection()
+  databaseService.setUpFavoritesCollection()
+  databaseService.setUpCommentsCollection()
 })
 
 // Quy định CORS

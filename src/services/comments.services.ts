@@ -1,16 +1,14 @@
-import omit from 'lodash/omit'
 import { ObjectId } from 'mongodb'
 
-import { HttpStatusCode } from '@/constants/http-status-code'
 import Comment from '@/models/comment.model'
-import { ErrorWithStatus } from '@/models/errors'
+import { COMMENT_PAGE_LIMIT } from '@/constants'
 import databaseService from '@/services/database.services'
-import { AddCommentBodyType, AddCommentResponseType } from '@/schemas/comments.schema'
+import { MediaType } from '@/schemas/common-media.schema'
+import { PaginationResponseType } from '@/schemas/common.schema'
+import { AddCommentBodyType, AggregatedCommentType } from '@/schemas/comments.schema'
 
 class CommentsService {
-  async addComment(
-    payload: AddCommentBodyType & { userId: string }
-  ): Promise<Omit<AddCommentResponseType, 'message'>['data']> {
+  async addComment(payload: AddCommentBodyType & { userId: string }) {
     const { content, mediaId, mediaPoster, mediaReleaseDate, mediaTitle, mediaType, userId } = payload
 
     const result = await databaseService.comments.insertOne(
@@ -25,33 +23,157 @@ class CommentsService {
       })
     )
 
-    const [newComment, user] = await Promise.all([
-      databaseService.comments.findOne({ _id: result.insertedId }),
-      databaseService.users.findOne(
-        { _id: new ObjectId(userId) },
+    const [comment] = await databaseService.comments
+      .aggregate<AggregatedCommentType>([
         {
-          projection: { forgotPasswordToken: 0, password: 0 },
-        }
-      ),
-    ])
+          $match: {
+            _id: result.insertedId,
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'user',
+          },
+        },
+        {
+          $project: {
+            userId: 0,
+          },
+        },
+        {
+          $addFields: {
+            user: {
+              $map: {
+                input: '$user',
+                as: 'item',
+                in: {
+                  _id: '$$item._id',
+                  name: '$$item.name',
+                  email: '$$item.email',
+                  isVerified: {
+                    $cond: {
+                      if: {
+                        $eq: ['$$item.emailVerifyToken', null],
+                      },
+                      then: true,
+                      else: false,
+                    },
+                  },
+                  avatar: '$$item.avatar',
+                },
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            user: {
+              $arrayElemAt: ['$user', 0],
+            },
+          },
+        },
+      ])
+      .toArray()
 
-    if (!newComment || !user) {
-      throw new ErrorWithStatus({
-        message: 'Add comment failed',
-        statusCode: HttpStatusCode.BadRequest,
-        errorInfo: { mediaId, userId },
-      })
-    }
+    return comment
+  }
 
-    return {
-      ...omit(newComment, ['userId']),
-      _id: newComment._id.toHexString(),
-      user: {
-        ...omit(user, ['emailVerifyToken']),
-        _id: user._id.toHexString(),
-        isVerified: user.emailVerifyToken === null,
-      },
-    }
+  async getCommentsByMedia(payload: { mediaId: number; mediaType: MediaType; page: number }) {
+    const { mediaId, mediaType, page } = payload
+
+    const [response] = await databaseService.comments
+      .aggregate<{ data: AggregatedCommentType[]; pagination: PaginationResponseType }>([
+        {
+          $match: {
+            mediaId,
+            mediaType,
+          },
+        },
+        {
+          $facet: {
+            data: [
+              {
+                $lookup: {
+                  from: 'users',
+                  localField: 'userId',
+                  foreignField: '_id',
+                  as: 'user',
+                },
+              },
+              {
+                $addFields: {
+                  user: {
+                    $arrayElemAt: ['$user', 0],
+                  },
+                },
+              },
+              {
+                $addFields: {
+                  'user.isVerified': {
+                    $cond: {
+                      if: {
+                        $eq: ['$user.emailVerifyToken', null],
+                      },
+                      then: true,
+                      else: false,
+                    },
+                  },
+                },
+              },
+              {
+                $project: {
+                  userId: 0,
+                  user: {
+                    password: 0,
+                    forgotPasswordToken: 0,
+                    emailVerifyToken: 0,
+                    createdAt: 0,
+                    updatedAt: 0,
+                  },
+                },
+              },
+              {
+                $skip: (page - 1) * COMMENT_PAGE_LIMIT,
+              },
+              {
+                $limit: COMMENT_PAGE_LIMIT,
+              },
+            ],
+            totalCount: [
+              {
+                $count: 'count',
+              },
+            ],
+          },
+        },
+        {
+          $project: {
+            data: 1,
+            pagination: {
+              currentPage: { $literal: page },
+              totalPages: {
+                $ceil: {
+                  $divide: [
+                    {
+                      $arrayElemAt: ['$totalCount.count', 0],
+                    },
+                    COMMENT_PAGE_LIMIT,
+                  ],
+                },
+              },
+              count: {
+                $arrayElemAt: ['$totalCount.count', 0],
+              },
+            },
+          },
+        },
+      ])
+      .toArray()
+
+    return response
   }
 }
 
