@@ -186,7 +186,7 @@ class CommentsService {
     return response
   }
 
-  async getCommentsByUserId(payload: { userId: string; page: number }) {
+  async getMyComments(payload: { userId: string; page: number }) {
     const { userId, page } = payload
 
     const [response] = await databaseService.comments

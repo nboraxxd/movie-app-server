@@ -9,8 +9,7 @@ import {
   GetCommentsByMediaParamsType,
   GetCommentsQueryType,
   GetCommentsByMediaResponseType,
-  GetCommentsByUserIdParamsType,
-  GetCommentsByUserIdResponseType,
+  GetMyCommentsResponseType,
 } from '@/schemas/comments.schema'
 
 export const addCommentController = async (
@@ -67,14 +66,14 @@ export const getCommentsByMediaController = async (
   })
 }
 
-export const getCommentsByUserIdController = async (
-  req: Request<GetCommentsByUserIdParamsType, any, any, GetCommentsQueryType>,
-  res: Response<GetCommentsByUserIdResponseType>
+export const getMyCommentsController = async (
+  req: Request<ParamsDictionary, any, any, GetCommentsQueryType>,
+  res: Response<GetMyCommentsResponseType>
 ) => {
-  const { userId } = req.params
   const { page } = req.query
+  const { userId } = req.decodedAuthorization as TokenPayload
 
-  const result = await commentsService.getCommentsByUserId({ userId, page })
+  const result = await commentsService.getMyComments({ userId, page })
 
   return res.json({
     message: 'Get comments successful',

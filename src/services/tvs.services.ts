@@ -116,7 +116,7 @@ class TVsService {
       http.get<TMDBTvDetailResponseType>(`/tv/${tvId}`, {
         params: { append_to_response: 'content_ratings,aggregate_credits,videos' },
       }),
-      userId ? favoritesService.getFavorite({ mediaId: tvId, type: 'tv', userId }) : null,
+      userId ? favoritesService.getFavorite({ mediaId: tvId, mediaType: 'tv', userId }) : null,
     ])
 
     const certification = response.content_ratings.results.find((item) => item.iso_3166_1 === 'US')?.rating ?? null
@@ -297,7 +297,7 @@ class TVsService {
 
     const [response, favoriteRecord] = await Promise.all([
       http.get<TMDBRecommendedTvsResponseType>(`/tv/${tvId}/recommendations`),
-      userId ? favoritesService.getFavorite({ mediaId: tvId, type: 'tv', userId }) : null,
+      userId ? favoritesService.getFavorite({ mediaId: tvId, mediaType: 'tv', userId }) : null,
     ])
 
     const isFavorite = !userId ? null : Boolean(favoriteRecord)

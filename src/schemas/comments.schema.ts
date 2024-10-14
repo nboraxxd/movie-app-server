@@ -1,5 +1,5 @@
 import z from 'zod'
-import { ObjectId, WithId } from 'mongodb'
+import { WithId } from 'mongodb'
 
 import { userDocumentResponseSchema } from '@/schemas/profile.schema'
 import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
@@ -72,25 +72,10 @@ export type AggregatedCommentType = WithId<Omit<GetCommentsByMediaResponseType['
   user: WithId<Omit<GetCommentsByMediaResponseType['data'][number]['user'], '_id'>>
 }
 
-export const getCommentsByUserIdParams = z
-  .object({
-    userId: z.string().refine(
-      (value) => {
-        if (ObjectId.isValid(value)) {
-          return true
-        }
-      },
-      { message: 'Invalid user id' }
-    ),
-  })
-  .strict({ message: 'Additional properties not allowed' })
-
-export type GetCommentsByUserIdParamsType = z.TypeOf<typeof getCommentsByUserIdParams>
-
-export const getCommentsByUserIdResponseSchema = z.object({
+export const getMyCommentsResponseSchema = z.object({
   message: z.string(),
   data: z.array(commentDocumentSchema.omit({ userId: true })),
   pagination: paginationResponseSchema,
 })
 
-export type GetCommentsByUserIdResponseType = z.TypeOf<typeof getCommentsByUserIdResponseSchema>
+export type GetMyCommentsResponseType = z.TypeOf<typeof getMyCommentsResponseSchema>

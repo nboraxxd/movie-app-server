@@ -121,7 +121,7 @@ class MoviesService {
       http.get<TMDBMovieDetailResponseType>(`/movie/${movieId}`, {
         params: { append_to_response: 'release_dates,credits,videos' },
       }),
-      userId ? favoritesService.getFavorite({ mediaId: movieId, type: 'movie', userId }) : null,
+      userId ? favoritesService.getFavorite({ mediaId: movieId, mediaType: 'movie', userId }) : null,
     ])
 
     const certification =
@@ -242,7 +242,7 @@ class MoviesService {
 
     const [response, favoriteRecord] = await Promise.all([
       http.get<TMDBRecommendedMoviesResponseType>(`/movie/${movieId}/recommendations`),
-      userId ? favoritesService.getFavorite({ mediaId: movieId, type: 'movie', userId }) : null,
+      userId ? favoritesService.getFavorite({ mediaId: movieId, mediaType: 'movie', userId }) : null,
     ])
 
     const isFavorite = !userId ? null : Boolean(favoriteRecord)

@@ -1,3 +1,4 @@
+import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
 import z from 'zod'
 
 const favoriteDocumentSchema = z.object({
@@ -31,3 +32,17 @@ export const addFavoriteResponseSchema = z.object({
 })
 
 export type AddFavoriteResponseType = z.TypeOf<typeof addFavoriteResponseSchema>
+
+export const getFavoritesQuery = z.object({
+  page: queryPageSchema,
+})
+
+export type GetFavoritesQueryType = z.TypeOf<typeof getFavoritesQuery>
+
+export const getMyFavoritesResponseSchema = z.object({
+  message: z.string(),
+  data: z.array(favoriteDocumentSchema.omit({ userId: true })),
+  pagination: paginationResponseSchema,
+})
+
+export type GetMyFavoritesResponseType = z.TypeOf<typeof getMyFavoritesResponseSchema>

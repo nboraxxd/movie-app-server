@@ -3,16 +3,11 @@ import { Router } from 'express'
 import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
-import {
-  addCommentBodySchema,
-  getCommentsByMediaParams,
-  getCommentsByUserIdParams,
-  getCommentsQuery,
-} from '@/schemas/comments.schema'
+import { addCommentBodySchema, getCommentsByMediaParams, getCommentsQuery } from '@/schemas/comments.schema'
 import {
   addCommentController,
   getCommentsByMediaController,
-  getCommentsByUserIdController,
+  getMyCommentsController,
 } from '@/controllers/comments.controllers'
 
 const commentsRouter = Router()
@@ -26,6 +21,8 @@ const commentsRouter = Router()
  *   summary: Add comment
  *   description: Add comment with media id, media title, media type, media poster, media release date and content
  *   operationId: addComment
+ *   security:
+ *    - bearerAuth: []
  *   requestBody:
  *    description: Comment information
  *    required: true
@@ -117,25 +114,20 @@ commentsRouter.get(
 
 /**
  * @swagger
- * /comments/users/{userId}:
+ * /comments/me:
  *  get:
  *   tags:
  *   - comments
- *   summary: Get comments by user id
- *   description: Get comments by user id with query parameters
+ *   summary: Get my comments
+ *   description: Get all comments of current user with query parameters
  *   operationId: getCommentsByUserId
+ *   security:
+ *    - bearerAuth: []
  *   parameters:
- *    - in: path
- *      name: userId
- *      required: true
- *      description: User id need to get comments.
- *      schema:
- *       type: string
- *       example: 670bc1a292537e068525f9d1
  *    - in: query
  *      name: page
  *      required: false
- *      description: Page number of comments list. If not provided, page 1 will be used.
+ *      description: Page number of comment list. If not provided, page 1 will be used.
  *      schema:
  *       type: integer
  *       nullable: true
@@ -161,10 +153,10 @@ commentsRouter.get(
  *     description: Bad request
  */
 commentsRouter.get(
-  '/users/:userId',
-  zodValidator(getCommentsByUserIdParams, { location: 'params' }),
+  '/me',
+  authorizationValidator({ isLoginRequired: true }),
   zodValidator(getCommentsQuery, { location: 'query' }),
-  wrapRequestHandler(getCommentsByUserIdController)
+  wrapRequestHandler(getMyCommentsController)
 )
 
 export default commentsRouter

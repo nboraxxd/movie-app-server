@@ -1102,4 +1102,69 @@
  *         isVerified:
  *          type: boolean
  *          example: true
+ *
+ *   addFavoriteBodySchema:
+ *    required:
+ *    - mediaId
+ *    - mediaTitle
+ *    - mediaType
+ *    - mediaPoster
+ *    - mediaReleaseDate
+ *    type: object
+ *    properties:
+ *     mediaId:
+ *      type: integer
+ *      example: 155
+ *     mediaTitle:
+ *      type: string
+ *      example: "The Dark Knight"
+ *     mediaType:
+ *      type: string
+ *      enum:
+ *      - movie
+ *      - tv
+ *      example: "movie"
+ *     mediaPoster:
+ *      type: string
+ *      example: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+ *     mediaReleaseDate:
+ *      type: string
+ *      format: date
+ *      example: "2008-07-16"
+ *     createdAt:
+ *      type: string
+ *      format: date-time
+ *      example: "2025-02-19T08:46:24.000Z"
+ *
+ *   favoriteDataResponseSchema:
+ *    type: object
+ *    nullable: true
+ *    properties:
+ *     _id:
+ *      type: string
+ *      example: 123abc...
+ *     mediaId:
+ *      type: integer
+ *      example: 155
+ *     mediaTitle:
+ *      type: string
+ *      example: "The Dark Knight"
+ *     mediaType:
+ *      type: string
+ *      enum:
+ *      - movie
+ *      - tv
+ *      example: "movie"
+ *     mediaPoster:
+ *      type: string
+ *      nullable: true
+ *      example: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+ *     mediaReleaseDate:
+ *      type: string
+ *      format: date
+ *      example: "2008-07-16"
+ *     createdAt:
+ *      type: string
+ *      format: date-time
+ *      example: "2025-02-19T08:46:24.000Z"
  */

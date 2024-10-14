@@ -1,15 +1,4 @@
 export const EMAIL_TEMPLATES = {
-  TWO_FACTOR: ({ name, code }: { name: string; code: string }) => `
-      <div>
-        <p>Hello <strong>${name}</strong>,</p>
-        <p>We noticed a login attempt to your <strong>nmovies</strong> account. To verify this login attempt, please enter the verification code below:</p>
-        <p>
-          <strong>${code}</strong>
-        </p>
-        <p>This code will expire in 5 minutes.</p>
-        <p>— nmovies</p>
-      </div>
-      `,
   PASSWORD_RESET: ({ name, link }: { name: string; link: string }) => `
       <div>
         <p>Hello <strong>${name}</strong>,</p>

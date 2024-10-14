@@ -2,7 +2,13 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import { TokenPayload } from '@/types/token.type'
-import { AddFavoriteBodyType, AddFavoriteResponseType } from '@/schemas/favorite.schema'
+import { capitalizeFirstLetter } from '@/utils/common'
+import {
+  AddFavoriteBodyType,
+  AddFavoriteResponseType,
+  GetFavoritesQueryType,
+  GetMyFavoritesResponseType,
+} from '@/schemas/favorite.schema'
 import favoritesService from '@/services/favorites.services'
 
 export const addFavoriteController = async (
@@ -23,11 +29,30 @@ export const addFavoriteController = async (
   })
 
   if (!isNew) {
-    return res.json({ message: 'Media already added to favorites', data: null })
+    return res.json({ message: `${capitalizeFirstLetter(mediaType)} already added to favorites`, data: null })
   }
 
   return res.json({
     message: 'Favorite added successful',
     data: { ...data, _id: data._id.toHexString(), userId: data.userId.toHexString() },
+  })
+}
+
+export const getMyFavoritesController = async (
+  req: Request<ParamsDictionary, any, any, GetFavoritesQueryType>,
+  res: Response<GetMyFavoritesResponseType>
+) => {
+  const { page } = req.query
+  const { userId } = req.decodedAuthorization as TokenPayload
+
+  const { data, pagination } = await favoritesService.getMyFavorites({ userId, page })
+
+  return res.json({
+    message: 'Get favorites successful',
+    data: data.map((favorite) => ({
+      ...favorite,
+      _id: favorite._id.toHexString(),
+    })),
+    pagination,
   })
 }
