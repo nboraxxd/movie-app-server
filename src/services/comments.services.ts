@@ -158,14 +158,96 @@ class CommentsService {
                 $ceil: {
                   $divide: [
                     {
-                      $arrayElemAt: ['$totalCount.count', 0],
+                      $ifNull: [
+                        {
+                          $arrayElemAt: ['$totalCount.count', 0],
+                        },
+                        0,
+                      ],
                     },
                     COMMENT_PAGE_LIMIT,
                   ],
                 },
               },
               count: {
-                $arrayElemAt: ['$totalCount.count', 0],
+                $ifNull: [
+                  {
+                    $arrayElemAt: ['$totalCount.count', 0],
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      ])
+      .toArray()
+
+    return response
+  }
+
+  async getCommentsByUserId(payload: { userId: string; page: number }) {
+    const { userId, page } = payload
+
+    const [response] = await databaseService.comments
+      .aggregate<{
+        data: Omit<AggregatedCommentType, 'user'>[]
+        pagination: PaginationResponseType
+      }>([
+        {
+          $match: {
+            userId: new ObjectId(userId),
+          },
+        },
+        {
+          $facet: {
+            data: [
+              {
+                $project: {
+                  userId: 0,
+                },
+              },
+              {
+                $skip: (page - 1) * COMMENT_PAGE_LIMIT,
+              },
+              {
+                $limit: COMMENT_PAGE_LIMIT,
+              },
+            ],
+            totalCount: [
+              {
+                $count: 'count',
+              },
+            ],
+          },
+        },
+        {
+          $project: {
+            data: 1,
+            pagination: {
+              currentPage: { $literal: page },
+              totalPages: {
+                $ceil: {
+                  $divide: [
+                    {
+                      $ifNull: [
+                        {
+                          $arrayElemAt: ['$totalCount.count', 0],
+                        },
+                        0,
+                      ],
+                    },
+                    COMMENT_PAGE_LIMIT,
+                  ],
+                },
+              },
+              count: {
+                $ifNull: [
+                  {
+                    $arrayElemAt: ['$totalCount.count', 0],
+                  },
+                  0,
+                ],
               },
             },
           },

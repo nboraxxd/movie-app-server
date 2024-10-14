@@ -1042,25 +1042,6 @@
  *      type: string
  *      format: date-time
  *      example: "2025-02-19T08:46:24.000Z"
- *     user:
- *      type: object
- *      properties:
- *       _id:
- *        type: string
- *        example: 123abc...
- *       name:
- *        type: string
- *        example: Bruce Wayne
- *       email:
- *        type: string
- *        example: brucewayne@wayne-ent.dc
- *       avatar:
- *        type: string
- *        nullable: true
- *        example: https://www.wayne-ent.dc/brucewayne.jpg
- *       isVerified:
- *        type: boolean
- *        example: true
  *
  *   addCommentBodySchema:
  *    required:
@@ -1096,4 +1077,29 @@
  *      example: "Amazing movie!"
  *      minLength: 1
  *      maxLength: 500
+ *
+ *   commentExtendDataResponseSchema:
+ *    allOf:
+ *    - $ref: '#/components/schemas/commentDataResponseSchema'
+ *    - type: object
+ *      properties:
+ *       user:
+ *        type: object
+ *        properties:
+ *         _id:
+ *          type: string
+ *          example: 123abc...
+ *         name:
+ *          type: string
+ *          example: Bruce Wayne
+ *         email:
+ *          type: string
+ *          example: brucewayne@wayne-ent.dc
+ *         avatar:
+ *          type: string
+ *          nullable: true
+ *          example: https://www.wayne-ent.dc/brucewayne.jpg
+ *         isVerified:
+ *          type: boolean
+ *          example: true
  */

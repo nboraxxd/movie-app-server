@@ -2,9 +2,18 @@ import { Router } from 'express'
 
 import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
-import { addCommentBodySchema, getCommentsByMediaParams, getCommentsByMediaQuery } from '@/schemas/comments.schema'
-import { addCommentController, getCommentsByMediaController } from '@/controllers/comments.controllers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
+import {
+  addCommentBodySchema,
+  getCommentsByMediaParams,
+  getCommentsByUserIdParams,
+  getCommentsQuery,
+} from '@/schemas/comments.schema'
+import {
+  addCommentController,
+  getCommentsByMediaController,
+  getCommentsByUserIdController,
+} from '@/controllers/comments.controllers'
 
 const commentsRouter = Router()
 
@@ -36,7 +45,7 @@ const commentsRouter = Router()
  *          type: string
  *          example: Comment added successful
  *         data:
- *          $ref: '#/components/schemas/commentDataResponseSchema'
+ *          $ref: '#/components/schemas/commentExtendDataResponseSchema'
  *    '400':
  *     description: Bad request
  */
@@ -93,7 +102,7 @@ commentsRouter.post(
  *         data:
  *          type: array
  *          items:
- *           $ref: '#/components/schemas/commentDataResponseSchema'
+ *           $ref: '#/components/schemas/commentExtendDataResponseSchema'
  *         pagination:
  *          $ref: '#/components/schemas/paginationResponseSchema'
  *    '400':
@@ -102,8 +111,60 @@ commentsRouter.post(
 commentsRouter.get(
   '/medias/:mediaId/:mediaType',
   zodValidator(getCommentsByMediaParams, { location: 'params' }),
-  zodValidator(getCommentsByMediaQuery, { location: 'query' }),
+  zodValidator(getCommentsQuery, { location: 'query' }),
   wrapRequestHandler(getCommentsByMediaController)
+)
+
+/**
+ * @swagger
+ * /comments/users/{userId}:
+ *  get:
+ *   tags:
+ *   - comments
+ *   summary: Get comments by user id
+ *   description: Get comments by user id with query parameters
+ *   operationId: getCommentsByUserId
+ *   parameters:
+ *    - in: path
+ *      name: userId
+ *      required: true
+ *      description: User id need to get comments.
+ *      schema:
+ *       type: string
+ *       example: 670bc1a292537e068525f9d1
+ *    - in: query
+ *      name: page
+ *      required: false
+ *      description: Page number of comments list. If not provided, page 1 will be used.
+ *      schema:
+ *       type: integer
+ *       nullable: true
+ *       example: null
+ *   responses:
+ *    '200':
+ *     description: Get comments successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get comments successful
+ *         data:
+ *          type: array
+ *          items:
+ *           $ref: '#/components/schemas/commentDataResponseSchema'
+ *         pagination:
+ *          $ref: '#/components/schemas/paginationResponseSchema'
+ *    '400':
+ *     description: Bad request
+ */
+commentsRouter.get(
+  '/users/:userId',
+  zodValidator(getCommentsByUserIdParams, { location: 'params' }),
+  zodValidator(getCommentsQuery, { location: 'query' }),
+  wrapRequestHandler(getCommentsByUserIdController)
 )
 
 export default commentsRouter

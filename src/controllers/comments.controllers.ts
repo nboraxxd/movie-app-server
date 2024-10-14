@@ -7,8 +7,10 @@ import {
   AddCommentBodyType,
   AddCommentResponseType,
   GetCommentsByMediaParamsType,
-  GetCommentsByMediaQuery,
+  GetCommentsQueryType,
   GetCommentsByMediaResponseType,
+  GetCommentsByUserIdParamsType,
+  GetCommentsByUserIdResponseType,
 } from '@/schemas/comments.schema'
 
 export const addCommentController = async (
@@ -43,7 +45,7 @@ export const addCommentController = async (
 }
 
 export const getCommentsByMediaController = async (
-  req: Request<GetCommentsByMediaParamsType, any, any, GetCommentsByMediaQuery>,
+  req: Request<GetCommentsByMediaParamsType, any, any, GetCommentsQueryType>,
   res: Response<GetCommentsByMediaResponseType>
 ) => {
   const { mediaId, mediaType } = req.params
@@ -60,6 +62,25 @@ export const getCommentsByMediaController = async (
         ...comment.user,
         _id: comment.user._id.toHexString(),
       },
+    })),
+    pagination: result.pagination,
+  })
+}
+
+export const getCommentsByUserIdController = async (
+  req: Request<GetCommentsByUserIdParamsType, any, any, GetCommentsQueryType>,
+  res: Response<GetCommentsByUserIdResponseType>
+) => {
+  const { userId } = req.params
+  const { page } = req.query
+
+  const result = await commentsService.getCommentsByUserId({ userId, page })
+
+  return res.json({
+    message: 'Get comments successful',
+    data: result.data.map((comment) => ({
+      ...comment,
+      _id: comment._id.toHexString(),
     })),
     pagination: result.pagination,
   })
