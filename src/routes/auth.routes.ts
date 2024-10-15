@@ -96,7 +96,7 @@ authRouter.post(
  */
 authRouter.post(
   '/resend-email-verification',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.validateUserResendEmailVerification }),
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.validateResendEmailVerificationReq }),
   wrapRequestHandler(resendEmailVerificationController)
 )
 

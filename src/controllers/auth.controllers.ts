@@ -1,14 +1,13 @@
-import ms from 'ms'
 import { ObjectId } from 'mongodb'
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
-import { verifyToken } from '@/utils/jwt'
+import { sendEmail } from '@/utils/mailgun'
 import { TokenPayload } from '@/types/token.type'
-import { HttpStatusCode } from '@/constants/http-status-code'
 import authService from '@/services/auth.services'
-import User, { UserDocumentWithoutPassword } from '@/models/user.model'
-import { ErrorWithStatus } from '@/models/errors'
+import { HttpStatusCode } from '@/constants/http-status-code'
+import { EMAIL_TEMPLATES } from '@/constants/email-templates'
+import { UserDocumentWithoutPassword } from '@/models/user.model'
 import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
 import {
@@ -20,8 +19,6 @@ import {
   RefreshTokenType,
   RegisterBodyType,
 } from '@/schemas/auth.schema'
-import { sendEmail } from '@/utils/mailgun'
-import { EMAIL_TEMPLATES } from '@/constants/email-templates'
 
 export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterBodyType>,
@@ -29,35 +26,27 @@ export const registerController = async (
 ) => {
   const { email, name, password } = req.body
 
-  const result = await authService.register({ email, name, password })
+  const { accessToken, emailVerifyToken, refreshToken } = await authService.register({ email, name, password })
 
-  return res
+  res
     .status(HttpStatusCode.Created)
-    .json({ message: 'Please check your email to verify your account', data: result })
+    .json({ message: 'Please check your email to verify your account', data: { accessToken, refreshToken } })
+
+  setImmediate(async () => {
+    await authService.sendVerificationEmail({ email, name, token: emailVerifyToken })
+  })
 }
 
 export const resendEmailVerificationController = async (req: Request, res: Response<MessageResponseType>) => {
-  const { emailVerifyToken, email, name, _id } = req.user as User
+  const { email, name, _id } = req.user as UserDocumentWithoutPassword
 
-  const decodedEmailVerifyToken = await verifyToken({
-    token: emailVerifyToken as string,
-    jwtKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
+  const emailVerifyToken = await authService.updateEmailVerifyToken(_id)
+
+  res.json({ message: 'Please check your email to verify your account' })
+
+  setImmediate(async () => {
+    await authService.sendVerificationEmail({ email, name, token: emailVerifyToken })
   })
-
-  const nextEmailResendTime = new Date(decodedEmailVerifyToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME))
-
-  const remainingTimeInMs = Math.max(0, nextEmailResendTime.getTime() - Date.now())
-
-  if (remainingTimeInMs > 0) {
-    throw new ErrorWithStatus({
-      message: `Please try again in ${remainingTimeInMs / 1000} second(s)`,
-      statusCode: HttpStatusCode.TooManyRequests,
-    })
-  }
-
-  await authService.resendEmailVerification({ email, name, userId: _id as ObjectId })
-
-  return res.json({ message: 'Please check your email to verify your account' })
 }
 
 export const verifyEmailController = async (
@@ -126,8 +115,8 @@ export const forgotPasswordController = async (
 
   res.json({ message: 'Please check your email to reset your password' })
 
-  setImmediate(() => {
-    sendEmail({
+  setImmediate(async () => {
+    await sendEmail({
       name,
       email,
       subject: '[nmovies] Reset your password',

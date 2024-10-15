@@ -117,13 +117,12 @@ class AuthService {
         new User({ _id: userId, email, name, password: hashPassword(password), emailVerifyToken })
       ),
       databaseService.refreshTokens.insertOne(new RefreshToken({ userId, token: refreshToken, iat, exp })),
-      this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
     ])
 
-    return { accessToken, refreshToken }
+    return { accessToken, refreshToken, emailVerifyToken }
   }
 
-  async validateUserResendEmailVerification(req: Request<ParamsDictionary, any, EmailVerifyTokenType>) {
+  async validateResendEmailVerificationReq(req: Request<ParamsDictionary, any, EmailVerifyTokenType>) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
     const user = await profileService.findById(userId)
@@ -142,21 +141,36 @@ class AuthService {
       })
     }
 
+    const decodedEmailVerifyToken = await verifyToken({
+      token: user.emailVerifyToken,
+      jwtKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
+    })
+
+    const nextEmailResendTime = new Date(
+      decodedEmailVerifyToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME)
+    )
+
+    const remainingTimeInMs = Math.max(0, nextEmailResendTime.getTime() - Date.now())
+
+    if (remainingTimeInMs > 0) {
+      throw new ErrorWithStatus({
+        message: `Please try again in ${Math.ceil(remainingTimeInMs / 1000)} second(s)`,
+        statusCode: HttpStatusCode.TooManyRequests,
+      })
+    }
+
     req.user = user
   }
 
-  async resendEmailVerification(payload: { userId: ObjectId; email: string; name: string }) {
-    const { email, name, userId } = payload
-
+  async updateEmailVerifyToken(userId: ObjectId) {
     const emailVerifyToken = await this.signEmailVerifyToken(userId.toHexString())
 
-    await Promise.all([
-      databaseService.users.updateOne(
-        { _id: userId },
-        { $set: { emailVerifyToken }, $currentDate: { updatedAt: true } }
-      ),
-      this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
-    ])
+    await databaseService.users.updateOne(
+      { _id: userId },
+      { $set: { emailVerifyToken }, $currentDate: { updatedAt: true } }
+    )
+
+    return emailVerifyToken
   }
 
   async validateUserVerifyEmail(req: Request<ParamsDictionary, any, EmailVerifyTokenType>) {
