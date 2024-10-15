@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import 'axios'
-import User from '@/models/schemas/User.schema'
+import { ObjectId } from 'mongodb'
 import { TokenPayload } from '@/types/token.type'
+import { UserDocument, UserDocumentWithoutPassword } from '@/models/user.model'
+
 declare module 'express' {
   interface Request {
-    user?: User
+    user?: UserDocument | UserDocumentWithoutPassword | { _id: ObjectId }
     decodedAuthorization?: TokenPayload
     decodedRefreshToken?: TokenPayload
     decodedEmailVerifyToken?: TokenPayload

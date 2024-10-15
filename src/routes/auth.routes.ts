@@ -1,10 +1,18 @@
 import { Router } from 'express'
 
+import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { decodeEmailVerifyToken, decodeRefreshToken } from '@/utils/jwt'
-import { registerBodySchema, emailVerifyTokenSchema, loginBodySchema, refreshTokenSchema } from '@/schemas/auth.schema'
+import {
+  registerBodySchema,
+  emailVerifyTokenSchema,
+  loginBodySchema,
+  refreshTokenSchema,
+  changePasswordBodySchema,
+} from '@/schemas/auth.schema'
 import { zodValidator, authorizationValidator, tokenValidator } from '@/middlewares/validators.middleware'
 import {
+  changePasswordController,
   loginController,
   logoutController,
   refreshTokenController,
@@ -12,7 +20,6 @@ import {
   resendEmailVerificationController,
   verifyEmailController,
 } from '@/controllers/auth.controllers'
-import authService from '@/services/auth.services'
 
 const authRouter = Router()
 
@@ -242,5 +249,14 @@ authRouter.post(
  *     description: Unauthorized
  */
 authRouter.post('/logout', tokenValidator(refreshTokenSchema, decodeRefreshToken), wrapRequestHandler(logoutController))
+
+authRouter.patch(
+  '/change-password',
+  authorizationValidator({
+    isLoginRequired: true,
+  }),
+  zodValidator(changePasswordBodySchema, { location: 'body', customHandler: authService.validateUserChangePassword }),
+  wrapRequestHandler(changePasswordController)
+)
 
 export default authRouter

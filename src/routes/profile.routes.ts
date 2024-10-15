@@ -2,10 +2,15 @@ import { Router } from 'express'
 
 import { uploadAvatar } from '@/utils/multer'
 import { wrapRequestHandler } from '@/utils/handlers'
-import { avatarSchema } from '@/schemas/profile.schema'
-import { authorizationValidator, fileValidator, zodValidator } from '@/middlewares/validators.middleware'
-import { getProfileController, uploadAvatarController } from '@/controllers/profile.controllers'
 import authService from '@/services/auth.services'
+import { avatarSchema, updateProfileBodySchema } from '@/schemas/profile.schema'
+import { authorizationValidator, fileValidator, zodValidator } from '@/middlewares/validators.middleware'
+import {
+  deleteMyAccountController,
+  getProfileController,
+  updateProfileController,
+  uploadAvatarController,
+} from '@/controllers/profile.controllers'
 
 const profileRouter = Router()
 
@@ -81,8 +86,21 @@ profileRouter.post(
   '/upload-avatar',
   fileValidator(uploadAvatar),
   zodValidator(avatarSchema, { customPath: 'avatar', location: 'file' }),
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.checkUserVerification }),
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
   wrapRequestHandler(uploadAvatarController)
+)
+
+profileRouter.post(
+  '/',
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  zodValidator(updateProfileBodySchema, { location: 'body' }),
+  wrapRequestHandler(updateProfileController)
+)
+
+profileRouter.delete(
+  '/',
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExists }),
+  wrapRequestHandler(deleteMyAccountController)
 )
 
 export default profileRouter

@@ -48,7 +48,7 @@ const commentsRouter = Router()
  */
 commentsRouter.post(
   '/',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.checkUserVerification }),
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
   zodValidator(addCommentBodySchema, { location: 'body' }),
   wrapRequestHandler(addCommentController)
 )

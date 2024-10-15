@@ -50,7 +50,7 @@ const favoritesRouter = Router()
  */
 favoritesRouter.post(
   '/',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.checkUserVerification }),
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
   zodValidator(addFavoriteBodySchema, { location: 'body' }),
   wrapRequestHandler(addFavoriteController)
 )

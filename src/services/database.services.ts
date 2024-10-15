@@ -9,8 +9,8 @@ import RefreshToken from '@/models/refresh-token.model'
 const uri = `mongodb+srv://${envVariables.DB_USERNAME}:${envVariables.DB_PASSWORD}@movie-app-singapore.s0ve5.mongodb.net/?retryWrites=true&w=majority&appName=${envVariables.DB_CLUSTER}`
 
 class DatabaseService {
-  private client: MongoClient
   private db: Db
+  client: MongoClient
 
   constructor() {
     this.client = new MongoClient(uri)

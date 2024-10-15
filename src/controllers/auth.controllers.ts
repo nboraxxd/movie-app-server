@@ -14,6 +14,7 @@ import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
 import {
   AuthResponseType,
+  ChangePasswordBodyType,
   EmailVerifyTokenType,
   LoginBodyType,
   RefreshTokenType,
@@ -72,9 +73,9 @@ export const loginController = async (
   req: Request<ParamsDictionary, any, LoginBodyType>,
   res: Response<AuthResponseType>
 ) => {
-  const { _id } = req.user as User
+  const { _id } = req.user as { _id: ObjectId }
 
-  const result = await authService.login((_id as ObjectId).toHexString())
+  const result = await authService.login(_id.toHexString())
 
   return res.json({ message: 'Login successful', data: result })
 }
@@ -99,4 +100,16 @@ export const logoutController = async (
   await authService.logout(refreshToken)
 
   return res.json({ message: 'Logout successful' })
+}
+
+export const changePasswordController = async (
+  req: Request<ParamsDictionary, any, ChangePasswordBodyType>,
+  res: Response<MessageResponseType>
+) => {
+  const { userId } = req.decodedAuthorization as TokenPayload
+  const { newPassword } = req.body
+
+  await authService.changePassword({ userId, newPassword })
+
+  return res.json({ message: 'Change password successful' })
 }

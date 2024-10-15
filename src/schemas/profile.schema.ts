@@ -1,5 +1,6 @@
 import z from 'zod'
 import { AVATAR_SIZE_LIMIT } from '@/constants'
+import { nameSchema } from '@/schemas/common.schema'
 
 export const userDocumentResponseSchema = z.object({
   _id: z.string(),
@@ -27,3 +28,19 @@ export const avatarSchema = z.object({
 })
 
 export type AvatarType = z.TypeOf<typeof avatarSchema>
+
+export const updateProfileBodySchema = z
+  .object({
+    name: nameSchema.optional(),
+    avatar: z.string().optional(),
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type UpdateProfileBodyType = z.TypeOf<typeof updateProfileBodySchema>
+
+export const updateProfileResponseSchema = z.object({
+  message: z.string(),
+  data: userDocumentResponseSchema,
+})
+
+export type UpdateProfileResponseType = z.TypeOf<typeof updateProfileResponseSchema>

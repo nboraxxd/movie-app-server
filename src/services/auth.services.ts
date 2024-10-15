@@ -15,11 +15,11 @@ import { HttpStatusCode } from '@/constants/http-status-code'
 import { signToken, verifyToken } from '@/utils/jwt'
 import { sendEmail } from '@/utils/mailgun'
 import { hashPassword } from '@/utils/crypto'
-import { EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas/auth.schema'
-import { RegisterBodyType } from '@/schemas/auth.schema'
-import envVariables from '@/schemas/env-variables.schema'
 import databaseService from '@/services/database.services'
 import profileService from '@/services/profile.services'
+import { RegisterBodyType } from '@/schemas/auth.schema'
+import envVariables from '@/schemas/env-variables.schema'
+import { ChangePasswordBodyType, EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas/auth.schema'
 
 class AuthService {
   async signAccessToken(userId: string) {
@@ -162,7 +162,7 @@ class AuthService {
     await Promise.all([
       databaseService.users.updateOne(
         { _id: userId },
-        { $set: { email_verify_token: emailVerifyToken }, $currentDate: { updated_at: true } }
+        { $set: { emailVerifyToken }, $currentDate: { updatedAt: true } }
       ),
       this.sendVerificationEmail({ email, name, token: emailVerifyToken }),
     ])
@@ -202,7 +202,7 @@ class AuthService {
     await Promise.all([
       databaseService.users.updateOne(
         { _id: new ObjectId(userId) },
-        { $set: { email_verify_token: null }, $currentDate: { updated_at: true } }
+        { $set: { emailVerifyToken: null }, $currentDate: { updatedAt: true } }
       ),
       databaseService.refreshTokens.insertOne(
         new RefreshToken({ userId: new ObjectId(userId), token: refreshToken, iat, exp })
@@ -212,27 +212,22 @@ class AuthService {
     return { accessToken, refreshToken }
   }
 
-  async validateUserLogin(req: Request<ParamsDictionary, any, LoginBodyType>) {
-    const user = await profileService.findByEmail(req.body.email)
+  async ensureUserExists(req: Request) {
+    const { userId } = req.decodedAuthorization as TokenPayload
 
-    if (!user || user.password !== hashPassword(req.body.password)) {
-      throw new EntityError({
-        message: 'Validation error occurred in body',
-        errors: [
-          {
-            code: z.ZodIssueCode.custom,
-            message: 'Invalid email or password',
-            location: 'body',
-            path: 'email',
-          },
-        ],
+    const user = await profileService.findById(userId)
+
+    if (!user) {
+      throw new ErrorWithStatus({
+        message: 'User not found',
+        statusCode: HttpStatusCode.NotFound,
       })
     }
 
     req.user = user
   }
 
-  async checkUserVerification(req: Request) {
+  async ensureUserExistsAndVerify(req: Request) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
     const user = await profileService.findById(userId)
@@ -250,6 +245,32 @@ class AuthService {
         statusCode: HttpStatusCode.Forbidden,
       })
     }
+
+    req.user = user
+  }
+
+  async validateUserLogin(req: Request<ParamsDictionary, any, LoginBodyType>) {
+    const user = await databaseService.users.findOne({ email: req.body.email }, { projection: { password: 1 } })
+
+    if (!user || user.password !== hashPassword(req.body.password)) {
+      throw new EntityError({
+        message: 'Validation error occurred in body',
+        errors: [
+          {
+            code: z.ZodIssueCode.custom,
+            message: 'Invalid email or password',
+            location: 'body',
+            path: 'email',
+          },
+        ],
+      })
+    }
+
+    Object.keys(user).forEach((key) => {
+      if (key !== '_id') {
+        delete user[key as keyof typeof user]
+      }
+    })
 
     req.user = user
   }
@@ -313,6 +334,67 @@ class AuthService {
         statusCode: HttpStatusCode.Unauthorized,
       })
     }
+  }
+
+  async validateUserChangePassword(req: Request<ParamsDictionary, any, ChangePasswordBodyType>) {
+    const { userId } = req.decodedAuthorization as TokenPayload
+
+    const user = await databaseService.users.findOne({ _id: new ObjectId(userId) })
+
+    if (!user) {
+      throw new ErrorWithStatus({
+        message: 'User not found',
+        statusCode: HttpStatusCode.NotFound,
+      })
+    }
+
+    if (user.emailVerifyToken !== null) {
+      throw new ErrorWithStatus({
+        message: 'Email has not been verified',
+        statusCode: HttpStatusCode.Forbidden,
+      })
+    }
+
+    if (user.password !== hashPassword(req.body.currentPassword)) {
+      throw new EntityError({
+        message: 'Validation error occurred in body',
+        errors: [
+          {
+            code: z.ZodIssueCode.custom,
+            message: 'Current password is incorrect',
+            location: 'body',
+            path: 'currentPassword',
+          },
+        ],
+      })
+    }
+
+    if (req.body.newPassword === req.body.currentPassword) {
+      throw new EntityError({
+        message: 'Validation error occurred in body',
+        errors: [
+          {
+            code: z.ZodIssueCode.custom,
+            message: 'New password cannot be the same as the current password.',
+            location: 'body',
+            path: 'newPassword',
+          },
+        ],
+      })
+    }
+
+    Object.keys(user).forEach((key) => {
+      if (key !== '_id') {
+        delete user[key as keyof typeof user]
+      }
+    })
+  }
+
+  async changePassword({ userId, newPassword }: { userId: string; newPassword: string }) {
+    await databaseService.users.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { password: hashPassword(newPassword) }, $currentDate: { updatedAt: true } }
+    )
   }
 }
 

@@ -37,3 +37,12 @@ export default class User {
     this.updatedAt = user.updatedAt || currentDate
   }
 }
+
+export type UserDocument = Required<User>
+
+export type UserDocumentWithoutPassword = Omit<Required<User>, 'password'>
+
+export type UserDocumentWithoutSensitiveInfo = Omit<
+  Required<User>,
+  'password' | 'emailVerifyToken' | 'forgotPasswordToken'
+>
