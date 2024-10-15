@@ -1,7 +1,9 @@
 import { ObjectId } from 'mongodb'
 
 import Comment from '@/models/comment.model'
+import { ErrorWithStatus } from '@/models/errors'
 import { COMMENT_PAGE_LIMIT } from '@/constants'
+import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import { MediaType } from '@/schemas/common-media.schema'
 import { PaginationResponseType } from '@/schemas/common.schema'
@@ -256,6 +258,17 @@ class CommentsService {
       .toArray()
 
     return response
+  }
+
+  async deleteComment({ commentId, userId }: { commentId: string; userId: string }) {
+    const result = await databaseService.comments.deleteOne({
+      _id: new ObjectId(commentId),
+      userId: new ObjectId(userId),
+    })
+
+    if (result.deletedCount === 0) {
+      throw new ErrorWithStatus({ message: 'Comment not found', statusCode: HttpStatusCode.NotFound })
+    }
   }
 }
 

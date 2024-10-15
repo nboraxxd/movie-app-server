@@ -251,10 +251,11 @@ class DatabaseService {
       })
     }
 
-    const isIndexExist = await this.comments.indexExists(['mediaId_1_mediaType_1', 'userId_1'])
+    const isIndexExist = await this.comments.indexExists(['mediaId_1_mediaType_1', 'userId_1', '_id_1_userId_1'])
     if (!isIndexExist) {
       this.comments.createIndex({ mediaId: 1, mediaType: 1 })
       this.comments.createIndex({ userId: 1 })
+      this.comments.createIndex({ _id: 1, userId: 1 })
     }
   }
 

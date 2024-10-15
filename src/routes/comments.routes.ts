@@ -3,9 +3,15 @@ import { Router } from 'express'
 import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
-import { addCommentBodySchema, getCommentsByMediaParams, getCommentsQuery } from '@/schemas/comments.schema'
+import {
+  addCommentBodySchema,
+  deleteCommentParams,
+  getCommentsByMediaParams,
+  getCommentsQuery,
+} from '@/schemas/comments.schema'
 import {
   addCommentController,
+  deleteCommentController,
   getCommentsByMediaController,
   getMyCommentsController,
 } from '@/controllers/comments.controllers'
@@ -157,6 +163,48 @@ commentsRouter.get(
   authorizationValidator({ isLoginRequired: true }),
   zodValidator(getCommentsQuery, { location: 'query' }),
   wrapRequestHandler(getMyCommentsController)
+)
+
+/**
+ * @swagger
+ * /comments/{commentId}:
+ *  delete:
+ *   tags:
+ *   - comments
+ *   summary: Delete comment
+ *   description: Delete comment by comment id
+ *   operationId: deleteComment
+ *   parameters:
+ *    - in: path
+ *      name: commentId
+ *      required: true
+ *      description: Comment id need to delete.
+ *      schema:
+ *       type: string
+ *       example: 123abc...
+ *   responses:
+ *    '200':
+ *     description: Delete comment successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Delete comment successful
+ *    '400':
+ *     description: Missing or invalid comment id
+ *    '401':
+ *     description: Unauthorized
+ *    '404':
+ *     description: Comment not found
+ */
+commentsRouter.delete(
+  '/:commentId',
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  zodValidator(deleteCommentParams, { location: 'params' }),
+  wrapRequestHandler(deleteCommentController)
 )
 
 export default commentsRouter

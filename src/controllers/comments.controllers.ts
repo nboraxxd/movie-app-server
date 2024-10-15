@@ -3,6 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { TokenPayload } from '@/types/token.type'
 import commentsService from '@/services/comments.services'
+import { MessageResponseType } from '@/schemas/common.schema'
 import {
   AddCommentBodyType,
   AddCommentResponseType,
@@ -10,6 +11,7 @@ import {
   GetCommentsQueryType,
   GetCommentsByMediaResponseType,
   GetMyCommentsResponseType,
+  DeleteCommentParamsType,
 } from '@/schemas/comments.schema'
 
 export const addCommentController = async (
@@ -83,4 +85,16 @@ export const getMyCommentsController = async (
     })),
     pagination: result.pagination,
   })
+}
+
+export const deleteCommentController = async (
+  req: Request<DeleteCommentParamsType>,
+  res: Response<MessageResponseType>
+) => {
+  const { commentId } = req.params
+  const { userId } = req.decodedAuthorization as TokenPayload
+
+  await commentsService.deleteComment({ commentId, userId })
+
+  return res.json({ message: 'Delete comment successful' })
 }
