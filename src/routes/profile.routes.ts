@@ -3,7 +3,8 @@ import { Router } from 'express'
 import { uploadAvatar } from '@/utils/multer'
 import { wrapRequestHandler } from '@/utils/handlers'
 import authService from '@/services/auth.services'
-import { avatarSchema, updateProfileBodySchema } from '@/schemas/profile.schema'
+import profileService from '@/services/profile.services'
+import { avatarSchema, deleteMyAccountBodySchema, updateProfileBodySchema } from '@/schemas/profile.schema'
 import { authorizationValidator, fileValidator, zodValidator } from '@/middlewares/validators.middleware'
 import {
   deleteMyAccountController,
@@ -100,6 +101,7 @@ profileRouter.patch(
 profileRouter.delete(
   '/',
   authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExists }),
+  zodValidator(deleteMyAccountBodySchema, { location: 'body', customHandler: profileService.validateUserDelete }),
   wrapRequestHandler(deleteMyAccountController)
 )
 

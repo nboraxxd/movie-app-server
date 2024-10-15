@@ -1,6 +1,6 @@
 import z from 'zod'
 import { AVATAR_SIZE_LIMIT } from '@/constants'
-import { nameSchema } from '@/schemas/common.schema'
+import { nameSchema, passwordSchema } from '@/schemas/common.schema'
 
 export const userDocumentResponseSchema = z.object({
   _id: z.string(),
@@ -44,3 +44,11 @@ export const updateProfileResponseSchema = z.object({
 })
 
 export type UpdateProfileResponseType = z.TypeOf<typeof updateProfileResponseSchema>
+
+export const deleteMyAccountBodySchema = z
+  .object({
+    password: passwordSchema,
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type DeleteMyAccountBodyType = z.TypeOf<typeof deleteMyAccountBodySchema>

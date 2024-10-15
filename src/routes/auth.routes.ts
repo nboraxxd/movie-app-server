@@ -257,7 +257,10 @@ authRouter.patch(
   authorizationValidator({
     isLoginRequired: true,
   }),
-  zodValidator(changePasswordBodySchema, { location: 'body', customHandler: authService.validateReqChangePassword }),
+  zodValidator(changePasswordBodySchema, {
+    location: 'body',
+    customHandler: authService.validateChangePasswordRequest,
+  }),
   wrapRequestHandler(changePasswordController)
 )
 
@@ -265,7 +268,7 @@ authRouter.post(
   '/forgot-password',
   zodValidator(forgotPasswordBodySchema, {
     location: 'body',
-    customHandler: authService.validateReqForgotPassword,
+    customHandler: authService.validateForgotPasswordRequest,
   }),
   wrapRequestHandler(forgotPasswordController)
 )

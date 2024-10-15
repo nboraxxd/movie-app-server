@@ -206,7 +206,7 @@ class AuthService {
   async ensureUserExists(req: Request) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
-    const user = await profileService.findById(userId)
+    const user = await databaseService.users.findOne({ _id: new ObjectId(userId) })
 
     if (!user) {
       throw new ErrorWithStatus({
@@ -327,7 +327,7 @@ class AuthService {
     }
   }
 
-  async validateReqChangePassword(req: Request<ParamsDictionary, any, ChangePasswordBodyType>) {
+  async validateChangePasswordRequest(req: Request<ParamsDictionary, any, ChangePasswordBodyType>) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
     const user = await databaseService.users.findOne({ _id: new ObjectId(userId) })
@@ -388,7 +388,7 @@ class AuthService {
     )
   }
 
-  async validateReqForgotPassword(req: Request<ParamsDictionary, any, ForgotPasswordBodyType>) {
+  async validateForgotPasswordRequest(req: Request<ParamsDictionary, any, ForgotPasswordBodyType>) {
     const user = await profileService.findByEmail(req.body.email)
 
     if (!user) {

@@ -1,11 +1,15 @@
+import z from 'zod'
 import omit from 'lodash/omit'
+import { Request } from 'express'
 import { ObjectId } from 'mongodb'
+import { ParamsDictionary } from 'express-serve-static-core'
 
-import { ErrorWithStatus } from '@/models/errors'
+import { hashPassword } from '@/utils/crypto'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
-import { UpdateProfileBodyType, UpdateProfileResponseType } from '@/schemas/profile.schema'
-import { UserDocumentWithoutPassword } from '@/models/user.model'
+import { EntityError, ErrorWithStatus } from '@/models/errors'
+import { UserDocument, UserDocumentWithoutPassword } from '@/models/user.model'
+import { DeleteMyAccountBodyType, UpdateProfileBodyType, UpdateProfileResponseType } from '@/schemas/profile.schema'
 
 class ProfileService {
   async findById(userId: string) {
@@ -64,6 +68,24 @@ class ProfileService {
     return omit({ ...result, _id: result._id.toHexString(), isVerified: result.emailVerifyToken === null }, [
       'emailVerifyToken',
     ])
+  }
+
+  async validateUserDelete(req: Request<ParamsDictionary, any, DeleteMyAccountBodyType>) {
+    const user = req.user as UserDocument
+
+    if (user.password !== hashPassword(req.body.password)) {
+      throw new EntityError({
+        message: 'Validation error occurred in body',
+        errors: [
+          {
+            code: z.ZodIssueCode.custom,
+            message: 'Password is incorrect',
+            location: 'body',
+            path: 'password',
+          },
+        ],
+      })
+    }
   }
 
   async deleteMyAccount(userId: ObjectId) {
