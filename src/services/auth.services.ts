@@ -1,3 +1,4 @@
+import ms from 'ms'
 import z from 'zod'
 import { ObjectId } from 'mongodb'
 import { Request } from 'express'
@@ -17,7 +18,7 @@ import { sendEmail } from '@/utils/mailgun'
 import { hashPassword } from '@/utils/crypto'
 import databaseService from '@/services/database.services'
 import profileService from '@/services/profile.services'
-import { RegisterBodyType } from '@/schemas/auth.schema'
+import { ForgotPasswordBodyType, RegisterBodyType } from '@/schemas/auth.schema'
 import envVariables from '@/schemas/env-variables.schema'
 import { ChangePasswordBodyType, EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas/auth.schema'
 
@@ -41,7 +42,7 @@ class AuthService {
           exp,
         },
         isUndefined
-      ),
+      ) as Pick<TokenPayload, 'userId' | 'tokenType'> & { exp?: number },
       privateKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
       options: exp ? undefined : { expiresIn: envVariables.JWT_REFRESH_TOKEN_EXPIRES_IN },
     })
@@ -58,19 +59,9 @@ class AuthService {
     return Promise.all([this.signAccessToken(userId), this.signRefreshToken(userId)])
   }
 
-  private async signForgotPasswordToken(userId: string) {
-    return signToken({
-      payload: { userId, token_type: TokenType.ForgotPasswordToken },
-      privateKey: envVariables.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
-      options: {
-        expiresIn: envVariables.JWT_FORGOT_PASSWORD_TOKEN_EXPIRES_IN,
-      },
-    })
-  }
-
   async signEmailVerifyToken(userId: string) {
     return signToken({
-      payload: { userId, token_type: TokenType.EmailVerifyToken },
+      payload: { userId, tokenType: TokenType.EmailVerifyToken },
       privateKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
       options: {
         expiresIn: envVariables.JWT_EMAIL_VERIFY_TOKEN_EXPIRES_IN,
@@ -336,7 +327,7 @@ class AuthService {
     }
   }
 
-  async validateUserChangePassword(req: Request<ParamsDictionary, any, ChangePasswordBodyType>) {
+  async validateReqChangePassword(req: Request<ParamsDictionary, any, ChangePasswordBodyType>) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
     const user = await databaseService.users.findOne({ _id: new ObjectId(userId) })
@@ -395,6 +386,61 @@ class AuthService {
       { _id: new ObjectId(userId) },
       { $set: { password: hashPassword(newPassword) }, $currentDate: { updatedAt: true } }
     )
+  }
+
+  async validateReqForgotPassword(req: Request<ParamsDictionary, any, ForgotPasswordBodyType>) {
+    const user = await profileService.findByEmail(req.body.email)
+
+    if (!user) {
+      throw new EntityError({
+        message: 'Validation error occurred in body',
+        errors: [
+          {
+            code: z.ZodIssueCode.custom,
+            message: 'Email does not exist in the system',
+            location: 'body',
+            path: 'email',
+          },
+        ],
+      })
+    }
+
+    if (user.forgotPasswordToken !== null) {
+      const decodedToken = await verifyToken({
+        token: user.forgotPasswordToken,
+        jwtKey: envVariables.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
+      })
+
+      const nextEmailResendTime = new Date(decodedToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME))
+
+      const remainingTimeInMs = Math.max(0, nextEmailResendTime.getTime() - Date.now())
+
+      if (remainingTimeInMs > 0) {
+        throw new ErrorWithStatus({
+          message: `Please try again in ${Math.ceil(remainingTimeInMs / 1000)} second(s)`,
+          statusCode: HttpStatusCode.TooManyRequests,
+        })
+      }
+    }
+
+    req.user = user
+  }
+
+  async updateForgotPasswordToken(userId: string) {
+    const forgotPasswordToken = await signToken({
+      payload: { userId, tokenType: TokenType.ForgotPasswordToken },
+      privateKey: envVariables.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
+      options: {
+        expiresIn: envVariables.JWT_FORGOT_PASSWORD_TOKEN_EXPIRES_IN,
+      },
+    })
+
+    await databaseService.users.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { forgotPasswordToken }, $currentDate: { updatedAt: true } }
+    )
+
+    return forgotPasswordToken
   }
 }
 

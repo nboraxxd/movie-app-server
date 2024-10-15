@@ -159,6 +159,7 @@ export const discoverTvsQuerySchema = z
     includeAdult: z
       .string()
       .refine((value) => value === 'true' || value === 'false', { message: 'includeAdult must be true or false' })
+      .transform((value) => (value === 'true' ? true : false))
       .optional(),
     page: queryPageSchema.optional(),
     sortBy: discoverySortBySchema.optional(),

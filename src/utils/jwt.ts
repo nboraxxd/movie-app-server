@@ -7,7 +7,7 @@ import envVariables from '@/schemas/env-variables.schema'
 import { EmailVerifyTokenType, RefreshTokenType } from '@/schemas/auth.schema'
 
 type SignTokenType = {
-  payload: Omit<TokenPayload, 'iat' | 'exp'> & { exp?: number }
+  payload: Pick<TokenPayload, 'userId' | 'tokenType'> & { exp?: number }
   privateKey: string
   options?: SignOptions
 }

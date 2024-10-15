@@ -80,3 +80,11 @@ export const changePasswordBodySchema = z
   })
 
 export type ChangePasswordBodyType = z.TypeOf<typeof changePasswordBodySchema>
+
+export const forgotPasswordBodySchema = z
+  .object({
+    email: emailSchema,
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type ForgotPasswordBodyType = z.TypeOf<typeof forgotPasswordBodySchema>

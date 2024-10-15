@@ -6,9 +6,8 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { verifyToken } from '@/utils/jwt'
 import { TokenPayload } from '@/types/token.type'
 import { HttpStatusCode } from '@/constants/http-status-code'
-import { calculateRemainingTimeInSeconds } from '@/utils/common'
 import authService from '@/services/auth.services'
-import User from '@/models/user.model'
+import User, { UserDocumentWithoutPassword } from '@/models/user.model'
 import { ErrorWithStatus } from '@/models/errors'
 import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
@@ -16,10 +15,13 @@ import {
   AuthResponseType,
   ChangePasswordBodyType,
   EmailVerifyTokenType,
+  ForgotPasswordBodyType,
   LoginBodyType,
   RefreshTokenType,
   RegisterBodyType,
 } from '@/schemas/auth.schema'
+import { sendEmail } from '@/utils/mailgun'
+import { EMAIL_TEMPLATES } from '@/constants/email-templates'
 
 export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterBodyType>,
@@ -44,11 +46,11 @@ export const resendEmailVerificationController = async (req: Request, res: Respo
 
   const nextEmailResendTime = new Date(decodedEmailVerifyToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME))
 
-  const remainingTimeInSeconds = calculateRemainingTimeInSeconds(nextEmailResendTime)
+  const remainingTimeInMs = Math.max(0, nextEmailResendTime.getTime() - Date.now())
 
-  if (remainingTimeInSeconds > 0) {
+  if (remainingTimeInMs > 0) {
     throw new ErrorWithStatus({
-      message: `Please try again in ${remainingTimeInSeconds} seconds`,
+      message: `Please try again in ${remainingTimeInMs / 1000} second(s)`,
       statusCode: HttpStatusCode.TooManyRequests,
     })
   }
@@ -112,4 +114,27 @@ export const changePasswordController = async (
   await authService.changePassword({ userId, newPassword })
 
   return res.json({ message: 'Change password successful' })
+}
+
+export const forgotPasswordController = async (
+  req: Request<ParamsDictionary, any, ForgotPasswordBodyType>,
+  res: Response<MessageResponseType>
+) => {
+  const { _id, email, name } = req.user as UserDocumentWithoutPassword
+
+  const forgotPasswordToken = await authService.updateForgotPasswordToken(_id.toHexString())
+
+  res.json({ message: 'Please check your email to reset your password' })
+
+  setImmediate(() => {
+    sendEmail({
+      name,
+      email,
+      subject: '[nmovies] Reset your password',
+      html: EMAIL_TEMPLATES.PASSWORD_RESET({
+        name,
+        link: `${envVariables.CLIENT_URL}/reset-password?token=${forgotPasswordToken}`,
+      }),
+    })
+  })
 }

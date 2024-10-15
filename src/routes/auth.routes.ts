@@ -9,10 +9,12 @@ import {
   loginBodySchema,
   refreshTokenSchema,
   changePasswordBodySchema,
+  forgotPasswordBodySchema,
 } from '@/schemas/auth.schema'
 import { zodValidator, authorizationValidator, tokenValidator } from '@/middlewares/validators.middleware'
 import {
   changePasswordController,
+  forgotPasswordController,
   loginController,
   logoutController,
   refreshTokenController,
@@ -255,8 +257,17 @@ authRouter.patch(
   authorizationValidator({
     isLoginRequired: true,
   }),
-  zodValidator(changePasswordBodySchema, { location: 'body', customHandler: authService.validateUserChangePassword }),
+  zodValidator(changePasswordBodySchema, { location: 'body', customHandler: authService.validateReqChangePassword }),
   wrapRequestHandler(changePasswordController)
+)
+
+authRouter.post(
+  '/forgot-password',
+  zodValidator(forgotPasswordBodySchema, {
+    location: 'body',
+    customHandler: authService.validateReqForgotPassword,
+  }),
+  wrapRequestHandler(forgotPasswordController)
 )
 
 export default authRouter

@@ -90,7 +90,7 @@ profileRouter.post(
   wrapRequestHandler(uploadAvatarController)
 )
 
-profileRouter.post(
+profileRouter.patch(
   '/',
   authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
   zodValidator(updateProfileBodySchema, { location: 'body' }),
