@@ -36,6 +36,10 @@ export const updateProfileController = async (
   return res.json({ message: 'Update profile successful', data: result })
 }
 
+export const verifyPasswordController = async (_req: Request, res: Response<MessageResponseType>) => {
+  return res.json({ message: 'Verify password successful' })
+}
+
 export const deleteMyAccountController = async (req: Request, res: Response<MessageResponseType>) => {
   const { userId } = req.decodedAuthorization as TokenPayload
 

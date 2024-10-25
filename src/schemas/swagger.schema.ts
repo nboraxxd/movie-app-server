@@ -1158,7 +1158,7 @@
  *     mediaPoster:
  *      type: string
  *      nullable: true
- *      example: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+ *      example: https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg
  *     mediaReleaseDate:
  *      type: string
  *      format: date
@@ -1167,4 +1167,14 @@
  *      type: string
  *      format: date-time
  *      example: "2025-02-19T08:46:24.000Z"
+ *
+ *   updateProfileBodySchema:
+ *    type: object
+ *    properties:
+ *     name:
+ *      type: string
+ *      example: Bruce Wayne
+ *     avatar:
+ *      type: string
+ *      example: https://www.wayne-ent.dc/brucewayne.jpg
  */

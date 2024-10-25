@@ -9,7 +9,7 @@ import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import { EntityError, ErrorWithStatus } from '@/models/errors'
 import { UserDocument, UserDocumentWithoutPassword } from '@/models/user.model'
-import { DeleteMyAccountBodyType, UpdateProfileBodyType, UpdateProfileResponseType } from '@/schemas/profile.schema'
+import { VerifyPasswordBodyType, UpdateProfileBodyType, UpdateProfileResponseType } from '@/schemas/profile.schema'
 
 class ProfileService {
   async findById(userId: string) {
@@ -41,6 +41,15 @@ class ProfileService {
     ])
   }
 
+  async hasFieldToUpdate(req: Request<ParamsDictionary, any, UpdateProfileBodyType>) {
+    if (Object.keys(req.body).length === 0) {
+      throw new ErrorWithStatus({
+        message: 'At least one field is required to update',
+        statusCode: HttpStatusCode.BadRequest,
+      })
+    }
+  }
+
   async updateProfile(
     userId: string,
     payload: UpdateProfileBodyType
@@ -70,7 +79,7 @@ class ProfileService {
     ])
   }
 
-  async validateUserDelete(req: Request<ParamsDictionary, any, DeleteMyAccountBodyType>) {
+  async validateUserPassword(req: Request<ParamsDictionary, any, VerifyPasswordBodyType>) {
     const user = req.user as UserDocument
 
     if (user.password !== hashPassword(req.body.password)) {
@@ -93,7 +102,14 @@ class ProfileService {
     session.startTransaction()
 
     try {
-      await databaseService.users.deleteOne({ _id: userId }, { session })
+      const result = await databaseService.users.deleteOne({ _id: userId }, { session })
+
+      if (!result.deletedCount) {
+        throw new ErrorWithStatus({
+          message: 'User not found',
+          statusCode: HttpStatusCode.NotFound,
+        })
+      }
 
       await Promise.all([
         databaseService.favorites.deleteMany({ userId }, { session }),

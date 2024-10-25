@@ -45,10 +45,10 @@ export const updateProfileResponseSchema = z.object({
 
 export type UpdateProfileResponseType = z.TypeOf<typeof updateProfileResponseSchema>
 
-export const deleteMyAccountBodySchema = z
+export const verifyPasswordBodySchema = z
   .object({
     password: passwordSchema,
   })
   .strict({ message: 'Additional properties not allowed' })
 
-export type DeleteMyAccountBodyType = z.TypeOf<typeof deleteMyAccountBodySchema>
+export type VerifyPasswordBodyType = z.TypeOf<typeof verifyPasswordBodySchema>

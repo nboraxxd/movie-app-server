@@ -4,13 +4,14 @@ import { uploadAvatar } from '@/utils/multer'
 import { wrapRequestHandler } from '@/utils/handlers'
 import authService from '@/services/auth.services'
 import profileService from '@/services/profile.services'
-import { avatarSchema, deleteMyAccountBodySchema, updateProfileBodySchema } from '@/schemas/profile.schema'
+import { avatarSchema, verifyPasswordBodySchema, updateProfileBodySchema } from '@/schemas/profile.schema'
 import { authorizationValidator, fileValidator, zodValidator } from '@/middlewares/validators.middleware'
 import {
   deleteMyAccountController,
   getProfileController,
   updateProfileController,
   uploadAvatarController,
+  verifyPasswordController,
 } from '@/controllers/profile.controllers'
 
 const profileRouter = Router()
@@ -91,17 +92,134 @@ profileRouter.post(
   wrapRequestHandler(uploadAvatarController)
 )
 
+/**
+ * @swagger
+ * /profile:
+ *  patch:
+ *   tags:
+ *   - profile
+ *   summary: Update profile
+ *   description: Update user profile by token and body
+ *   operationId: updateProfile
+ *   security:
+ *    - bearerAuth: []
+ *   requestBody:
+ *    description: Profile information (avatar or name, at least one field is required)
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#/components/schemas/updateProfileBodySchema'
+ *   responses:
+ *    '200':
+ *     description: Update profile successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Update profile successful
+ *         data:
+ *          $ref: '#/components/schemas/dataGetProfileResponseSchema'
+ *    '400':
+ *     description: At least one field is required to update
+ *    '401':
+ *     description: Unauthorized
+ *    '403':
+ *     description: Email has not been verified
+ *    '404':
+ *     description: User not found
+ *    '422':
+ *     description: Invalid value or missing field
+ */
 profileRouter.patch(
   '/',
   authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
-  zodValidator(updateProfileBodySchema, { location: 'body' }),
+  zodValidator(updateProfileBodySchema, { location: 'body', customHandler: profileService.hasFieldToUpdate }),
   wrapRequestHandler(updateProfileController)
 )
 
+/**
+ * @swagger
+ * /profile/verify-password:
+ *  post:
+ *   tags:
+ *   - profile
+ *   summary: Verify password
+ *   description: Verify user password
+ *   operationId: verifyPassword
+ *   security:
+ *    - bearerAuth: []
+ *   requestBody:
+ *    description: Password information
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       type: object
+ *       required:
+ *       - password
+ *       properties:
+ *        password:
+ *         type: string
+ *         example: 123456
+ *   responses:
+ *    '200':
+ *     description: Verify password successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Verify password successful
+ *    '401':
+ *     description: Unauthorized
+ *    '404':
+ *     description: User not found
+ *    '422':
+ *     description: Password is incorrect
+ */
+profileRouter.post(
+  '/verify-password',
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExists }),
+  zodValidator(verifyPasswordBodySchema, { location: 'body', customHandler: profileService.validateUserPassword }),
+  wrapRequestHandler(verifyPasswordController)
+)
+
+/**
+ * @swagger
+ * /profile:
+ *  delete:
+ *   tags:
+ *   - profile
+ *   summary: Delete my account (must using profile/verify-password route first)
+ *   description: Delete user account by token
+ *   operationId: deleteMyAccount
+ *   security:
+ *    - bearerAuth: []
+ *   responses:
+ *    '200':
+ *     description: Delete account successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Delete account successful
+ *    '401':
+ *     description: Unauthorized
+ *    '404':
+ *     description: User not found
+ */
 profileRouter.delete(
   '/',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExists }),
-  zodValidator(deleteMyAccountBodySchema, { location: 'body', customHandler: profileService.validateUserDelete }),
+  authorizationValidator({ isLoginRequired: true }),
   wrapRequestHandler(deleteMyAccountController)
 )
 

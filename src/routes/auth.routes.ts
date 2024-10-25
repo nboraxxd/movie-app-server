@@ -252,6 +252,58 @@ authRouter.post(
  */
 authRouter.post('/logout', tokenValidator(refreshTokenSchema, decodeRefreshToken), wrapRequestHandler(logoutController))
 
+/**
+ * @swagger
+ * /auth/change-password:
+ *  patch:
+ *   tags:
+ *   - auth
+ *   summary: Change password
+ *   description: Change password using old password, new password and confirm password
+ *   operationId: changePassword
+ *   security:
+ *    - bearerAuth: []
+ *   requestBody:
+ *    description: Change password information
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       type: object
+ *       required:
+ *       - currentPassword
+ *       - newPassword
+ *       - confirmNewPassword
+ *       properties:
+ *        currentPassword:
+ *         type: string
+ *         example: 123456
+ *        newPassword:
+ *         type: string
+ *         example: 12345678
+ *        confirmNewPassword:
+ *         type: string
+ *         example: 12345678
+ *   responses:
+ *    '200':
+ *     description: Change password successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Change password successful
+ *    '401':
+ *     description: Unauthorized
+ *    '403':
+ *     description: Email has not been verified
+ *    '404':
+ *     description: User not found
+ *    '422':
+ *     description: Invalid value or missing field
+ */
 authRouter.patch(
   '/change-password',
   authorizationValidator({
@@ -264,6 +316,48 @@ authRouter.patch(
   wrapRequestHandler(changePasswordController)
 )
 
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *  post:
+ *   tags:
+ *   - auth
+ *   summary: Forgot password
+ *   description: Forgot password using email
+ *   operationId: forgotPassword
+ *   requestBody:
+ *    description: Email need to reset password
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       type: object
+ *       required:
+ *       - email
+ *       properties:
+ *        email:
+ *         type: string
+ *         example: brucewayne@wayne-ent.dc
+ *   responses:
+ *    '200':
+ *     description: Resend email verification successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Please check your email to verify your account
+ *    '400':
+ *     description: Account has been verified
+ *    '401':
+ *     description: Unauthorized
+ *    '404':
+ *     description: User not found
+ *    '429':
+ *     description: Too many requests
+ */
 authRouter.post(
   '/forgot-password',
   zodValidator(forgotPasswordBodySchema, {
