@@ -130,7 +130,7 @@ class CommentsService {
                   userId: 0,
                   user: {
                     password: 0,
-                    forgotPasswordToken: 0,
+                    resetPasswordToken: 0,
                     emailVerifyToken: 0,
                     createdAt: 0,
                     updatedAt: 0,

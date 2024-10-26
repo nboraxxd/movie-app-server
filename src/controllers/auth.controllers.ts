@@ -18,6 +18,7 @@ import {
   LoginBodyType,
   RefreshTokenType,
   RegisterBodyType,
+  ResetPasswordBodyType,
 } from '@/schemas/auth.schema'
 
 export const registerController = async (
@@ -111,7 +112,7 @@ export const forgotPasswordController = async (
 ) => {
   const { _id, email, name } = req.user as UserDocumentWithoutPassword
 
-  const forgotPasswordToken = await authService.updateForgotPasswordToken(_id.toHexString())
+  const updateResetPasswordToken = await authService.updateResetPasswordToken(_id.toHexString())
 
   res.json({ message: 'Please check your email to reset your password' })
 
@@ -122,8 +123,20 @@ export const forgotPasswordController = async (
       subject: '[nmovies] Reset your password',
       html: EMAIL_TEMPLATES.PASSWORD_RESET({
         name,
-        link: `${envVariables.CLIENT_URL}/reset-password?token=${forgotPasswordToken}`,
+        link: `${envVariables.CLIENT_URL}/reset-password?token=${updateResetPasswordToken}`,
       }),
     })
   })
+}
+
+export const resetPasswordController = async (
+  req: Request<ParamsDictionary, any, ResetPasswordBodyType>,
+  res: Response<MessageResponseType>
+) => {
+  const { _id } = req.user as UserDocumentWithoutPassword
+  const { password } = req.body
+
+  await authService.resetPassword({ userId: _id, password })
+
+  return res.json({ message: 'Reset password successful. Please login again' })
 }

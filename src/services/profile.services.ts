@@ -65,7 +65,7 @@ class ProfileService {
       { _id: new ObjectId(userId) },
       { $set: payload, $currentDate: { updatedAt: true } },
       {
-        projection: { password: 0, forgotPasswordToken: 0 },
+        projection: { password: 0, resetPasswordToken: 0 },
         returnDocument: 'after',
       }
     )

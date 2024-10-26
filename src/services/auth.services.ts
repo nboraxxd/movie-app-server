@@ -1,24 +1,27 @@
 import ms from 'ms'
 import z from 'zod'
-import { ObjectId } from 'mongodb'
-import { Request } from 'express'
+import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import isUndefined from 'lodash/isUndefined'
+import { Request } from 'express'
+import { ObjectId } from 'mongodb'
+import { JsonWebTokenError, decode } from 'jsonwebtoken'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import User from '@/models/user.model'
-import { EntityError, ErrorWithStatus } from '@/models/errors'
+import { EntityError, ErrorWithStatus, ErrorWithStatusAndLocation } from '@/models/errors'
 import RefreshToken from '@/models/refresh-token.model'
 import { TokenPayload } from '@/types/token.type'
 import { TokenType } from '@/constants/type'
 import { EMAIL_TEMPLATES } from '@/constants/email-templates'
 import { HttpStatusCode } from '@/constants/http-status-code'
-import { signToken, verifyToken } from '@/utils/jwt'
 import { sendEmail } from '@/utils/mailgun'
 import { hashPassword } from '@/utils/crypto'
+import { capitalizeFirstLetter } from '@/utils/common'
+import { decodeRefreshToken, decodeResetPasswordToken, signToken } from '@/utils/jwt'
 import databaseService from '@/services/database.services'
 import profileService from '@/services/profile.services'
-import { ForgotPasswordBodyType, RegisterBodyType } from '@/schemas/auth.schema'
+import { ForgotPasswordBodyType, RegisterBodyType, ResetPasswordBodyType } from '@/schemas/auth.schema'
 import envVariables from '@/schemas/env-variables.schema'
 import { ChangePasswordBodyType, EmailVerifyTokenType, LoginBodyType, RefreshTokenType } from '@/schemas/auth.schema'
 
@@ -45,13 +48,6 @@ class AuthService {
       ) as Pick<TokenPayload, 'userId' | 'tokenType'> & { exp?: number },
       privateKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
       options: exp ? undefined : { expiresIn: envVariables.JWT_REFRESH_TOKEN_EXPIRES_IN },
-    })
-  }
-
-  private decodeRefreshToken(token: string) {
-    return verifyToken({
-      token,
-      jwtKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
     })
   }
 
@@ -110,7 +106,7 @@ class AuthService {
       this.signRefreshToken(userId.toHexString()),
     ])
 
-    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
+    const { iat, exp } = await decodeRefreshToken(refreshToken)
 
     await Promise.all([
       databaseService.users.insertOne(
@@ -141,10 +137,7 @@ class AuthService {
       })
     }
 
-    const decodedEmailVerifyToken = await verifyToken({
-      token: user.emailVerifyToken,
-      jwtKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
-    })
+    const decodedEmailVerifyToken = decode(user.emailVerifyToken) as TokenPayload
 
     const nextEmailResendTime = new Date(
       decodedEmailVerifyToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME)
@@ -202,7 +195,7 @@ class AuthService {
 
   async verifyEmail(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
-    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
+    const { iat, exp } = await decodeRefreshToken(refreshToken)
 
     await Promise.all([
       databaseService.users.updateOne(
@@ -282,7 +275,7 @@ class AuthService {
 
   async login(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
-    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
+    const { iat, exp } = await decodeRefreshToken(refreshToken)
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ userId: new ObjectId(userId), token: refreshToken, iat, exp })
@@ -293,10 +286,7 @@ class AuthService {
 
   async validateRefreshTokenRequest(req: Request<ParamsDictionary, any, RefreshTokenType>) {
     const [decodedRefreshToken, findAndDeleteResult] = await Promise.all([
-      await verifyToken({
-        token: req.body.refreshToken,
-        jwtKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
-      }),
+      decodeRefreshToken(req.body.refreshToken),
       databaseService.refreshTokens.findOneAndDelete({ token: req.body.refreshToken }),
     ])
 
@@ -316,7 +306,7 @@ class AuthService {
       this.signRefreshToken(userId, exp),
     ])
 
-    const decodedRefreshToken = await this.decodeRefreshToken(newRefreshToken)
+    const decodedRefreshToken = await decodeRefreshToken(newRefreshToken)
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
@@ -418,14 +408,14 @@ class AuthService {
         ],
       })
     }
+    req.user = user
 
-    if (user.forgotPasswordToken !== null) {
-      const decodedToken = await verifyToken({
-        token: user.forgotPasswordToken,
-        jwtKey: envVariables.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
-      })
+    if (user.resetPasswordToken !== null) {
+      const decodedResetPasswordToken = decode(user.resetPasswordToken) as TokenPayload
 
-      const nextEmailResendTime = new Date(decodedToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME))
+      const nextEmailResendTime = new Date(
+        decodedResetPasswordToken.iat * 1000 + ms(envVariables.RESEND_EMAIL_DEBOUNCE_TIME)
+      )
 
       const remainingTimeInMs = Math.max(0, nextEmailResendTime.getTime() - Date.now())
 
@@ -436,25 +426,67 @@ class AuthService {
         })
       }
     }
-
-    req.user = user
   }
 
-  async updateForgotPasswordToken(userId: string) {
-    const forgotPasswordToken = await signToken({
-      payload: { userId, tokenType: TokenType.ForgotPasswordToken },
-      privateKey: envVariables.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
+  async updateResetPasswordToken(userId: string) {
+    const resetPasswordToken = await signToken({
+      payload: { userId, tokenType: TokenType.ResetPasswordToken },
+      privateKey: envVariables.JWT_SECRET_RESET_PASSWORD_TOKEN,
       options: {
-        expiresIn: envVariables.JWT_FORGOT_PASSWORD_TOKEN_EXPIRES_IN,
+        expiresIn: envVariables.JWT_RESET_PASSWORD_TOKEN_EXPIRES_IN,
       },
     })
 
     await databaseService.users.updateOne(
       { _id: new ObjectId(userId) },
-      { $set: { forgotPasswordToken }, $currentDate: { updatedAt: true } }
+      { $set: { resetPasswordToken }, $currentDate: { updatedAt: true } }
     )
 
-    return forgotPasswordToken
+    return resetPasswordToken
+  }
+
+  async validateResetPasswordTokenAndAttachUser(req: Request<ParamsDictionary, any, ResetPasswordBodyType>) {
+    const { resetPasswordToken } = req.body
+
+    try {
+      const decodedResetPasswordToken = await decodeResetPasswordToken(resetPasswordToken)
+
+      const user = await profileService.findById(decodedResetPasswordToken.userId)
+
+      if (!user) {
+        throw new ErrorWithStatus({
+          message: 'User not found',
+          statusCode: HttpStatusCode.NotFound,
+        })
+      }
+
+      if (user.resetPasswordToken !== resetPasswordToken) {
+        throw new ErrorWithStatus({
+          message: 'Invalid reset password token. Please check your email for the latest link or request a new one.',
+          statusCode: HttpStatusCode.BadRequest,
+        })
+      }
+
+      req.user = user
+    } catch (error) {
+      if (error instanceof JsonWebTokenError) {
+        throw new ErrorWithStatusAndLocation({
+          message: capitalizeFirstLetter(error.message),
+          statusCode: HttpStatusCode.BadRequest,
+          location: 'body',
+          errorInfo: omit(error, ['message']),
+        })
+      } else {
+        throw error
+      }
+    }
+  }
+
+  async resetPassword({ userId, password }: { userId: ObjectId; password: string }) {
+    await databaseService.users.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { password: hashPassword(password), resetPasswordToken: null }, $currentDate: { updatedAt: true } }
+    )
   }
 }
 

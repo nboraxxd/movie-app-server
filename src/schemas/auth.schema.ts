@@ -88,3 +88,24 @@ export const forgotPasswordBodySchema = z
   .strict({ message: 'Additional properties not allowed' })
 
 export type ForgotPasswordBodyType = z.TypeOf<typeof forgotPasswordBodySchema>
+
+export const resetPasswordBodySchema = z
+  .object({
+    resetPasswordToken: z.string({ required_error: 'Reset password token is required' }),
+    password: passwordSchema,
+    confirmPassword: z
+      .string({ required_error: 'confirmPassword is required' })
+      .min(6, { message: 'confirmPassword must be at least 6 characters' }),
+  })
+  .strict({ message: 'Additional properties not allowed' })
+  .superRefine(({ password, confirmPassword }, ctx) => {
+    if (password !== confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+      })
+    }
+  })
+
+export type ResetPasswordBodyType = z.TypeOf<typeof resetPasswordBodySchema>

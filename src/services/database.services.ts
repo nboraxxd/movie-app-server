@@ -59,7 +59,7 @@ class DatabaseService {
                 bsonType: ['string', 'null'],
                 description: 'Token for email verification, can be null',
               },
-              forgotPasswordToken: {
+              resetPasswordToken: {
                 bsonType: ['string', 'null'],
                 description: 'Token for password reset, can be null',
               },

@@ -6,7 +6,7 @@ type UserType = {
   email: string
   password: string
   emailVerifyToken?: string
-  forgotPasswordToken?: string
+  resetPasswordToken?: string
   avatar?: string
   createdAt?: Date
   updatedAt?: Date
@@ -18,7 +18,7 @@ export default class User {
   email: string
   password: string
   emailVerifyToken: string | null
-  forgotPasswordToken: string | null
+  resetPasswordToken: string | null
   avatar: string | null
   createdAt: Date
   updatedAt: Date
@@ -31,7 +31,7 @@ export default class User {
     this.email = user.email
     this.password = user.password
     this.emailVerifyToken = user.emailVerifyToken || null
-    this.forgotPasswordToken = user.forgotPasswordToken || null
+    this.resetPasswordToken = user.resetPasswordToken || null
     this.avatar = user.avatar || null
     this.createdAt = user.createdAt || currentDate
     this.updatedAt = user.updatedAt || currentDate
@@ -44,5 +44,5 @@ export type UserDocumentWithoutPassword = Omit<Required<User>, 'password'>
 
 export type UserDocumentWithoutSensitiveInfo = Omit<
   Required<User>,
-  'password' | 'emailVerifyToken' | 'forgotPasswordToken'
+  'password' | 'emailVerifyToken' | 'resetPasswordToken'
 >

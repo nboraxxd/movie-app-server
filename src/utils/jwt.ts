@@ -41,16 +41,19 @@ export function verifyToken({ token, jwtKey }: VerifyTokenType) {
   })
 }
 
-export async function decodeEmailVerifyToken(req: Request<ParamsDictionary, any, EmailVerifyTokenType>) {
-  const decodedEmailVerifyToken = await verifyToken({
-    token: req.body.emailVerifyToken,
+export async function decodeEmailVerifyToken(token: string) {
+  return verifyToken({
+    token: token,
     jwtKey: envVariables.JWT_SECRET_EMAIL_VERIFY_TOKEN,
   })
+}
 
+export async function attachDecodedEmailVerifyTokenToReq(req: Request<ParamsDictionary, any, EmailVerifyTokenType>) {
+  const decodedEmailVerifyToken = await decodeEmailVerifyToken(req.body.emailVerifyToken)
   req.decodedEmailVerifyToken = decodedEmailVerifyToken
 }
 
-export async function decodeAuthorizationToken(token: string, req: Request) {
+export async function attachDecodedAuthorizationTokenToReq(token: string, req: Request) {
   const decodedAuthorizationToken = await verifyToken({
     token,
     jwtKey: envVariables.JWT_SECRET_ACCESS_TOKEN,
@@ -59,11 +62,21 @@ export async function decodeAuthorizationToken(token: string, req: Request) {
   req.decodedAuthorization = decodedAuthorizationToken
 }
 
-export async function decodeRefreshToken(req: Request<ParamsDictionary, any, RefreshTokenType>) {
-  const decodedEmailVerifyToken = await verifyToken({
-    token: req.body.refreshToken,
+export async function decodeRefreshToken(token: string) {
+  return verifyToken({
+    token,
     jwtKey: envVariables.JWT_SECRET_REFRESH_TOKEN,
   })
+}
 
-  req.decodedRefreshToken = decodedEmailVerifyToken
+export async function attachDecodedRefreshTokenToReq(req: Request<ParamsDictionary, any, RefreshTokenType>) {
+  const decodedRefreshToken = await decodeRefreshToken(req.body.refreshToken)
+  req.decodedRefreshToken = decodedRefreshToken
+}
+
+export async function decodeResetPasswordToken(token: string) {
+  return verifyToken({
+    token: token,
+    jwtKey: envVariables.JWT_SECRET_RESET_PASSWORD_TOKEN,
+  })
 }

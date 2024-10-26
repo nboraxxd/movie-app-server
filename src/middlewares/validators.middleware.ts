@@ -4,7 +4,7 @@ import omit from 'lodash/omit'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
-import { decodeAuthorizationToken } from '@/utils/jwt'
+import { attachDecodedAuthorizationTokenToReq } from '@/utils/jwt'
 import { capitalizeFirstLetter } from '@/utils/common'
 import { authorizationSchema } from '@/schemas/auth.schema'
 import { HttpStatusCode } from '@/constants/http-status-code'
@@ -14,7 +14,11 @@ export type ValidationLocation = 'body' | 'params' | 'query' | 'headers' | 'file
 
 export const zodValidator = (
   schema: z.Schema,
-  options: { location: ValidationLocation; customPath?: string; customHandler?: (req: Request) => Promise<void> }
+  options: {
+    location: ValidationLocation
+    customPath?: string
+    customHandler?: (req: Request) => Promise<void>
+  }
 ) => {
   const { location, customPath, customHandler } = options
 
@@ -81,9 +85,9 @@ export const authorizationValidator = ({
         const { authorization: parsedAccessToken } = await authorizationSchema.parseAsync({
           authorization: accessToken,
         })
-        await decodeAuthorizationToken(parsedAccessToken, req)
+        await attachDecodedAuthorizationTokenToReq(parsedAccessToken, req)
       } else if (!isLoginRequired && accessToken) {
-        await decodeAuthorizationToken(accessToken, req)
+        await attachDecodedAuthorizationTokenToReq(accessToken, req)
       }
 
       if (customHandler) {

@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
-import { decodeEmailVerifyToken, decodeRefreshToken } from '@/utils/jwt'
+import { attachDecodedEmailVerifyTokenToReq, attachDecodedRefreshTokenToReq } from '@/utils/jwt'
 import {
   registerBodySchema,
   emailVerifyTokenSchema,
@@ -10,6 +10,7 @@ import {
   refreshTokenSchema,
   changePasswordBodySchema,
   forgotPasswordBodySchema,
+  resetPasswordBodySchema,
 } from '@/schemas/auth.schema'
 import { zodValidator, authorizationValidator, tokenValidator } from '@/middlewares/validators.middleware'
 import {
@@ -20,6 +21,7 @@ import {
   refreshTokenController,
   registerController,
   resendEmailVerificationController,
+  resetPasswordController,
   verifyEmailController,
 } from '@/controllers/auth.controllers'
 
@@ -140,7 +142,7 @@ authRouter.post(
  */
 authRouter.post(
   '/verify-email',
-  tokenValidator(emailVerifyTokenSchema, decodeEmailVerifyToken, authService.validateUserVerifyEmail),
+  tokenValidator(emailVerifyTokenSchema, attachDecodedEmailVerifyTokenToReq, authService.validateUserVerifyEmail),
   wrapRequestHandler(verifyEmailController)
 )
 
@@ -250,7 +252,11 @@ authRouter.post(
  *    '401':
  *     description: Unauthorized
  */
-authRouter.post('/logout', tokenValidator(refreshTokenSchema, decodeRefreshToken), wrapRequestHandler(logoutController))
+authRouter.post(
+  '/logout',
+  tokenValidator(refreshTokenSchema, attachDecodedRefreshTokenToReq),
+  wrapRequestHandler(logoutController)
+)
 
 /**
  * @swagger
@@ -326,7 +332,7 @@ authRouter.patch(
  *   description: Forgot password using email
  *   operationId: forgotPassword
  *   requestBody:
- *    description: Email need to reset password
+ *    description: Email need to recover password
  *    required: true
  *    content:
  *     application/json:
@@ -340,7 +346,7 @@ authRouter.patch(
  *         example: brucewayne@wayne-ent.dc
  *   responses:
  *    '200':
- *     description: Resend email verification successful
+ *     description: Please check your email to reset your password
  *     content:
  *      application/json:
  *       schema:
@@ -348,7 +354,7 @@ authRouter.patch(
  *        properties:
  *         message:
  *          type: string
- *          example: Please check your email to verify your account
+ *          example: Please check your email to reset your password
  *    '400':
  *     description: Account has been verified
  *    '401':
@@ -365,6 +371,63 @@ authRouter.post(
     customHandler: authService.validateForgotPasswordRequest,
   }),
   wrapRequestHandler(forgotPasswordController)
+)
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *  post:
+ *   tags:
+ *   - auth
+ *   summary: Reset password
+ *   description: Reset password using reset password token, new password and confirm password
+ *   operationId: resetPassword
+ *   requestBody:
+ *    description: Reset password information
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       type: object
+ *       required:
+ *       - resetPasswordToken
+ *       - password
+ *       - confirmPassword
+ *       properties:
+ *        resetPasswordToken:
+ *         type: string
+ *         example: eyJhbGciOiJIUzI1...
+ *        password:
+ *         type: string
+ *         example: 12345678
+ *        confirmPassword:
+ *         type: string
+ *         example: 12345678
+ *   responses:
+ *    '200':
+ *     description: Reset password successful. Please login again
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Reset password successful. Please login again
+ *    '400':
+ *     description: Reset password token is invalid
+ *    '404':
+ *     description: User not found
+ *    '422':
+ *     description: Invalid value or missing field
+ */
+authRouter.post(
+  '/reset-password',
+  zodValidator(resetPasswordBodySchema, {
+    location: 'body',
+    customHandler: authService.validateResetPasswordTokenAndAttachUser,
+  }),
+  wrapRequestHandler(resetPasswordController)
 )
 
 export default authRouter
