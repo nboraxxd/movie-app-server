@@ -261,13 +261,18 @@ class CommentsService {
   }
 
   async deleteComment({ commentId, userId }: { commentId: string; userId: string }) {
+    // Phải deleteOne theo _id và userId
+    // Vì để tránh trường hợp người dùng xóa comment của người khác
     const result = await databaseService.comments.deleteOne({
       _id: new ObjectId(commentId),
       userId: new ObjectId(userId),
     })
 
     if (result.deletedCount === 0) {
-      throw new ErrorWithStatus({ message: 'Comment not found', statusCode: HttpStatusCode.NotFound })
+      throw new ErrorWithStatus({
+        message: 'Comment not found or does not belong to you.',
+        statusCode: HttpStatusCode.NotFound,
+      })
     }
   }
 }

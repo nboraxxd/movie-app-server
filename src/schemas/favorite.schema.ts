@@ -1,5 +1,6 @@
-import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
 import z from 'zod'
+import { ObjectId } from 'mongodb'
+import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
 
 const favoriteDocumentSchema = z.object({
   _id: z.string(),
@@ -46,3 +47,18 @@ export const getMyFavoritesResponseSchema = z.object({
 })
 
 export type GetMyFavoritesResponseType = z.TypeOf<typeof getMyFavoritesResponseSchema>
+
+export const deleteFavoriteByIdParamsSchema = z.object({
+  favoriteId: z.string().refine((value) => ObjectId.isValid(value), { message: 'Invalid favorite id' }),
+})
+
+export type DeleteFavoriteByIdParamsType = z.TypeOf<typeof deleteFavoriteByIdParamsSchema>
+
+export const deleteFavoriteByMediaParamsSchema = z
+  .object({
+    mediaId: z.coerce.number(),
+    mediaType: z.enum(['movie', 'tv']),
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type DeleteFavoriteByMediaParamsType = z.TypeOf<typeof deleteFavoriteByMediaParamsSchema>

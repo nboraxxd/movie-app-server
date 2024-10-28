@@ -5,7 +5,7 @@ import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
 import {
   addCommentBodySchema,
-  deleteCommentParams,
+  deleteCommentParamsSchema,
   getCommentsByMediaParams,
   getCommentsQuery,
 } from '@/schemas/comments.schema'
@@ -82,6 +82,7 @@ commentsRouter.post(
  *      description: Media type of media id (movie, tv).
  *      schema:
  *       type: string
+ *       enum: [movie, tv]
  *       example: movie
  *    - in: query
  *      name: page
@@ -203,7 +204,7 @@ commentsRouter.get(
 commentsRouter.delete(
   '/:commentId',
   authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
-  zodValidator(deleteCommentParams, { location: 'params' }),
+  zodValidator(deleteCommentParamsSchema, { location: 'params' }),
   wrapRequestHandler(deleteCommentController)
 )
 

@@ -2,9 +2,19 @@ import { Router } from 'express'
 
 import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
-import { addFavoriteBodySchema, getFavoritesQuery } from '@/schemas/favorite.schema'
+import {
+  addFavoriteBodySchema,
+  deleteFavoriteByIdParamsSchema,
+  deleteFavoriteByMediaParamsSchema,
+  getFavoritesQuery,
+} from '@/schemas/favorite.schema'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
-import { addFavoriteController, getMyFavoritesController } from '@/controllers/favorites.controllers'
+import {
+  addFavoriteController,
+  deleteFavoriteByIdController,
+  deleteFavoriteByMediaController,
+  getMyFavoritesController,
+} from '@/controllers/favorites.controllers'
 
 const favoritesRouter = Router()
 
@@ -100,6 +110,98 @@ favoritesRouter.get(
   authorizationValidator({ isLoginRequired: true }),
   zodValidator(getFavoritesQuery, { location: 'query' }),
   wrapRequestHandler(getMyFavoritesController)
+)
+
+/**
+ * @swagger
+ * /favorites/{favoriteId}:
+ *  delete:
+ *   tags:
+ *   - favorites
+ *   summary: Delete favorite by id
+ *   description: Delete favorite by favorite id
+ *   operationId: deleteFavoriteById
+ *   parameters:
+ *    - in: path
+ *      name: favoriteId
+ *      required: true
+ *      description: Favorite id to delete.
+ *      schema:
+ *       type: string
+ *       example: 123abc...
+ *   responses:
+ *    '200':
+ *     description: Delete favorite by id successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Delete favorite by id successful
+ *    '400':
+ *     description: Missing or invalid comment id
+ *    '401':
+ *     description: Unauthorized
+ *    '404':
+ *     description: Favorite not found
+ */
+favoritesRouter.delete(
+  '/:favoriteId',
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  zodValidator(deleteFavoriteByIdParamsSchema, { location: 'params' }),
+  wrapRequestHandler(deleteFavoriteByIdController)
+)
+
+/**
+ * @swagger
+ * /favorites/medias/{mediaId}/{mediaType}:
+ *  delete:
+ *   tags:
+ *   - favorites
+ *   summary: Delete favorite by media
+ *   description: Delete favorite by media id and media type
+ *   operationId: deleteFavoriteByMedia
+ *   parameters:
+ *    - in: path
+ *      name: mediaId
+ *      required: true
+ *      description: Media id to delete favorite.
+ *      schema:
+ *       type: string
+ *       example: 155
+ *    - in: path
+ *      name: mediaType
+ *      required: true
+ *      description: Media type to delete favorite.
+ *      schema:
+ *       type: string
+ *       enum: ['movie', 'tv']
+ *       example: movie
+ *   responses:
+ *    '200':
+ *     description: Delete favorite by media successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Delete favorite by media successful
+ *    '400':
+ *     description: Missing or invalid comment id
+ *    '401':
+ *     description: Unauthorized
+ *    '404':
+ *     description: Favorite not found
+ */
+favoritesRouter.delete(
+  '/medias/:mediaId/:mediaType',
+  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  zodValidator(deleteFavoriteByMediaParamsSchema, { location: 'params' }),
+  wrapRequestHandler(deleteFavoriteByMediaController)
 )
 
 export default favoritesRouter

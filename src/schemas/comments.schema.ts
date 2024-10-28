@@ -80,8 +80,8 @@ export const getMyCommentsResponseSchema = z.object({
 
 export type GetMyCommentsResponseType = z.TypeOf<typeof getMyCommentsResponseSchema>
 
-export const deleteCommentParams = z.object({
+export const deleteCommentParamsSchema = z.object({
   commentId: z.string().refine((value) => ObjectId.isValid(value), { message: 'Invalid comment id' }),
 })
 
-export type DeleteCommentParamsType = z.TypeOf<typeof deleteCommentParams>
+export type DeleteCommentParamsType = z.TypeOf<typeof deleteCommentParamsSchema>

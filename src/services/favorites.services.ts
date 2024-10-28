@@ -1,11 +1,13 @@
 import { ObjectId, WithId } from 'mongodb'
 
 import Favorite from '@/models/favorite.model'
+import { ErrorWithStatus } from '@/models/errors'
+import { FAVORITE_PAGE_LIMIT } from '@/constants'
+import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import { MediaType } from '@/schemas/common-media.schema'
-import { AddFavoriteBodyType, FavoriteDocumentType } from '@/schemas/favorite.schema'
-import { FAVORITE_PAGE_LIMIT } from '@/constants'
 import { PaginationResponseType } from '@/schemas/common.schema'
+import { AddFavoriteBodyType, FavoriteDocumentType } from '@/schemas/favorite.schema'
 
 class FavoritesService {
   async getMediaFavoritesMap(payload: { medias: Array<{ id: number; type: MediaType }>; userId?: string }) {
@@ -144,6 +146,39 @@ class FavoritesService {
       .toArray()
 
     return response
+  }
+
+  async deleteFavoriteById({ favoriteId, userId }: { favoriteId: string; userId: string }) {
+    // Phải deleteOne theo _id và userId
+    // Vì để tránh trường hợp người dùng xóa favorite của người khác
+    const result = await databaseService.favorites.deleteOne({
+      _id: new ObjectId(favoriteId),
+      userId: new ObjectId(userId),
+    })
+
+    if (result.deletedCount === 0) {
+      throw new ErrorWithStatus({
+        message: 'Favorite not found or does not belong to you.',
+        statusCode: HttpStatusCode.NotFound,
+      })
+    }
+  }
+
+  async deleteFavoriteByMedia(payload: { mediaId: number; mediaType: MediaType; userId: string }) {
+    const { mediaId, mediaType, userId } = payload
+
+    const result = await databaseService.favorites.deleteOne({
+      mediaId,
+      mediaType,
+      userId: new ObjectId(userId),
+    })
+
+    if (result.deletedCount === 0) {
+      throw new ErrorWithStatus({
+        message: 'Favorite not found or does not belong to you.',
+        statusCode: HttpStatusCode.NotFound,
+      })
+    }
   }
 }
 

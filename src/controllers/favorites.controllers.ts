@@ -6,10 +6,13 @@ import { capitalizeFirstLetter } from '@/utils/common'
 import {
   AddFavoriteBodyType,
   AddFavoriteResponseType,
+  DeleteFavoriteByIdParamsType,
+  DeleteFavoriteByMediaParamsType,
   GetFavoritesQueryType,
   GetMyFavoritesResponseType,
 } from '@/schemas/favorite.schema'
 import favoritesService from '@/services/favorites.services'
+import { MessageResponseType } from '@/schemas/common.schema'
 
 export const addFavoriteController = async (
   req: Request<ParamsDictionary, any, AddFavoriteBodyType>,
@@ -55,4 +58,28 @@ export const getMyFavoritesController = async (
     })),
     pagination,
   })
+}
+
+export const deleteFavoriteByIdController = async (
+  req: Request<DeleteFavoriteByIdParamsType>,
+  res: Response<MessageResponseType>
+) => {
+  const { favoriteId } = req.params
+  const { userId } = req.decodedAuthorization as TokenPayload
+
+  await favoritesService.deleteFavoriteById({ favoriteId, userId })
+
+  return res.json({ message: 'Delete favorite by id successful' })
+}
+
+export const deleteFavoriteByMediaController = async (
+  req: Request<DeleteFavoriteByMediaParamsType>,
+  res: Response<MessageResponseType>
+) => {
+  const { mediaId, mediaType } = req.params
+  const { userId } = req.decodedAuthorization as TokenPayload
+
+  await favoritesService.deleteFavoriteByMedia({ mediaId, mediaType, userId })
+
+  return res.json({ message: 'Delete favorite by media successful' })
 }
