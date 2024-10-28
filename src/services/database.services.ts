@@ -29,57 +29,58 @@ class DatabaseService {
   }
 
   async setupUsersCollection() {
-    // const isExistCollection = await this.db.listCollections({ name: 'users' }).hasNext()
-
-    this.db.createCollection('users', {
-      validator: {
-        $jsonSchema: {
-          title: 'Users Schema',
-          bsonType: 'object',
-          required: ['name', 'email', 'password', 'createdAt', 'updatedAt'],
-          properties: {
-            _id: {
-              bsonType: 'objectId',
-              description: 'Unique identifier for the user',
+    const isExistCollection = await this.db.listCollections({ name: 'users' }).hasNext()
+    if (!isExistCollection) {
+      this.db.createCollection('users', {
+        validator: {
+          $jsonSchema: {
+            title: 'Users Schema',
+            bsonType: 'object',
+            required: ['name', 'email', 'password', 'createdAt', 'updatedAt'],
+            properties: {
+              _id: {
+                bsonType: 'objectId',
+                description: 'Unique identifier for the user',
+              },
+              name: {
+                bsonType: 'string',
+                description: 'Name of the user, required',
+              },
+              email: {
+                bsonType: 'string',
+                pattern: '^\\S+@\\S+\\.\\S+$',
+                description: "User's email address, required and must match the email format",
+              },
+              password: {
+                bsonType: 'string',
+                description: 'Hashed password of the user, required',
+              },
+              emailVerifyToken: {
+                bsonType: ['string', 'null'],
+                description: 'Token for email verification, can be null',
+              },
+              resetPasswordToken: {
+                bsonType: ['string', 'null'],
+                description: 'Token for password reset, can be null',
+              },
+              avatar: {
+                bsonType: ['string', 'null'],
+                description: 'Avatar URL for the user, can be null',
+              },
+              createdAt: {
+                bsonType: 'date',
+                description: 'Date when the user was created, required',
+              },
+              updatedAt: {
+                bsonType: 'date',
+                description: 'Date when the user was last updated, required',
+              },
             },
-            name: {
-              bsonType: 'string',
-              description: 'Name of the user, required',
-            },
-            email: {
-              bsonType: 'string',
-              pattern: '^\\S+@\\S+\\.\\S+$',
-              description: "User's email address, required and must match the email format",
-            },
-            password: {
-              bsonType: 'string',
-              description: 'Hashed password of the user, required',
-            },
-            emailVerifyToken: {
-              bsonType: ['string', 'null'],
-              description: 'Token for email verification, can be null',
-            },
-            resetPasswordToken: {
-              bsonType: ['string', 'null'],
-              description: 'Token for password reset, can be null',
-            },
-            avatar: {
-              bsonType: ['string', 'null'],
-              description: 'Avatar URL for the user, can be null',
-            },
-            createdAt: {
-              bsonType: 'date',
-              description: 'Date when the user was created, required',
-            },
-            updatedAt: {
-              bsonType: 'date',
-              description: 'Date when the user was last updated, required',
-            },
+            additionalProperties: false,
           },
-          additionalProperties: false,
         },
-      },
-    })
+      })
+    }
 
     const isIndexExist = await this.users.indexExists('email_1')
     if (!isIndexExist) {
