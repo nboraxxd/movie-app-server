@@ -2,12 +2,13 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { topRatedQuerySchema } from '@/schemas/common-media.schema'
+import { searchQuerySchema, topRatedQuerySchema } from '@/schemas/common-media.schema'
 import { discoverMoviesQuerySchema, getMovieDetailParamsSchema } from '@/schemas/movies.schema'
 import {
   discoverMoviesController,
   getMovieDetailController,
   getRecommendedMoviesController,
+  searchMoviesController,
   topRatedMoviesController,
 } from '@/controllers/movies.controllers'
 
@@ -154,6 +155,54 @@ moviesRouter.get(
   '/top-rated',
   zodValidator(topRatedQuerySchema, { location: 'query' }),
   wrapRequestHandler(topRatedMoviesController)
+)
+
+/**
+ * @swagger
+ * /movies/search:
+ *  get:
+ *   tags:
+ *   - movies
+ *   summary: Search movies
+ *   description: Search movies by query parameters
+ *   operationId: searchMovies
+ *   parameters:
+ *    - in: query
+ *      name: query
+ *      required: true
+ *      description: Search query.
+ *      schema:
+ *       type: string
+ *       example: The Avengers
+ *    - in: query
+ *      name: page
+ *      required: false
+ *      description: Page number of search list. If not provided, page 1 will be used.
+ *      schema:
+ *       type: integer
+ *       example: null
+ *   responses:
+ *    '200':
+ *     description: Get search movie list successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get search movie list successful
+ *         data:
+ *          $ref: '#/components/schemas/dataSearchMoviesResponseSchema'
+ *         pagination:
+ *          $ref: '#/components/schemas/paginationResponseSchema'
+ *    '400':
+ *     description: Bad request
+ */
+moviesRouter.get(
+  '/search',
+  zodValidator(searchQuerySchema, { location: 'query' }),
+  wrapRequestHandler(searchMoviesController)
 )
 
 /**

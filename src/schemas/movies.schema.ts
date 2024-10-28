@@ -135,6 +135,11 @@ export const topRatedMoviesResponseSchema = discoverMoviesResponseSchema
 
 export type TopRatedMoviesResponseType = z.TypeOf<typeof topRatedMoviesResponseSchema>
 
+/* Search movies schema */
+export const searchMoviesResponseSchema = discoverMoviesResponseSchema
+
+export type SearchMoviesResponseType = z.TypeOf<typeof searchMoviesResponseSchema>
+
 /* Movie detail schema */
 export const getMovieDetailParamsSchema = z.object({
   movieId: z.coerce.number({ message: 'Movie ID must be a number' }).int({ message: 'Movie ID must be an integer' }),

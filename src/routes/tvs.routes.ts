@@ -2,12 +2,13 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { topRatedQuerySchema } from '@/schemas/common-media.schema'
+import { searchQuerySchema, topRatedQuerySchema } from '@/schemas/common-media.schema'
 import { discoverTvsQuerySchema, getTvDetailParamsSchema } from '@/schemas/tv.schema'
 import {
   discoverTvsController,
   getRecommendedTvsController,
   getTvDetailController,
+  searchTvsController,
   topRatedTvsController,
 } from '@/controllers/tvs.controllers'
 
@@ -147,6 +148,54 @@ tvsRouter.get(
   '/top-rated',
   zodValidator(topRatedQuerySchema, { location: 'query' }),
   wrapRequestHandler(topRatedTvsController)
+)
+
+/**
+ * @swagger
+ * /tvs/search:
+ *  get:
+ *   tags:
+ *   - tvs
+ *   summary: Search tvs
+ *   description: Search tvs by query parameters
+ *   operationId: searchTvs
+ *   parameters:
+ *    - in: query
+ *      name: query
+ *      required: true
+ *      description: Search query.
+ *      schema:
+ *       type: string
+ *       example: 'Breaking Bad'
+ *    - in: query
+ *      name: page
+ *      required: false
+ *      description: Page number of search list. If not provided, page 1 will be used.
+ *      schema:
+ *       type: integer
+ *       example: null
+ *   responses:
+ *    '200':
+ *     description: Get search tv list successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get search tv list successful
+ *         data:
+ *          $ref: '#/components/schemas/dataSearchTvsResponseSchema'
+ *         pagination:
+ *          $ref: '#/components/schemas/paginationResponseSchema'
+ *    '400':
+ *     description: Bad request
+ */
+tvsRouter.get(
+  '/search',
+  zodValidator(searchQuerySchema, { location: 'query' }),
+  wrapRequestHandler(searchTvsController)
 )
 
 /**

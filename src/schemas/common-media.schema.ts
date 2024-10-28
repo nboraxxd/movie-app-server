@@ -78,6 +78,15 @@ export const topRatedQuerySchema = z
 
 export type TopRatedQueryType = z.TypeOf<typeof topRatedQuerySchema>
 
+export const searchQuerySchema = z
+  .object({
+    page: queryPageSchema,
+    query: z.string(),
+  })
+  .strict({ message: 'Additional properties not allowed' })
+
+export type SearchQueryType = z.TypeOf<typeof searchQuerySchema>
+
 /* Common TMDB schema */
 const tmdbGenreSchema = z.object({
   id: z.number(),
@@ -259,7 +268,6 @@ export const tmdbTvResultSchema = z.object({
 export type TMDBTvResultType = z.TypeOf<typeof tmdbTvResultSchema>
 
 /* TMDB movie server schema */
-
 export const tmdbDiscoverMovieResponseSchema = z.object({
   page: z.number(),
   results: z.array(tmdbMovieResultSchema.omit({ media_type: true })),
@@ -277,6 +285,15 @@ export const tmdbTopRatedMoviesResponseSchema = z.object({
 })
 
 export type TMDBTopRatedMoviesResponseType = z.TypeOf<typeof tmdbTopRatedMoviesResponseSchema>
+
+export const tmdbSearchMoviesResponseSchema = z.object({
+  page: z.number(),
+  results: z.array(tmdbMovieResultSchema.omit({ media_type: true })),
+  total_pages: z.number(),
+  total_results: z.number(),
+})
+
+export type TMDBSearchMoviesResponseType = z.TypeOf<typeof tmdbSearchMoviesResponseSchema>
 
 export const tmdbMovieDetailResponseSchema = tmdbMovieResultSchema.omit({ media_type: true, genre_ids: true }).extend({
   belongs_to_collection: z
@@ -334,6 +351,12 @@ export const tmdbTopRatedTvResponseSchema = tmdbTopRatedMoviesResponseSchema.omi
 })
 
 export type TMDBTopRatedTvResponseType = z.TypeOf<typeof tmdbTopRatedTvResponseSchema>
+
+export const tmdbSearchTvsResponseSchema = tmdbSearchMoviesResponseSchema.omit({ results: true }).extend({
+  results: z.array(tmdbTvResultSchema.omit({ media_type: true })),
+})
+
+export type TMDBSearchTvsResponseType = z.TypeOf<typeof tmdbSearchTvsResponseSchema>
 
 export const tmdbTvDetailResponseSchema = tmdbTvResultSchema.omit({ media_type: true, genre_ids: true }).extend({
   created_by: z.array(

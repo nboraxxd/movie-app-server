@@ -266,6 +266,11 @@
  *    items:
  *     $ref: '#/components/schemas/movieItemSchema'
  *
+ *   dataSearchMoviesResponseSchema:
+ *    type: array
+ *    items:
+ *     $ref: '#/components/schemas/movieItemSchema'
+ *
  *   movieDetailDataSchema:
  *    type: object
  *    properties:
@@ -555,6 +560,11 @@
  *     $ref: '#/components/schemas/tvItemSchema'
  *
  *   dataTopRatedTvsResponseSchema:
+ *    type: array
+ *    items:
+ *     $ref: '#/components/schemas/tvItemSchema'
+ *
+ *   dataSearchTvsResponseSchema:
  *    type: array
  *    items:
  *     $ref: '#/components/schemas/tvItemSchema'

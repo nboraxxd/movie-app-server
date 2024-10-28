@@ -2,12 +2,13 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import tvsService from '@/services/tvs.services'
-import { TopRatedQueryType } from '@/schemas/common-media.schema'
+import { SearchQueryType, TopRatedQueryType } from '@/schemas/common-media.schema'
 import {
   DiscoverTvsQueryType,
   DiscoverTvsResponseType,
   GetTvDetailParamsType,
   RecommendedTvsResponseType,
+  SearchTvsResponseType,
   TopRatedTvsResponseType,
   TvDetailResponseType,
 } from '@/schemas/tv.schema'
@@ -44,6 +45,19 @@ export const topRatedTvsController = async (
   const { data, pagination } = await tvsService.topRatedTvs({ page, userId: tokenPayload?.userId })
 
   return res.json({ message: 'Get top rated tv list successful', data, pagination })
+}
+
+export const searchTvsController = async (
+  req: Request<ParamsDictionary, any, any, SearchQueryType>,
+  res: Response<SearchTvsResponseType>
+) => {
+  const { page, query } = req.query
+
+  const tokenPayload = req.decodedAuthorization
+
+  const { data, pagination } = await tvsService.searchTvs({ page, query, userId: tokenPayload?.userId })
+
+  return res.json({ message: 'Get search tv list successful', data, pagination })
 }
 
 export const getTvDetailController = async (

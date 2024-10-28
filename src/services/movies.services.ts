@@ -12,6 +12,7 @@ import {
   SpokenLanguageType,
   VideoType,
   TMDBRecommendedMoviesResponseType,
+  TMDBSearchMoviesResponseType,
 } from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesQueryType,
@@ -21,6 +22,7 @@ import {
   MovieDataType,
   MovieDetailDataType,
   RecommendedMoviesResponseType,
+  SearchMoviesResponseType,
   TopRatedMoviesResponseType,
 } from '@/schemas/movies.schema'
 
@@ -108,6 +110,50 @@ class MoviesService {
           video: item.video,
           voteAverage: item.vote_average,
           voteCount: item.vote_count,
+        }
+      }),
+      pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
+    }
+  }
+
+  async searchMovies(payload: {
+    page: number
+    query: string
+    userId?: string
+  }): Promise<Omit<SearchMoviesResponseType, 'message'>> {
+    const { page, query, userId } = payload
+
+    const response = await http.get<TMDBSearchMoviesResponseType>('/search/movie', {
+      params: { page, query },
+    })
+
+    const mediaFavoritesMap = await favoritesService.getMediaFavoritesMap({
+      medias: response.results.map((item) => ({ id: item.id, type: 'movie' })),
+      userId,
+    })
+
+    return {
+      data: response.results.map<MovieDataType>(({ backdrop_path, poster_path, ...item }) => {
+        const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
+        const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
+
+        return {
+          adult: item.adult,
+          genreIds: item.genre_ids,
+          id: item.id,
+          mediaType: 'movie',
+          originalLanguage: item.original_language,
+          originalTitle: item.original_title,
+          overview: item.overview,
+          popularity: item.popularity,
+          releaseDate: item.release_date,
+          title: item.title,
+          video: item.video,
+          voteAverage: item.vote_average,
+          voteCount: item.vote_count,
+          backdropPath: backdropFullPath,
+          posterPath: posterFullPath,
+          isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes('movie') ?? false) : null,
         }
       }),
       pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },

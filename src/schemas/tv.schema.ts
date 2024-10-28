@@ -187,6 +187,11 @@ export const topRatedTvsResponseSchema = discoverTvsResponseSchema
 
 export type TopRatedTvsResponseType = z.TypeOf<typeof topRatedTvsResponseSchema>
 
+/* Search tv schema */
+export const searchTvsResponseSchema = discoverTvsResponseSchema
+
+export type SearchTvsResponseType = z.TypeOf<typeof searchTvsResponseSchema>
+
 /* Tv detail schema */
 export const getTvDetailParamsSchema = z.object({
   tvId: z.coerce.number({ message: 'Tv ID must be a number' }).int({ message: 'Tv ID must be an integer' }),

@@ -3,6 +3,7 @@ import envVariables from '@/schemas/env-variables.schema'
 import {
   TMDBDiscoverTvResponseType,
   TMDBRecommendedTvsResponseType,
+  TMDBSearchTvsResponseType,
   TMDBTopRatedTvResponseType,
   TMDBTvDetailResponseType,
   TopRatedQueryType,
@@ -11,6 +12,7 @@ import {
   DiscoverTvsQueryType,
   DiscoverTvsResponseType,
   RecommendedTvsResponseType,
+  SearchTvsResponseType,
   TopRatedTvsResponseType,
   TvCastType,
   TvCrewType,
@@ -75,6 +77,48 @@ class TVsService {
     userId,
   }: TopRatedQueryType & { userId?: string }): Promise<Omit<TopRatedTvsResponseType, 'message'>> {
     const response = await http.get<TMDBTopRatedTvResponseType>('/tv/top_rated', { params: { page } })
+
+    const mediaFavoritesMap = await favoritesService.getMediaFavoritesMap({
+      medias: response.results.map((item) => ({ id: item.id, type: 'tv' })),
+      userId,
+    })
+
+    return {
+      data: response.results.map<TVDataType>(({ backdrop_path, poster_path, ...item }) => {
+        const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
+        const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
+
+        return {
+          adult: item.adult,
+          genreIds: item.genre_ids,
+          backdropPath: backdropFullPath,
+          id: item.id,
+          originalLanguage: item.original_language,
+          isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes('tv') ?? false) : null,
+          originalName: item.original_name,
+          overview: item.overview,
+          popularity: item.popularity,
+          posterPath: posterFullPath,
+          firstAirDate: item.first_air_date,
+          name: item.name,
+          mediaType: 'tv',
+          originalCountry: item.original_country,
+          voteAverage: item.vote_average,
+          voteCount: item.vote_count,
+        }
+      }),
+      pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
+    }
+  }
+
+  async searchTvs(payload: {
+    page: number
+    query: string
+    userId?: string
+  }): Promise<Omit<SearchTvsResponseType, 'message'>> {
+    const { page, query, userId } = payload
+
+    const response = await http.get<TMDBSearchTvsResponseType>('/search/tv', { params: { page, query } })
 
     const mediaFavoritesMap = await favoritesService.getMediaFavoritesMap({
       medias: response.results.map((item) => ({ id: item.id, type: 'tv' })),
