@@ -415,3 +415,46 @@ export const tmdbTrendingResponseSchema = z.object({
 })
 
 export type TMDBTrendingResponseType = z.TypeOf<typeof tmdbTrendingResponseSchema>
+
+/* TMDB people schema */
+export const tmdbPersonDetailResponseSchema = z.object({
+  adult: z.boolean(),
+  also_known_as: z.array(z.string()),
+  biography: z.string(),
+  birthday: z.string().nullable(),
+  deathday: z.string().nullable(),
+  gender: z.number(),
+  homepage: z.string().nullable(),
+  id: z.number(),
+  imdb_id: z.string().nullable(),
+  known_for_department: z.string(),
+  name: z.string(),
+  place_of_birth: z.string().nullable(),
+  popularity: z.number(),
+  profile_path: z.string().nullable(),
+})
+
+export type TMDBPersonDetailResponseType = z.TypeOf<typeof tmdbPersonDetailResponseSchema>
+
+export const tmdbPersonCombinedCreditsResponseSchema = z.object({
+  id: z.number(),
+  cast: z.array(
+    z.union([
+      tmdbMovieResultSchema.extend({ character: z.string(), credit_id: z.string(), order: z.number() }),
+      tmdbTvResultSchema.extend({ character: z.string(), credit_id: z.string(), episode_count: z.number() }),
+    ])
+  ),
+  crew: z.array(
+    z.union([
+      tmdbMovieResultSchema.extend({ credit_id: z.string(), department: z.string(), job: z.string() }),
+      tmdbTvResultSchema.extend({
+        credit_id: z.string(),
+        department: z.string(),
+        episode_count: z.number(),
+        job: z.string(),
+      }),
+    ])
+  ),
+})
+
+export type TMDBPersonCombinedCreditsResponseType = z.TypeOf<typeof tmdbPersonCombinedCreditsResponseSchema>

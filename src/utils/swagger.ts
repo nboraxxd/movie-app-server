@@ -37,6 +37,10 @@ const options: swaggerJSDoc.Options = {
         description: 'Operations about tvs',
       },
       {
+        name: 'people',
+        description: 'Operations about people',
+      },
+      {
         name: 'favorites',
         description: 'Operations about favorites',
       },

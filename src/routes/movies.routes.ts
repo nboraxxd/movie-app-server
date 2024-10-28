@@ -188,6 +188,8 @@ moviesRouter.get(
  *          $ref: '#/components/schemas/movieDetailDataSchema'
  *    '400':
  *     description: Bad request
+ *    '404':
+ *     description: The resource you requested could not be found.
  */
 moviesRouter.get(
   '/:movieId',
