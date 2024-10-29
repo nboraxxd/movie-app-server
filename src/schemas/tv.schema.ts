@@ -157,9 +157,8 @@ export type TvDetailDataType = z.TypeOf<typeof tvDetailDataSchema>
 export const discoverTvsQuerySchema = z
   .object({
     includeAdult: z
-      .string()
-      .refine((value) => value === 'true' || value === 'false', { message: 'includeAdult must be true or false' })
-      .transform((value) => (value === 'true' ? true : false))
+      .number()
+      .refine((value) => value === 0 || value === 1, { message: 'includeAdult must be 0 (false) or 1 (true)' })
       .optional(),
     page: queryPageSchema.optional(),
     sortBy: discoverySortBySchema.optional(),
@@ -193,11 +192,11 @@ export const searchTvsResponseSchema = discoverTvsResponseSchema
 export type SearchTvsResponseType = z.TypeOf<typeof searchTvsResponseSchema>
 
 /* Tv detail schema */
-export const getTvDetailParamsSchema = z.object({
+export const tvIdParamsSchema = z.object({
   tvId: z.coerce.number({ message: 'Tv ID must be a number' }).int({ message: 'Tv ID must be an integer' }),
 })
 
-export type GetTvDetailParamsType = z.TypeOf<typeof getTvDetailParamsSchema>
+export type TvIdParamsType = z.TypeOf<typeof tvIdParamsSchema>
 
 export const tvDetailResponseSchema = z.object({
   message: z.string(),

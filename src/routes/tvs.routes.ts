@@ -3,7 +3,7 @@ import { Router } from 'express'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
 import { pageQuerySchema, searchQuerySchema } from '@/schemas/common-media.schema'
-import { discoverTvsQuerySchema, getTvDetailParamsSchema } from '@/schemas/tv.schema'
+import { discoverTvsQuerySchema, tvIdParamsSchema } from '@/schemas/tv.schema'
 import {
   discoverTvsController,
   getRecommendedTvsController,
@@ -233,7 +233,7 @@ tvsRouter.get(
  */
 tvsRouter.get(
   '/:tvId',
-  zodValidator(getTvDetailParamsSchema, { location: 'params' }),
+  zodValidator(tvIdParamsSchema, { location: 'params' }),
   wrapRequestHandler(getTvDetailController)
 )
 
@@ -274,7 +274,7 @@ tvsRouter.get(
  */
 tvsRouter.get(
   '/:tvId/recommended',
-  zodValidator(getTvDetailParamsSchema, { location: 'params' }),
+  zodValidator(tvIdParamsSchema, { location: 'params' }),
   wrapRequestHandler(getRecommendedTvsController)
 )
 

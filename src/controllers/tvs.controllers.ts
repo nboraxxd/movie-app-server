@@ -6,7 +6,7 @@ import { PageQueryType, SearchQueryType } from '@/schemas/common-media.schema'
 import {
   DiscoverTvsQueryType,
   DiscoverTvsResponseType,
-  GetTvDetailParamsType,
+  TvIdParamsType,
   RecommendedTvsResponseType,
   SearchTvsResponseType,
   TopRatedTvsResponseType,
@@ -60,10 +60,7 @@ export const searchTvsController = async (
   return res.json({ message: 'Get search tv list successful', data, pagination })
 }
 
-export const getTvDetailController = async (
-  req: Request<GetTvDetailParamsType>,
-  res: Response<TvDetailResponseType>
-) => {
+export const getTvDetailController = async (req: Request<TvIdParamsType>, res: Response<TvDetailResponseType>) => {
   const { tvId } = req.params
 
   const tokenPayload = req.decodedAuthorization
@@ -74,7 +71,7 @@ export const getTvDetailController = async (
 }
 
 export const getRecommendedTvsController = async (
-  req: Request<GetTvDetailParamsType>,
+  req: Request<TvIdParamsType>,
   res: Response<RecommendedTvsResponseType>
 ) => {
   const { tvId } = req.params

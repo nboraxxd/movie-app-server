@@ -35,8 +35,8 @@ class MoviesService {
     const response = await http.get<TMDBDiscoverMovieResponseType>('/discover/movie', {
       params: {
         page,
-        include_adult: includeAdult,
-        include_video: includeVideo,
+        include_adult: includeAdult === 1 ? true : false,
+        include_video: includeVideo === 1 ? true : false,
         sort_by: sortBy,
         'vote_average.gte': voteAverageGte,
         'vote_average.lte': voteAverageLte,

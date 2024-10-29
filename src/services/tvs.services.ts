@@ -31,7 +31,7 @@ class TVsService {
     const response = await http.get<TMDBDiscoverTvResponseType>('/discover/tv', {
       params: {
         page,
-        include_adult: includeAdult,
+        include_adult: includeAdult === 1 ? true : false,
         sort_by: sortBy,
         'vote_average.gte': voteAverageGte,
         'vote_average.lte': voteAverageLte,
