@@ -11,6 +11,8 @@ export const genreSchema = z.object({
   name: z.string(),
 })
 
+export type GenreType = z.TypeOf<typeof genreSchema>
+
 export const productionCompanySchema = z.object({
   id: z.number(),
   logoPath: z.string().nullable(),

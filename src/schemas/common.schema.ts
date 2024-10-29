@@ -21,7 +21,7 @@ export const queryPageSchema = z.coerce
   .int({ message: 'Page must be an integer' })
   .positive({ message: 'Page must be a positive number' })
   .max(500, { message: 'API just support maximum 500 pages' })
-  .default(1)
+  .optional()
 
 export const messageResponseSchema = z.object({
   message: z.string(),

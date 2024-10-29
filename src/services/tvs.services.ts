@@ -112,8 +112,8 @@ class TVsService {
   }
 
   async searchTvs(payload: {
-    page: number
     query: string
+    page?: number
     userId?: string
   }): Promise<Omit<SearchTvsResponseType, 'message'>> {
     const { page, query, userId } = payload

@@ -83,8 +83,8 @@ class CommentsService {
     return comment
   }
 
-  async getCommentsByMedia(payload: { mediaId: number; mediaType: MediaType; page: number }) {
-    const { mediaId, mediaType, page } = payload
+  async getCommentsByMedia(payload: { mediaId: number; mediaType: MediaType; page?: number }) {
+    const { mediaId, mediaType, page = 1 } = payload
 
     const [response] = await databaseService.comments
       .aggregate<{ data: AggregatedCommentType[]; pagination: PaginationResponseType }>([
@@ -188,8 +188,8 @@ class CommentsService {
     return response
   }
 
-  async getMyComments(payload: { userId: string; page: number }) {
-    const { userId, page } = payload
+  async getMyComments(payload: { userId: string; page?: number }) {
+    const { userId, page = 1 } = payload
 
     const [response] = await databaseService.comments
       .aggregate<{

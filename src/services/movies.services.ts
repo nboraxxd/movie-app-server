@@ -117,8 +117,8 @@ class MoviesService {
   }
 
   async searchMovies(payload: {
-    page: number
     query: string
+    page?: number
     userId?: string
   }): Promise<Omit<SearchMoviesResponseType, 'message'>> {
     const { page, query, userId } = payload
@@ -282,7 +282,7 @@ class MoviesService {
 
   async getRecommendedMovies(payload: {
     movieId: number
-    page: number
+    page?: number
     userId: string | undefined
   }): Promise<Omit<RecommendedMoviesResponseType, 'message'>> {
     const { movieId, page, userId } = payload

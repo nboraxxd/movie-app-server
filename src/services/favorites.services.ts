@@ -76,8 +76,8 @@ class FavoritesService {
     return databaseService.favorites.findOne({ mediaId, mediaType, userId: new ObjectId(userId) })
   }
 
-  async getMyFavorites(payload: { userId: string; page: number }) {
-    const { userId, page } = payload
+  async getMyFavorites(payload: { userId: string; page?: number }) {
+    const { userId, page = 1 } = payload
 
     const [response] = await databaseService.favorites
       .aggregate<{
