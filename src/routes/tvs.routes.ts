@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { searchQuerySchema, topRatedQuerySchema } from '@/schemas/common-media.schema'
+import { pageQuerySchema, searchQuerySchema } from '@/schemas/common-media.schema'
 import { discoverTvsQuerySchema, getTvDetailParamsSchema } from '@/schemas/tv.schema'
 import {
   discoverTvsController,
@@ -146,7 +146,7 @@ tvsRouter.get(
  */
 tvsRouter.get(
   '/top-rated',
-  zodValidator(topRatedQuerySchema, { location: 'query' }),
+  zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(topRatedTvsController)
 )
 

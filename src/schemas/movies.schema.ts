@@ -101,13 +101,13 @@ export type MovieDetailDataType = z.TypeOf<typeof movieDetailDataSchema>
 /* Discover movies schema */
 export const discoverMoviesQuerySchema = z
   .object({
-    includeAdult: z
-      .string()
-      .refine((value) => value === 'true' || value === 'false', { message: 'includeAdult must be true or false' })
+    includeAdult: z.coerce
+      .number()
+      .refine((value) => value === 0 || value === 1, { message: 'includeAdult must be 0 (false) or 1 (true)' })
       .optional(),
-    includeVideo: z
-      .string()
-      .refine((value) => value === 'true' || value === 'false', { message: 'includeVideo must be true or false' })
+    includeVideo: z.coerce
+      .number()
+      .refine((value) => value === 0 || value === 1, { message: 'includeVideo must be 0 (false) or 1 (true)' })
       .optional(),
     page: queryPageSchema.optional(),
     sortBy: discoverySortBySchema.optional(),
@@ -141,11 +141,11 @@ export const searchMoviesResponseSchema = discoverMoviesResponseSchema
 export type SearchMoviesResponseType = z.TypeOf<typeof searchMoviesResponseSchema>
 
 /* Movie detail schema */
-export const getMovieDetailParamsSchema = z.object({
+export const movieIdParamsSchema = z.object({
   movieId: z.coerce.number({ message: 'Movie ID must be a number' }).int({ message: 'Movie ID must be an integer' }),
 })
 
-export type GetMovieDetailParamsType = z.TypeOf<typeof getMovieDetailParamsSchema>
+export type MovieIdParamsType = z.TypeOf<typeof movieIdParamsSchema>
 
 export const movieDetailResponseSchema = z.object({
   message: z.string(),

@@ -4,11 +4,11 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '@/types/token.type'
 import commentsService from '@/services/comments.services'
 import { MessageResponseType } from '@/schemas/common.schema'
+import { PageQueryType } from '@/schemas/common-media.schema'
 import {
   AddCommentBodyType,
   AddCommentResponseType,
   GetCommentsByMediaParamsType,
-  GetCommentsQueryType,
   GetCommentsByMediaResponseType,
   GetMyCommentsResponseType,
   DeleteCommentParamsType,
@@ -46,7 +46,7 @@ export const addCommentController = async (
 }
 
 export const getCommentsByMediaController = async (
-  req: Request<GetCommentsByMediaParamsType, any, any, GetCommentsQueryType>,
+  req: Request<GetCommentsByMediaParamsType, any, any, PageQueryType>,
   res: Response<GetCommentsByMediaResponseType>
 ) => {
   const { mediaId, mediaType } = req.params
@@ -69,7 +69,7 @@ export const getCommentsByMediaController = async (
 }
 
 export const getMyCommentsController = async (
-  req: Request<ParamsDictionary, any, any, GetCommentsQueryType>,
+  req: Request<ParamsDictionary, any, any, PageQueryType>,
   res: Response<GetMyCommentsResponseType>
 ) => {
   const { page } = req.query

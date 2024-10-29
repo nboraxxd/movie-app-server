@@ -2,8 +2,8 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { searchQuerySchema, topRatedQuerySchema } from '@/schemas/common-media.schema'
-import { discoverMoviesQuerySchema, getMovieDetailParamsSchema } from '@/schemas/movies.schema'
+import { pageQuerySchema, searchQuerySchema } from '@/schemas/common-media.schema'
+import { discoverMoviesQuerySchema, movieIdParamsSchema } from '@/schemas/movies.schema'
 import {
   discoverMoviesController,
   getMovieDetailController,
@@ -153,7 +153,7 @@ moviesRouter.get(
  */
 moviesRouter.get(
   '/top-rated',
-  zodValidator(topRatedQuerySchema, { location: 'query' }),
+  zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(topRatedMoviesController)
 )
 
@@ -242,7 +242,7 @@ moviesRouter.get(
  */
 moviesRouter.get(
   '/:movieId',
-  zodValidator(getMovieDetailParamsSchema, { location: 'params' }),
+  zodValidator(movieIdParamsSchema, { location: 'params' }),
   wrapRequestHandler(getMovieDetailController)
 )
 
@@ -283,7 +283,8 @@ moviesRouter.get(
  */
 moviesRouter.get(
   '/:movieId/recommended',
-  zodValidator(getMovieDetailParamsSchema, { location: 'params' }),
+  zodValidator(movieIdParamsSchema, { location: 'params' }),
+  zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getRecommendedMoviesController)
 )
 

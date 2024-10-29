@@ -2,7 +2,7 @@ import z from 'zod'
 import { ObjectId, WithId } from 'mongodb'
 
 import { userDocumentResponseSchema } from '@/schemas/profile.schema'
-import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
+import { paginationResponseSchema } from '@/schemas/common.schema'
 
 const commentDocumentSchema = z.object({
   _id: z.string(),
@@ -53,12 +53,6 @@ export const getCommentsByMediaParams = z
   .strict({ message: 'Additional properties not allowed' })
 
 export type GetCommentsByMediaParamsType = z.TypeOf<typeof getCommentsByMediaParams>
-
-export const getCommentsQuery = z.object({
-  page: queryPageSchema,
-})
-
-export type GetCommentsQueryType = z.TypeOf<typeof getCommentsQuery>
 
 export const getCommentsByMediaResponseSchema = z.object({
   message: z.string(),

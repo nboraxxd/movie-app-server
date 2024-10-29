@@ -1,7 +1,7 @@
 import z from 'zod'
 import { tvDataSchema } from '@/schemas/tv.schema'
 import { movieDataSchema } from '@/schemas/movies.schema'
-import { queryPageSchema, paginationResponseSchema } from '@/schemas/common.schema'
+import { paginationResponseSchema } from '@/schemas/common.schema'
 
 /* Trending schema */
 export const trendingParamsSchema = z
@@ -12,14 +12,6 @@ export const trendingParamsSchema = z
   .strict({ message: 'Additional properties not allowed' })
 
 export type TrendingParamsType = z.TypeOf<typeof trendingParamsSchema>
-
-export const trendingQuerySchema = z
-  .object({
-    page: queryPageSchema,
-  })
-  .strict({ message: 'Additional properties not allowed' })
-
-export type TrendingQueryType = z.TypeOf<typeof trendingQuerySchema>
 
 export const trendingResponseSchema = z.object({
   message: z.string(),

@@ -1,12 +1,12 @@
 import http from '@/utils/http'
 import envVariables from '@/schemas/env-variables.schema'
 import {
+  PageQueryType,
   TMDBDiscoverTvResponseType,
   TMDBRecommendedTvsResponseType,
   TMDBSearchTvsResponseType,
   TMDBTopRatedTvResponseType,
   TMDBTvDetailResponseType,
-  TopRatedQueryType,
 } from '@/schemas/common-media.schema'
 import {
   DiscoverTvsQueryType,
@@ -75,7 +75,7 @@ class TVsService {
   async topRatedTvs({
     page,
     userId,
-  }: TopRatedQueryType & { userId?: string }): Promise<Omit<TopRatedTvsResponseType, 'message'>> {
+  }: PageQueryType & { userId?: string }): Promise<Omit<TopRatedTvsResponseType, 'message'>> {
     const response = await http.get<TMDBTopRatedTvResponseType>('/tv/top_rated', { params: { page } })
 
     const mediaFavoritesMap = await favoritesService.getMediaFavoritesMap({

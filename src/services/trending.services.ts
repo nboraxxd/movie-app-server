@@ -3,12 +3,12 @@ import favoritesService from '@/services/favorites.services'
 import envVariables from '@/schemas/env-variables.schema'
 import { TVDataType } from '@/schemas/tv.schema'
 import { MovieDataType } from '@/schemas/movies.schema'
-import { TMDBTrendingResponseType } from '@/schemas/common-media.schema'
-import { TrendingParamsType, TrendingQueryType, TrendingResponseType } from '@/schemas/trending.shema'
+import { PageQueryType, TMDBTrendingResponseType } from '@/schemas/common-media.schema'
+import { TrendingParamsType, TrendingResponseType } from '@/schemas/trending.shema'
 
 class TrendingService {
   async trending(
-    payload: TrendingParamsType & TrendingQueryType & { userId?: string }
+    payload: TrendingParamsType & PageQueryType & { userId?: string }
   ): Promise<Omit<TrendingResponseType, 'message'>> {
     const { timeWindow, trendingType, page, userId } = payload
 

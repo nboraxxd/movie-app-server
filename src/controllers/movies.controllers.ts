@@ -2,11 +2,11 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import moviesService from '@/services/movies.services'
-import { SearchQueryType, TopRatedQueryType } from '@/schemas/common-media.schema'
+import { PageQueryType, SearchQueryType } from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesResponseType,
   MovieDetailResponseType,
-  GetMovieDetailParamsType,
+  MovieIdParamsType,
   TopRatedMoviesResponseType,
   RecommendedMoviesResponseType,
   DiscoverMoviesQueryType,
@@ -36,7 +36,7 @@ export const discoverMoviesController = async (
 }
 
 export const topRatedMoviesController = async (
-  req: Request<ParamsDictionary, any, any, TopRatedQueryType>,
+  req: Request<ParamsDictionary, any, any, PageQueryType>,
   res: Response<TopRatedMoviesResponseType>
 ) => {
   const { page } = req.query
@@ -62,7 +62,7 @@ export const searchMoviesController = async (
 }
 
 export const getMovieDetailController = async (
-  req: Request<GetMovieDetailParamsType>,
+  req: Request<MovieIdParamsType>,
   res: Response<MovieDetailResponseType>
 ) => {
   const { movieId } = req.params
@@ -75,14 +75,15 @@ export const getMovieDetailController = async (
 }
 
 export const getRecommendedMoviesController = async (
-  req: Request<GetMovieDetailParamsType>,
+  req: Request<MovieIdParamsType, any, any, PageQueryType>,
   res: Response<RecommendedMoviesResponseType>
 ) => {
   const { movieId } = req.params
+  const { page } = req.query
 
   const tokenPayload = req.decodedAuthorization
 
-  const { data, pagination } = await moviesService.getRecommendedMovies({ movieId, userId: tokenPayload?.userId })
+  const { data, pagination } = await moviesService.getRecommendedMovies({ movieId, page, userId: tokenPayload?.userId })
 
   return res.json({ message: 'Get recommended successful', data, pagination })
 }

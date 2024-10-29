@@ -3,16 +3,16 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { TokenPayload } from '@/types/token.type'
 import { capitalizeFirstLetter } from '@/utils/common'
+import { MessageResponseType } from '@/schemas/common.schema'
+import { PageQueryType } from '@/schemas/common-media.schema'
 import {
   AddFavoriteBodyType,
   AddFavoriteResponseType,
   DeleteFavoriteByIdParamsType,
   DeleteFavoriteByMediaParamsType,
-  GetFavoritesQueryType,
   GetMyFavoritesResponseType,
 } from '@/schemas/favorite.schema'
 import favoritesService from '@/services/favorites.services'
-import { MessageResponseType } from '@/schemas/common.schema'
 
 export const addFavoriteController = async (
   req: Request<ParamsDictionary, any, AddFavoriteBodyType>,
@@ -42,7 +42,7 @@ export const addFavoriteController = async (
 }
 
 export const getMyFavoritesController = async (
-  req: Request<ParamsDictionary, any, any, GetFavoritesQueryType>,
+  req: Request<ParamsDictionary, any, any, PageQueryType>,
   res: Response<GetMyFavoritesResponseType>
 ) => {
   const { page } = req.query

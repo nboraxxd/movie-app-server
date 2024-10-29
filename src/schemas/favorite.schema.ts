@@ -1,6 +1,6 @@
 import z from 'zod'
 import { ObjectId } from 'mongodb'
-import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
+import { paginationResponseSchema } from '@/schemas/common.schema'
 
 const favoriteDocumentSchema = z.object({
   _id: z.string(),
@@ -33,12 +33,6 @@ export const addFavoriteResponseSchema = z.object({
 })
 
 export type AddFavoriteResponseType = z.TypeOf<typeof addFavoriteResponseSchema>
-
-export const getFavoritesQuery = z.object({
-  page: queryPageSchema,
-})
-
-export type GetFavoritesQueryType = z.TypeOf<typeof getFavoritesQuery>
 
 export const getMyFavoritesResponseSchema = z.object({
   message: z.string(),

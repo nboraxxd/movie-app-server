@@ -1,6 +1,7 @@
+import z from 'zod'
+
 import { movieDataSchema } from '@/schemas/movies.schema'
 import { tvDataSchema } from '@/schemas/tv.schema'
-import z from 'zod'
 
 export const personDetailParamsSchema = z.object({
   personId: z.coerce.number({ message: 'Person ID must be a number' }).int({ message: 'Person ID must be an integer' }),

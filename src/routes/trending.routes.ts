@@ -3,7 +3,8 @@ import { Router } from 'express'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { trendingController } from '@/controllers/trending.controllers'
 import { zodValidator } from '@/middlewares/validators.middleware'
-import { trendingParamsSchema, trendingQuerySchema } from '@/schemas/trending.shema'
+import { pageQuerySchema } from '@/schemas/common-media.schema'
+import { trendingParamsSchema } from '@/schemas/trending.shema'
 
 const trendingRouter = Router()
 
@@ -60,7 +61,7 @@ const trendingRouter = Router()
 trendingRouter.get(
   '/:trendingType/:timeWindow?',
   zodValidator(trendingParamsSchema, { location: 'params' }),
-  zodValidator(trendingQuerySchema, { location: 'query' }),
+  zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(trendingController)
 )
 

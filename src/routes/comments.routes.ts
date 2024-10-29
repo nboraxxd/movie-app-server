@@ -3,12 +3,8 @@ import { Router } from 'express'
 import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
-import {
-  addCommentBodySchema,
-  deleteCommentParamsSchema,
-  getCommentsByMediaParams,
-  getCommentsQuery,
-} from '@/schemas/comments.schema'
+import { pageQuerySchema } from '@/schemas/common-media.schema'
+import { addCommentBodySchema, deleteCommentParamsSchema, getCommentsByMediaParams } from '@/schemas/comments.schema'
 import {
   addCommentController,
   deleteCommentController,
@@ -115,7 +111,7 @@ commentsRouter.post(
 commentsRouter.get(
   '/medias/:mediaId/:mediaType',
   zodValidator(getCommentsByMediaParams, { location: 'params' }),
-  zodValidator(getCommentsQuery, { location: 'query' }),
+  zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getCommentsByMediaController)
 )
 
@@ -162,7 +158,7 @@ commentsRouter.get(
 commentsRouter.get(
   '/me',
   authorizationValidator({ isLoginRequired: true }),
-  zodValidator(getCommentsQuery, { location: 'query' }),
+  zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getMyCommentsController)
 )
 

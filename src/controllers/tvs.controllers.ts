@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import tvsService from '@/services/tvs.services'
-import { SearchQueryType, TopRatedQueryType } from '@/schemas/common-media.schema'
+import { PageQueryType, SearchQueryType } from '@/schemas/common-media.schema'
 import {
   DiscoverTvsQueryType,
   DiscoverTvsResponseType,
@@ -35,7 +35,7 @@ export const discoverTvsController = async (
 }
 
 export const topRatedTvsController = async (
-  req: Request<ParamsDictionary, any, any, TopRatedQueryType>,
+  req: Request<ParamsDictionary, any, any, PageQueryType>,
   res: Response<TopRatedTvsResponseType>
 ) => {
   const { page } = req.query

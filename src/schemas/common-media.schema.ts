@@ -70,18 +70,18 @@ export const discoverySortBySchema = z.enum(
   { message: 'Invalid sort by value' }
 )
 
-export const topRatedQuerySchema = z
+export const pageQuerySchema = z
   .object({
     page: queryPageSchema,
   })
   .strict({ message: 'Additional properties not allowed' })
 
-export type TopRatedQueryType = z.TypeOf<typeof topRatedQuerySchema>
+export type PageQueryType = z.TypeOf<typeof pageQuerySchema>
 
 export const searchQuerySchema = z
   .object({
     page: queryPageSchema,
-    query: z.string(),
+    query: z.string().min(1, { message: 'Query must be at least 1 character' }),
   })
   .strict({ message: 'Additional properties not allowed' })
 

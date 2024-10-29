@@ -6,8 +6,8 @@ import {
   addFavoriteBodySchema,
   deleteFavoriteByIdParamsSchema,
   deleteFavoriteByMediaParamsSchema,
-  getFavoritesQuery,
 } from '@/schemas/favorite.schema'
+import { pageQuerySchema } from '@/schemas/common-media.schema'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
 import {
   addFavoriteController,
@@ -108,7 +108,7 @@ favoritesRouter.post(
 favoritesRouter.get(
   '/me',
   authorizationValidator({ isLoginRequired: true }),
-  zodValidator(getFavoritesQuery, { location: 'query' }),
+  zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getMyFavoritesController)
 )
 

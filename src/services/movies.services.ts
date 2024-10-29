@@ -5,7 +5,6 @@ import { TVDataType } from '@/schemas/tv.schema'
 import {
   TMDBDiscoverMovieResponseType,
   TMDBTopRatedMoviesResponseType,
-  TopRatedQueryType,
   TMDBMovieDetailResponseType,
   ProductionCompanyType,
   ProductionCountryType,
@@ -13,6 +12,7 @@ import {
   VideoType,
   TMDBRecommendedMoviesResponseType,
   TMDBSearchMoviesResponseType,
+  PageQueryType,
 } from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesQueryType,
@@ -80,7 +80,7 @@ class MoviesService {
   async topRatedMovies({
     page,
     userId,
-  }: TopRatedQueryType & { userId?: string }): Promise<Omit<TopRatedMoviesResponseType, 'message'>> {
+  }: PageQueryType & { userId?: string }): Promise<Omit<TopRatedMoviesResponseType, 'message'>> {
     const response = await http.get<TMDBTopRatedMoviesResponseType>('/movie/top_rated', { params: { page } })
 
     const mediaFavoritesMap = await favoritesService.getMediaFavoritesMap({
@@ -282,12 +282,13 @@ class MoviesService {
 
   async getRecommendedMovies(payload: {
     movieId: number
+    page: number
     userId: string | undefined
   }): Promise<Omit<RecommendedMoviesResponseType, 'message'>> {
-    const { movieId, userId } = payload
+    const { movieId, page, userId } = payload
 
     const [response, favoriteRecord] = await Promise.all([
-      http.get<TMDBRecommendedMoviesResponseType>(`/movie/${movieId}/recommendations`),
+      http.get<TMDBRecommendedMoviesResponseType>(`/movie/${movieId}/recommendations`, { params: { page } }),
       userId ? favoritesService.getFavorite({ mediaId: movieId, mediaType: 'movie', userId }) : null,
     ])
 
