@@ -78,7 +78,7 @@ export const movieDetailDataSchema = movieDataSchema.omit({ mediaType: true, gen
   genres: z.array(genreSchema),
   homepage: z.string().nullable(),
   imdbId: z.string().nullable(),
-  originalCountry: z.array(z.string()),
+  originCountry: z.array(z.string()),
   productionCompanies: z.array(productionCompanySchema),
   productionCountries: z.array(productionCountrySchema),
   revenue: z.number(),

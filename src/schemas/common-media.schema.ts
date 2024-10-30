@@ -17,7 +17,7 @@ export const productionCompanySchema = z.object({
   id: z.number(),
   logoPath: z.string().nullable(),
   name: z.string(),
-  originalCountry: z.string(),
+  originCountry: z.string(),
 })
 
 export type ProductionCompanyType = z.TypeOf<typeof productionCompanySchema>
@@ -101,7 +101,7 @@ const tmdbProductionCompanySchema = z.object({
   id: z.number(),
   logo_path: z.string().nullable(),
   name: z.string(),
-  original_country: z.string(),
+  origin_country: z.string(),
 })
 
 const tmdbProductionCountrySchema = z.object({
@@ -257,7 +257,7 @@ export const tmdbTvResultSchema = z.object({
   id: z.number(),
   media_type: z.literal('tv'),
   name: z.string(),
-  original_country: z.array(z.string()),
+  origin_country: z.array(z.string()),
   original_language: z.string(),
   original_name: z.string(),
   overview: z.string(),
@@ -310,7 +310,7 @@ export const tmdbMovieDetailResponseSchema = tmdbMovieResultSchema.omit({ media_
   genres: z.array(tmdbGenreSchema),
   homepage: z.string().nullable(),
   imdb_id: z.string().nullable(),
-  original_country: z.array(z.string()),
+  origin_country: z.array(z.string()),
   production_companies: z.array(tmdbProductionCompanySchema),
   production_countries: z.array(tmdbProductionCountrySchema),
   revenue: z.number(),
@@ -384,7 +384,7 @@ export const tmdbTvDetailResponseSchema = tmdbTvResultSchema.omit({ media_type: 
       name: z.string(),
       id: z.number(),
       logo_path: z.string().nullable(),
-      original_country: z.string(),
+      origin_country: z.string(),
     })
   ),
   number_of_episodes: z.number(),

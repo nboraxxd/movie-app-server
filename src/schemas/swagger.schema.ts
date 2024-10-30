@@ -209,7 +209,7 @@
  *      enum:
  *      - tv
  *      example: "tv"
- *     originalCountry:
+ *     originCountry:
  *      type: array
  *      items:
  *       type: string
@@ -360,7 +360,7 @@
  *      type: string
  *      nullable: true
  *      example: "https://www.thedarkknight.com"
- *     originalCountry:
+ *     originCountry:
  *      type: array
  *      items:
  *       type: string
@@ -380,7 +380,7 @@
  *         type: string
  *         nullable: true
  *         example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
- *        originalCountry:
+ *        originCountry:
  *         type: string
  *         example: "US"
  *     productionCountries:
@@ -589,7 +589,7 @@
  *     name:
  *      type: string
  *      example: "The Platform 2"
- *     originalCountry:
+ *     originCountry:
  *      type: array
  *      items:
  *       type: string

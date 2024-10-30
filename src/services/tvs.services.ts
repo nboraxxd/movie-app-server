@@ -58,7 +58,7 @@ class TVsService {
           name: item.name,
           originalLanguage: item.original_language,
           overview: item.overview,
-          originalCountry: item.original_country,
+          originCountry: item.origin_country,
           originalName: item.original_name,
           popularity: item.popularity,
           voteAverage: item.vote_average,
@@ -102,7 +102,7 @@ class TVsService {
           firstAirDate: item.first_air_date,
           name: item.name,
           mediaType: 'tv',
-          originalCountry: item.original_country,
+          originCountry: item.origin_country,
           voteAverage: item.vote_average,
           voteCount: item.vote_count,
         }
@@ -144,7 +144,7 @@ class TVsService {
           firstAirDate: item.first_air_date,
           name: item.name,
           mediaType: 'tv',
-          originalCountry: item.original_country,
+          originCountry: item.origin_country,
           voteAverage: item.vote_average,
           voteCount: item.vote_count,
         }
@@ -260,7 +260,7 @@ class TVsService {
         id: item.id,
         logoPath: item.logo_path,
         name: item.name,
-        originalCountry: item.original_country,
+        originCountry: item.origin_country,
       })),
       nextEpisodeToAir: response.next_episode_to_air
         ? {
@@ -281,7 +281,7 @@ class TVsService {
         : null,
       numberOfEpisodes: response.number_of_episodes,
       numberOfSeasons: response.number_of_seasons,
-      originalCountry: response.original_country,
+      originCountry: response.origin_country,
       originalLanguage: response.original_language,
       originalName: response.original_name,
       overview: response.overview,
@@ -291,7 +291,7 @@ class TVsService {
         id: item.id,
         logoPath: item.logo_path,
         name: item.name,
-        originalCountry: item.original_country,
+        originCountry: item.origin_country,
       })),
       productionCountries: response.production_countries.map((item) => ({
         iso31661: item.iso_3166_1,
@@ -381,7 +381,7 @@ class TVsService {
               firstAirDate: item.first_air_date,
               isFavorite,
               name: item.name,
-              originalCountry: item.original_country,
+              originCountry: item.origin_country,
               originalLanguage: item.original_language,
               overview: item.overview,
               originalName: item.original_name,

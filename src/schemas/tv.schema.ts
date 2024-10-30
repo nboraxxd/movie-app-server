@@ -82,7 +82,7 @@ export const tvDataSchema = z.object({
   id: z.number(),
   mediaType: z.literal('tv'),
   name: z.string(),
-  originalCountry: z.array(z.string()),
+  originCountry: z.array(z.string()),
   originalLanguage: z.string(),
   originalName: z.string(),
   overview: z.string(),
@@ -119,7 +119,7 @@ export const tvDetailDataSchema = tvDataSchema.omit({ mediaType: true, genreIds:
       id: z.number(),
       logoPath: z.string().nullable(),
       name: z.string(),
-      originalCountry: z.string(),
+      originCountry: z.string(),
     })
   ),
   numberOfEpisodes: z.number(),

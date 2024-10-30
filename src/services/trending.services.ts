@@ -57,7 +57,7 @@ class TrendingService {
                 id: item.id,
                 isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes(item.media_type) ?? false) : null,
                 name: item.name,
-                originalCountry: item.original_country,
+                originCountry: item.origin_country,
                 originalLanguage: item.original_language,
                 originalName: item.original_name,
                 overview: item.overview,
