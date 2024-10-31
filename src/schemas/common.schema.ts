@@ -1,6 +1,6 @@
 import z from 'zod'
 
-export const nameSchema = z.string({ required_error: 'Name is required' }).trim()
+export const nameSchema = z.string().trim().min(1, { message: 'Name is required' })
 
 export const emailSchema = z.string({ required_error: 'Email is required' }).trim().email({ message: 'Invalid email' })
 
@@ -29,6 +29,4 @@ export const messageResponseSchema = z.object({
 
 export type MessageResponseType = z.TypeOf<typeof messageResponseSchema>
 
-export const textSchema = z.object({
-  text: z.string(),
-})
+export const clientUrlShema = z.string().url({ message: 'clientUrl must be a valid URL' })

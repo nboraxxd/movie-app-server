@@ -29,6 +29,15 @@ export const avatarSchema = z.object({
 
 export type AvatarType = z.TypeOf<typeof avatarSchema>
 
+export const uploadAvatarResponseSchema = z.object({
+  message: z.string(),
+  data: z.object({
+    url: z.string(),
+  }),
+})
+
+export type UploadAvatarResponseType = z.TypeOf<typeof uploadAvatarResponseSchema>
+
 export const updateProfileBodySchema = z
   .object({
     name: nameSchema.optional(),

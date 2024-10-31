@@ -65,14 +65,16 @@ class AuthService {
     })
   }
 
-  async sendVerificationEmail({ email, name, token }: { email: string; name: string; token: string }) {
+  async sendVerificationEmail(payload: { email: string; name: string; token: string; clientUrl: string }) {
+    const { email, name, token, clientUrl } = payload
+
     return sendEmail({
       name,
       email,
       subject: '[nmovies] Verify your email',
       html: EMAIL_TEMPLATES.EMAIL_VERIFICATION({
         name,
-        link: `${envVariables.CLIENT_URL}/verify-email?token=${token}`,
+        link: `${clientUrl}/verify-email?token=${token}`,
       }),
     })
   }
@@ -95,7 +97,7 @@ class AuthService {
     }
   }
 
-  async register(payload: Omit<RegisterBodyType, 'confirmPassword'>) {
+  async register(payload: Omit<RegisterBodyType, 'confirmPassword' | 'clientUrl'>) {
     const { email, name, password } = payload
 
     const userId = new ObjectId()

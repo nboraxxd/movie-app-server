@@ -8,7 +8,6 @@ import authService from '@/services/auth.services'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { EMAIL_TEMPLATES } from '@/constants/email-templates'
 import { UserDocumentWithoutPassword } from '@/models/user.model'
-import envVariables from '@/schemas/env-variables.schema'
 import { MessageResponseType } from '@/schemas/common.schema'
 import {
   AuthResponseType,
@@ -18,6 +17,7 @@ import {
   LoginBodyType,
   RefreshTokenType,
   RegisterBodyType,
+  ResendEmailVerificationBodyType,
   ResetPasswordBodyType,
 } from '@/schemas/auth.schema'
 
@@ -25,7 +25,7 @@ export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterBodyType>,
   res: Response<AuthResponseType>
 ) => {
-  const { email, name, password } = req.body
+  const { email, name, password, clientUrl } = req.body
 
   const { accessToken, emailVerifyToken, refreshToken } = await authService.register({ email, name, password })
 
@@ -34,19 +34,28 @@ export const registerController = async (
     .json({ message: 'Please check your email to verify your account', data: { accessToken, refreshToken } })
 
   setImmediate(async () => {
-    await authService.sendVerificationEmail({ email, name, token: emailVerifyToken })
+    await authService.sendVerificationEmail({
+      email,
+      name,
+      token: emailVerifyToken,
+      clientUrl,
+    })
   })
 }
 
-export const resendEmailVerificationController = async (req: Request, res: Response<MessageResponseType>) => {
+export const resendEmailVerificationController = async (
+  req: Request<ParamsDictionary, any, ResendEmailVerificationBodyType>,
+  res: Response<MessageResponseType>
+) => {
   const { email, name, _id } = req.user as UserDocumentWithoutPassword
+  const { clientUrl } = req.body
 
   const emailVerifyToken = await authService.updateEmailVerifyToken(_id)
 
   res.json({ message: 'Please check your email to verify your account' })
 
   setImmediate(async () => {
-    await authService.sendVerificationEmail({ email, name, token: emailVerifyToken })
+    await authService.sendVerificationEmail({ email, name, token: emailVerifyToken, clientUrl })
   })
 }
 
@@ -111,6 +120,7 @@ export const forgotPasswordController = async (
   res: Response<MessageResponseType>
 ) => {
   const { _id, email, name } = req.user as UserDocumentWithoutPassword
+  const { clientUrl } = req.body
 
   const updateResetPasswordToken = await authService.updateResetPasswordToken(_id.toHexString())
 
@@ -123,7 +133,7 @@ export const forgotPasswordController = async (
       subject: '[nmovies] Reset your password',
       html: EMAIL_TEMPLATES.PASSWORD_RESET({
         name,
-        link: `${envVariables.CLIENT_URL}/reset-password?token=${updateResetPasswordToken}`,
+        link: `${clientUrl}/reset-password?token=${updateResetPasswordToken}`,
       }),
     })
   })

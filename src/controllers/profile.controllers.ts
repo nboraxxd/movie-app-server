@@ -6,7 +6,12 @@ import { TokenPayload } from '@/types/token.type'
 import { uploadToCloudinary } from '@/utils/cloudinary'
 import profileService from '@/services/profile.services'
 import { MessageResponseType } from '@/schemas/common.schema'
-import { GetProfileResponseType, UpdateProfileBodyType, UpdateProfileResponseType } from '@/schemas/profile.schema'
+import {
+  GetProfileResponseType,
+  UpdateProfileBodyType,
+  UpdateProfileResponseType,
+  UploadAvatarResponseType,
+} from '@/schemas/profile.schema'
 
 export const getProfileController = async (req: Request, res: Response<GetProfileResponseType>) => {
   const { userId } = req.decodedAuthorization as TokenPayload
@@ -16,12 +21,12 @@ export const getProfileController = async (req: Request, res: Response<GetProfil
   return res.json({ message: 'Get profile successful', data: result })
 }
 
-export const uploadAvatarController = async (req: Request, res: Response) => {
+export const uploadAvatarController = async (req: Request, res: Response<UploadAvatarResponseType>) => {
   const file = req.file as Express.Multer.File
 
   const result = await uploadToCloudinary(file)
 
-  return res.json({ message: 'Upload avatar successful', data: result.secure_url })
+  return res.json({ message: 'Upload avatar successful', data: { url: result.secure_url } })
 }
 
 export const updateProfileController = async (
