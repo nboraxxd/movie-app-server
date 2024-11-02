@@ -38,6 +38,7 @@ class ProfileService {
 
     return omit({ ...user, _id: user._id.toHexString(), isVerified: user.emailVerifyToken === null }, [
       'emailVerifyToken',
+      'resetPasswordToken',
     ])
   }
 

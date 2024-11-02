@@ -18,7 +18,7 @@ import { HttpStatusCode } from '@/constants/http-status-code'
 import { sendEmail } from '@/utils/mailgun'
 import { hashPassword } from '@/utils/crypto'
 import { capitalizeFirstLetter } from '@/utils/common'
-import { decodeRefreshToken, decodeResetPasswordToken, signToken } from '@/utils/jwt'
+import { verifyRefreshToken, verifyResetPasswordToken, signToken } from '@/utils/jwt'
 import databaseService from '@/services/database.services'
 import profileService from '@/services/profile.services'
 import { ForgotPasswordBodyType, RegisterBodyType, ResetPasswordBodyType } from '@/schemas/auth.schema'
@@ -108,7 +108,7 @@ class AuthService {
       this.signRefreshToken(userId.toHexString()),
     ])
 
-    const { iat, exp } = await decodeRefreshToken(refreshToken)
+    const { iat, exp } = await verifyRefreshToken(refreshToken)
 
     await Promise.all([
       databaseService.users.insertOne(
@@ -189,7 +189,7 @@ class AuthService {
 
     if (user.emailVerifyToken !== req.body.emailVerifyToken) {
       throw new ErrorWithStatus({
-        message: 'Invalid email verify token',
+        message: 'Please check your email for the latest link or request a new one.',
         statusCode: HttpStatusCode.Unauthorized,
       })
     }
@@ -197,7 +197,7 @@ class AuthService {
 
   async verifyEmail(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
-    const { iat, exp } = await decodeRefreshToken(refreshToken)
+    const { iat, exp } = await verifyRefreshToken(refreshToken)
 
     await Promise.all([
       databaseService.users.updateOne(
@@ -277,7 +277,7 @@ class AuthService {
 
   async login(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(userId)
-    const { iat, exp } = await decodeRefreshToken(refreshToken)
+    const { iat, exp } = await verifyRefreshToken(refreshToken)
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ userId: new ObjectId(userId), token: refreshToken, iat, exp })
@@ -288,7 +288,7 @@ class AuthService {
 
   async validateRefreshTokenRequest(req: Request<ParamsDictionary, any, RefreshTokenType>) {
     const [decodedRefreshToken, findAndDeleteResult] = await Promise.all([
-      decodeRefreshToken(req.body.refreshToken),
+      verifyRefreshToken(req.body.refreshToken),
       databaseService.refreshTokens.findOneAndDelete({ token: req.body.refreshToken }),
     ])
 
@@ -308,7 +308,7 @@ class AuthService {
       this.signRefreshToken(userId, exp),
     ])
 
-    const decodedRefreshToken = await decodeRefreshToken(newRefreshToken)
+    const decodedRefreshToken = await verifyRefreshToken(newRefreshToken)
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
@@ -451,7 +451,7 @@ class AuthService {
     const { resetPasswordToken } = req.body
 
     try {
-      const decodedResetPasswordToken = await decodeResetPasswordToken(resetPasswordToken)
+      const decodedResetPasswordToken = await verifyResetPasswordToken(resetPasswordToken)
 
       const user = await profileService.findById(decodedResetPasswordToken.userId)
 
