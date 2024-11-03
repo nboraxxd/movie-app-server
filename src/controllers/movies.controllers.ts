@@ -67,9 +67,7 @@ export const getMovieDetailController = async (
 ) => {
   const { movieId } = req.params
 
-  const tokenPayload = req.decodedAuthorization
-
-  const data = await moviesService.getMovieDetail({ movieId, userId: tokenPayload?.userId })
+  const data = await moviesService.getMovieDetail(movieId)
 
   return res.json({ message: 'Get movie detail successful', data })
 }

@@ -65,36 +65,38 @@ export const movieDataSchema = z.object({
 
 export type MovieDataType = z.TypeOf<typeof movieDataSchema>
 
-export const movieDetailDataSchema = movieDataSchema.omit({ mediaType: true, genreIds: true }).extend({
-  belongsToCollection: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      posterPath: z.string().nullable(),
-      backdropPath: z.string().nullable(),
-    })
-    .nullable(),
-  budget: z.number(),
-  genres: z.array(genreSchema),
-  homepage: z.string().nullable(),
-  imdbId: z.string().nullable(),
-  originCountry: z.array(z.string()),
-  productionCompanies: z.array(productionCompanySchema),
-  productionCountries: z.array(productionCountrySchema),
-  revenue: z.number(),
-  runtime: z.number().nullable(),
-  spokenLanguages: z.array(spokenLanguageSchema),
-  status: z.string(),
-  tagline: z.string().nullable(),
-  credits: z.object({
-    cast: z.array(movieCastSchema),
-    crew: z.array(movieCrewSchema),
-  }),
-  videos: z.object({
-    results: z.array(videoSchema),
-  }),
-  certification: z.string().nullable(),
-})
+export const movieDetailDataSchema = movieDataSchema
+  .omit({ mediaType: true, genreIds: true, isFavorite: true })
+  .extend({
+    belongsToCollection: z
+      .object({
+        id: z.number(),
+        name: z.string(),
+        posterPath: z.string().nullable(),
+        backdropPath: z.string().nullable(),
+      })
+      .nullable(),
+    budget: z.number(),
+    genres: z.array(genreSchema),
+    homepage: z.string().nullable(),
+    imdbId: z.string().nullable(),
+    originCountry: z.array(z.string()),
+    productionCompanies: z.array(productionCompanySchema),
+    productionCountries: z.array(productionCountrySchema),
+    revenue: z.number(),
+    runtime: z.number().nullable(),
+    spokenLanguages: z.array(spokenLanguageSchema),
+    status: z.string(),
+    tagline: z.string().nullable(),
+    credits: z.object({
+      cast: z.array(movieCastSchema),
+      crew: z.array(movieCrewSchema),
+    }),
+    videos: z.object({
+      results: z.array(videoSchema),
+    }),
+    certification: z.string().nullable(),
+  })
 
 export type MovieDetailDataType = z.TypeOf<typeof movieDetailDataSchema>
 

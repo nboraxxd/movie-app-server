@@ -232,7 +232,7 @@ class AuthService {
 
     const user = (await databaseService.users.findOne(
       { _id: new ObjectId(userId) },
-      { projection: { password: 0, emailVerifyToken: 0 } }
+      { projection: { password: 0, resetPasswordToken: 0 } }
     )) as Omit<UserDocumentWithoutPassword, 'resetPasswordToken'> | null
 
     if (!user) {

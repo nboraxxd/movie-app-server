@@ -95,7 +95,7 @@ export const tvDataSchema = z.object({
 
 export type TVDataType = z.TypeOf<typeof tvDataSchema>
 
-export const tvDetailDataSchema = tvDataSchema.omit({ mediaType: true, genreIds: true }).extend({
+export const tvDetailDataSchema = tvDataSchema.omit({ mediaType: true, genreIds: true, isFavorite: true }).extend({
   createdBy: z.array(
     z.object({
       id: z.number(),

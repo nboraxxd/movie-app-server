@@ -160,15 +160,10 @@ class MoviesService {
     }
   }
 
-  async getMovieDetail(payload: { movieId: number; userId: string | undefined }): Promise<MovieDetailDataType> {
-    const { movieId, userId } = payload
-
-    const [response, favoriteRecord] = await Promise.all([
-      http.get<TMDBMovieDetailResponseType>(`/movie/${movieId}`, {
-        params: { append_to_response: 'release_dates,credits,videos' },
-      }),
-      userId ? favoritesService.getFavorite({ mediaId: movieId, mediaType: 'movie', userId }) : null,
-    ])
+  async getMovieDetail(movieId: number): Promise<MovieDetailDataType> {
+    const response = await http.get<TMDBMovieDetailResponseType>(`/movie/${movieId}`, {
+      params: { append_to_response: 'release_dates,credits,videos' },
+    })
 
     const certification =
       response.release_dates.results.find((item) => item.iso_3166_1 === 'US')?.release_dates[0].certification || null
@@ -232,7 +227,6 @@ class MoviesService {
       homepage: response.homepage,
       id: response.id,
       imdbId: response.imdb_id,
-      isFavorite: !userId ? null : Boolean(favoriteRecord),
       originCountry: response.origin_country,
       originalLanguage: response.original_language,
       originalTitle: response.original_title,

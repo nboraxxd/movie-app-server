@@ -153,15 +153,10 @@ class TVsService {
     }
   }
 
-  async getTvDetail(payload: { tvId: number; userId: string | undefined }): Promise<TvDetailDataType> {
-    const { tvId, userId } = payload
-
-    const [response, favoriteRecord] = await Promise.all([
-      http.get<TMDBTvDetailResponseType>(`/tv/${tvId}`, {
-        params: { append_to_response: 'content_ratings,aggregate_credits,videos' },
-      }),
-      userId ? favoritesService.getFavorite({ mediaId: tvId, mediaType: 'tv', userId }) : null,
-    ])
+  async getTvDetail(tvId: number): Promise<TvDetailDataType> {
+    const response = await http.get<TMDBTvDetailResponseType>(`/tv/${tvId}`, {
+      params: { append_to_response: 'content_ratings,aggregate_credits,videos' },
+    })
 
     const certification = response.content_ratings.results.find((item) => item.iso_3166_1 === 'US')?.rating ?? null
 
@@ -235,7 +230,6 @@ class TVsService {
       homepage: response.homepage,
       id: response.id,
       inProduction: response.in_production,
-      isFavorite: !userId ? null : Boolean(favoriteRecord),
       languages: response.languages,
       lastAirDate: response.last_air_date,
       lastEpisodeToAir: response.last_episode_to_air

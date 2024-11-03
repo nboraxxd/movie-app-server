@@ -63,9 +63,7 @@ export const searchTvsController = async (
 export const getTvDetailController = async (req: Request<TvIdParamsType>, res: Response<TvDetailResponseType>) => {
   const { tvId } = req.params
 
-  const tokenPayload = req.decodedAuthorization
-
-  const data = await tvsService.getTvDetail({ tvId, userId: tokenPayload?.userId })
+  const data = await tvsService.getTvDetail(tvId)
 
   return res.json({ message: 'Get tv detail successful', data })
 }
