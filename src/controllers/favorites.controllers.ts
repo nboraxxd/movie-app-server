@@ -8,8 +8,9 @@ import { PageQueryType } from '@/schemas/common-media.schema'
 import {
   AddFavoriteBodyType,
   AddFavoriteResponseType,
+  CheckFavoriteByMediaResponseType,
   DeleteFavoriteByIdParamsType,
-  DeleteFavoriteByMediaParamsType,
+  FavoriteByMediaParamsType,
   GetMyFavoritesResponseType,
 } from '@/schemas/favorite.schema'
 import favoritesService from '@/services/favorites.services'
@@ -72,8 +73,20 @@ export const deleteFavoriteByIdController = async (
   return res.json({ message: 'Delete favorite by id successful' })
 }
 
+export const checkIsFavoriteByMediaController = async (
+  req: Request<FavoriteByMediaParamsType>,
+  res: Response<CheckFavoriteByMediaResponseType>
+) => {
+  const { mediaId, mediaType } = req.params
+  const { userId } = req.decodedAuthorization as TokenPayload
+
+  const isFavorite = await favoritesService.checkIsFavoriteByMedia({ mediaId, mediaType, userId })
+
+  return res.json({ message: 'Check favorite by media successful', data: isFavorite })
+}
+
 export const deleteFavoriteByMediaController = async (
-  req: Request<DeleteFavoriteByMediaParamsType>,
+  req: Request<FavoriteByMediaParamsType>,
   res: Response<MessageResponseType>
 ) => {
   const { mediaId, mediaType } = req.params

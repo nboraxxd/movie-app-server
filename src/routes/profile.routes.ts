@@ -2,7 +2,6 @@ import { Router } from 'express'
 
 import { uploadAvatar } from '@/utils/multer'
 import { wrapRequestHandler } from '@/utils/handlers'
-import authService from '@/services/auth.services'
 import profileService from '@/services/profile.services'
 import { avatarSchema, verifyPasswordBodySchema, updateProfileBodySchema } from '@/schemas/profile.schema'
 import { authorizationValidator, fileValidator, zodValidator } from '@/middlewares/validators.middleware'
@@ -45,7 +44,14 @@ const profileRouter = Router()
  *    '404':
  *     description: User not found
  */
-profileRouter.get('/', authorizationValidator({ isLoginRequired: true }), wrapRequestHandler(getProfileController))
+profileRouter.get(
+  '/',
+  // không dùng ensureUserExists ở đây
+  // Mà tự check trong service
+  // Vì cần lấy trạng thái verify của user từ emailVerifyToken
+  authorizationValidator({ isLoginRequired: true }),
+  wrapRequestHandler(getProfileController)
+)
 
 /**
  * @swagger
@@ -88,7 +94,7 @@ profileRouter.post(
   '/upload-avatar',
   fileValidator(uploadAvatar),
   zodValidator(avatarSchema, { customPath: 'avatar', location: 'file' }),
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
   wrapRequestHandler(uploadAvatarController)
 )
 
@@ -136,7 +142,7 @@ profileRouter.post(
  */
 profileRouter.patch(
   '/',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
   zodValidator(updateProfileBodySchema, { location: 'body', customHandler: profileService.hasFieldToUpdate }),
   wrapRequestHandler(updateProfileController)
 )
@@ -185,7 +191,7 @@ profileRouter.patch(
  */
 profileRouter.post(
   '/verify-password',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExists }),
+  authorizationValidator({ isLoginRequired: true }),
   zodValidator(verifyPasswordBodySchema, { location: 'body', customHandler: profileService.validateUserPassword }),
   wrapRequestHandler(verifyPasswordController)
 )

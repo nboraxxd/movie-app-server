@@ -1,16 +1,16 @@
 import { Router } from 'express'
 
-import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import {
   addFavoriteBodySchema,
   deleteFavoriteByIdParamsSchema,
-  deleteFavoriteByMediaParamsSchema,
+  favoriteByMediaParamsSchema,
 } from '@/schemas/favorite.schema'
 import { pageQuerySchema } from '@/schemas/common-media.schema'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
 import {
   addFavoriteController,
+  checkIsFavoriteByMediaController,
   deleteFavoriteByIdController,
   deleteFavoriteByMediaController,
   getMyFavoritesController,
@@ -60,7 +60,7 @@ const favoritesRouter = Router()
  */
 favoritesRouter.post(
   '/',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
   zodValidator(addFavoriteBodySchema, { location: 'body' }),
   wrapRequestHandler(addFavoriteController)
 )
@@ -107,7 +107,7 @@ favoritesRouter.post(
  */
 favoritesRouter.get(
   '/me',
-  authorizationValidator({ isLoginRequired: true }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExists: true }),
   zodValidator(pageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getMyFavoritesController)
 )
@@ -141,7 +141,7 @@ favoritesRouter.get(
  *          type: string
  *          example: Delete favorite by id successful
  *    '400':
- *     description: Missing or invalid comment id
+ *     description: Missing or invalid params
  *    '401':
  *     description: Unauthorized
  *    '404':
@@ -149,9 +149,65 @@ favoritesRouter.get(
  */
 favoritesRouter.delete(
   '/:favoriteId',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
   zodValidator(deleteFavoriteByIdParamsSchema, { location: 'params' }),
   wrapRequestHandler(deleteFavoriteByIdController)
+)
+
+/**
+ * @swagger
+ * /favorites/medias/check/{mediaId}/{mediaType}:
+ *  get:
+ *   tags:
+ *   - favorites
+ *   summary: Check favorite by media
+ *   description: Check media is favorite by media id and media type
+ *   operationId: checkIsFavoriteByMedia
+ *   parameters:
+ *    - in: path
+ *      name: mediaId
+ *      required: true
+ *      description: Media id to check favorite.
+ *      schema:
+ *       type: string
+ *       example: 155
+ *    - in: path
+ *      name: mediaType
+ *      required: true
+ *      description: Media type to check favorite.
+ *      schema:
+ *       type: string
+ *       enum: ['movie', 'tv']
+ *       example: movie
+ *   responses:
+ *    '200':
+ *     description: Check favorite by media successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Check favorite by media successful
+ *         data:
+ *          type: object
+ *          properties:
+ *           isFavorite:
+ *            type: boolean
+ *            example: true
+ *    '400':
+ *     description: Missing or invalid params
+ *    '401':
+ *     description: Unauthorized
+ *    '404':
+ *     description: User not found
+ */
+favoritesRouter.get(
+  '/medias/check/:mediaId/:mediaType',
+  authorizationValidator({ isLoginRequired: true, ensureUserExists: true }),
+  zodValidator(favoriteByMediaParamsSchema, { location: 'params' }),
+  wrapRequestHandler(checkIsFavoriteByMediaController)
 )
 
 /**
@@ -191,7 +247,7 @@ favoritesRouter.delete(
  *          type: string
  *          example: Delete favorite by media successful
  *    '400':
- *     description: Missing or invalid comment id
+ *     description: Missing or invalid params
  *    '401':
  *     description: Unauthorized
  *    '404':
@@ -199,8 +255,8 @@ favoritesRouter.delete(
  */
 favoritesRouter.delete(
   '/medias/:mediaId/:mediaType',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
-  zodValidator(deleteFavoriteByMediaParamsSchema, { location: 'params' }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
+  zodValidator(favoriteByMediaParamsSchema, { location: 'params' }),
   wrapRequestHandler(deleteFavoriteByMediaController)
 )
 

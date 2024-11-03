@@ -8,7 +8,7 @@ import { ObjectId } from 'mongodb'
 import { JsonWebTokenError, decode } from 'jsonwebtoken'
 import { ParamsDictionary } from 'express-serve-static-core'
 
-import User from '@/models/user.model'
+import User, { UserDocumentWithoutPassword } from '@/models/user.model'
 import { EntityError, ErrorWithStatus, ErrorWithStatusAndLocation } from '@/models/errors'
 import RefreshToken from '@/models/refresh-token.model'
 import { TokenPayload } from '@/types/token.type'
@@ -175,7 +175,7 @@ class AuthService {
 
     if (!user) {
       throw new ErrorWithStatus({
-        message: 'User not found',
+        message: 'Email does not exist in the system',
         statusCode: HttpStatusCode.NotFound,
       })
     }
@@ -215,7 +215,7 @@ class AuthService {
   async ensureUserExists(req: Request) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
-    const user = await databaseService.users.findOne({ _id: new ObjectId(userId) })
+    const user = await profileService.findByIdWithoutSensitiveInfo(userId)
 
     if (!user) {
       throw new ErrorWithStatus({
@@ -230,7 +230,10 @@ class AuthService {
   async ensureUserExistsAndVerify(req: Request) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
-    const user = await profileService.findById(userId)
+    const user = (await databaseService.users.findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { password: 0, emailVerifyToken: 0 } }
+    )) as Omit<UserDocumentWithoutPassword, 'resetPasswordToken'> | null
 
     if (!user) {
       throw new ErrorWithStatus({
@@ -336,7 +339,10 @@ class AuthService {
   async validateChangePasswordRequest(req: Request<ParamsDictionary, any, ChangePasswordBodyType>) {
     const { userId } = req.decodedAuthorization as TokenPayload
 
-    const user = await databaseService.users.findOne({ _id: new ObjectId(userId) })
+    const user = await databaseService.users.findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { resetPasswordToken: 0 } }
+    )
 
     if (!user) {
       throw new ErrorWithStatus({
@@ -457,7 +463,7 @@ class AuthService {
 
       if (!user) {
         throw new ErrorWithStatus({
-          message: 'User not found',
+          message: 'Email does not exist in the system',
           statusCode: HttpStatusCode.NotFound,
         })
       }

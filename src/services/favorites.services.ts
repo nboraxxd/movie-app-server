@@ -164,6 +164,20 @@ class FavoritesService {
     }
   }
 
+  async checkIsFavoriteByMedia(payload: { mediaId: number; mediaType: MediaType; userId: string }) {
+    const { mediaId, mediaType, userId } = payload
+
+    const favorite = await databaseService.favorites.findOne({
+      mediaId,
+      mediaType,
+      userId: new ObjectId(userId),
+    })
+
+    return {
+      isFavorite: !!favorite,
+    }
+  }
+
   async deleteFavoriteByMedia(payload: { mediaId: number; mediaType: MediaType; userId: string }) {
     const { mediaId, mediaType, userId } = payload
 

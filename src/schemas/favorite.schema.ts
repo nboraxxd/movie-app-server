@@ -48,11 +48,20 @@ export const deleteFavoriteByIdParamsSchema = z.object({
 
 export type DeleteFavoriteByIdParamsType = z.TypeOf<typeof deleteFavoriteByIdParamsSchema>
 
-export const deleteFavoriteByMediaParamsSchema = z
+export const favoriteByMediaParamsSchema = z
   .object({
     mediaId: z.coerce.number(),
     mediaType: z.enum(['movie', 'tv']),
   })
   .strict({ message: 'Additional properties not allowed' })
 
-export type DeleteFavoriteByMediaParamsType = z.TypeOf<typeof deleteFavoriteByMediaParamsSchema>
+export type FavoriteByMediaParamsType = z.TypeOf<typeof favoriteByMediaParamsSchema>
+
+export const checkFavoriteByMediaResponseSchema = z.object({
+  message: z.string(),
+  data: z.object({
+    isFavorite: z.boolean(),
+  }),
+})
+
+export type CheckFavoriteByMediaResponseType = z.TypeOf<typeof checkFavoriteByMediaResponseSchema>

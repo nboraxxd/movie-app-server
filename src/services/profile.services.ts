@@ -1,15 +1,16 @@
 import z from 'zod'
 import omit from 'lodash/omit'
 import { Request } from 'express'
-import { ObjectId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import { hashPassword } from '@/utils/crypto'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import { EntityError, ErrorWithStatus } from '@/models/errors'
-import { UserDocument, UserDocumentWithoutPassword } from '@/models/user.model'
+import { UserDocumentWithoutPassword, UserDocumentWithoutSensitiveInfo } from '@/models/user.model'
 import { VerifyPasswordBodyType, UpdateProfileBodyType, UpdateProfileResponseType } from '@/schemas/profile.schema'
+import { TokenPayload } from '@/types/token.type'
 
 class ProfileService {
   async findById(userId: string) {
@@ -17,6 +18,13 @@ class ProfileService {
       { _id: new ObjectId(userId) },
       { projection: { password: 0 } }
     ) as Promise<UserDocumentWithoutPassword>
+  }
+
+  async findByIdWithoutSensitiveInfo(userId: string) {
+    return databaseService.users.findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { password: 0, emailVerifyToken: 0, resetPasswordToken: 0 } }
+    ) as Promise<UserDocumentWithoutSensitiveInfo>
   }
 
   async findByEmail(email: string) {
@@ -81,7 +89,19 @@ class ProfileService {
   }
 
   async validateUserPassword(req: Request<ParamsDictionary, any, VerifyPasswordBodyType>) {
-    const user = req.user as UserDocument
+    const { userId } = req.decodedAuthorization as TokenPayload
+
+    const user = (await databaseService.users.findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { password: 1 } }
+    )) as WithId<{ password: string }> | null
+
+    if (!user) {
+      throw new ErrorWithStatus({
+        message: 'User not found',
+        statusCode: HttpStatusCode.NotFound,
+      })
+    }
 
     if (user.password !== hashPassword(req.body.password)) {
       throw new EntityError({

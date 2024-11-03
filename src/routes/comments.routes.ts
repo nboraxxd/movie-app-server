@@ -1,6 +1,5 @@
 import { Router } from 'express'
 
-import authService from '@/services/auth.services'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
 import { pageQuerySchema } from '@/schemas/common-media.schema'
@@ -50,7 +49,7 @@ const commentsRouter = Router()
  */
 commentsRouter.post(
   '/',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
   zodValidator(addCommentBodySchema, { location: 'body' }),
   wrapRequestHandler(addCommentController)
 )
@@ -199,7 +198,7 @@ commentsRouter.get(
  */
 commentsRouter.delete(
   '/:commentId',
-  authorizationValidator({ isLoginRequired: true, customHandler: authService.ensureUserExistsAndVerify }),
+  authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
   zodValidator(deleteCommentParamsSchema, { location: 'params' }),
   wrapRequestHandler(deleteCommentController)
 )

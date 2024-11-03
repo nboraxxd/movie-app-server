@@ -312,6 +312,9 @@ authRouter.post(
  */
 authRouter.patch(
   '/change-password',
+  // không dùng ensureUserExistsAndVerify ở đây
+  // Mà phải dùng customHandler ở zodValidator
+  // Vì cần phải so sánh currentPassword với password trong db
   authorizationValidator({
     isLoginRequired: true,
   }),

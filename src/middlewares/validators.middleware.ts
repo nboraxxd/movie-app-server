@@ -4,11 +4,12 @@ import omit from 'lodash/omit'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
-import { attachDecodedAuthorizationTokenToReq } from '@/utils/jwt'
 import { capitalizeFirstLetter } from '@/utils/common'
+import { attachDecodedAuthorizationTokenToReq } from '@/utils/jwt'
 import { authorizationSchema } from '@/schemas/auth.schema'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import { EntityError, ErrorWithStatusAndLocation } from '@/models/errors'
+import authService from '@/services/auth.services'
 
 export type ValidationLocation = 'body' | 'params' | 'query' | 'headers' | 'file'
 
@@ -72,9 +73,13 @@ export const zodValidator = (
 
 export const authorizationValidator = ({
   isLoginRequired,
+  ensureUserExists,
+  ensureUserExistsAndVerify,
   customHandler,
 }: {
   isLoginRequired: boolean
+  ensureUserExists?: boolean
+  ensureUserExistsAndVerify?: boolean
   customHandler?: (req: Request) => Promise<void>
 }) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
@@ -86,6 +91,14 @@ export const authorizationValidator = ({
           authorization: accessToken,
         })
         await attachDecodedAuthorizationTokenToReq(parsedAccessToken, req)
+
+        if (ensureUserExists) {
+          await authService.ensureUserExists(req)
+        }
+
+        if (ensureUserExistsAndVerify) {
+          await authService.ensureUserExistsAndVerify(req)
+        }
       } else if (!isLoginRequired && accessToken) {
         await attachDecodedAuthorizationTokenToReq(accessToken, req)
       }
