@@ -13,11 +13,13 @@ import {
   TMDBRecommendedMoviesResponseType,
   TMDBSearchMoviesResponseType,
   PageQueryType,
+  TMDBMovieCreditsResponseType,
 } from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesQueryType,
   DiscoverMoviesResponseType,
   MovieCastType,
+  MovieCreditsResponseType,
   MovieCrewType,
   MovieDataType,
   MovieDetailDataType,
@@ -162,47 +164,11 @@ class MoviesService {
 
   async getMovieDetail(movieId: number): Promise<MovieDetailDataType> {
     const response = await http.get<TMDBMovieDetailResponseType>(`/movie/${movieId}`, {
-      params: { append_to_response: 'release_dates,credits,videos' },
+      params: { append_to_response: 'release_dates,videos' },
     })
 
     const certification =
       response.release_dates.results.find((item) => item.iso_3166_1 === 'US')?.release_dates[0].certification || null
-
-    const formattedCrew = response.credits.crew.map<MovieCrewType>((item) => {
-      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
-
-      return {
-        adult: item.adult,
-        creditId: item.credit_id,
-        department: item.department,
-        gender: item.gender,
-        id: item.id,
-        job: item.job,
-        knownForDepartment: item.known_for_department,
-        name: item.name,
-        originalName: item.original_name,
-        popularity: item.popularity,
-        profilePath: profileFullPath,
-      }
-    })
-    const formattedCast = response.credits.cast.map<MovieCastType>((item) => {
-      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
-
-      return {
-        adult: item.adult,
-        castId: item.cast_id,
-        character: item.character,
-        creditId: item.credit_id,
-        gender: item.gender,
-        id: item.id,
-        knownForDepartment: item.known_for_department,
-        name: item.name,
-        order: item.order,
-        originalName: item.original_name,
-        popularity: item.popularity,
-        profilePath: profileFullPath,
-      }
-    })
 
     const backdropFullPath = response.backdrop_path
       ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${response.backdrop_path}`
@@ -221,7 +187,6 @@ class MoviesService {
           }
         : null,
       budget: response.budget,
-      credits: { crew: formattedCrew, cast: formattedCast },
       certification,
       genres: response.genres,
       homepage: response.homepage,
@@ -272,6 +237,47 @@ class MoviesService {
       voteAverage: response.vote_average,
       voteCount: response.vote_count,
     }
+  }
+
+  async getMovieCredits(movieId: number): Promise<MovieCreditsResponseType['data']> {
+    const response = await http.get<TMDBMovieCreditsResponseType>(`/movie/${movieId}/credits`)
+
+    const formattedCrew = response.crew.map<MovieCrewType>((item) => {
+      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
+      return {
+        adult: item.adult,
+        creditId: item.credit_id,
+        department: item.department,
+        gender: item.gender,
+        id: item.id,
+        job: item.job,
+        knownForDepartment: item.known_for_department,
+        name: item.name,
+        originalName: item.original_name,
+        popularity: item.popularity,
+        profilePath: profileFullPath,
+      }
+    })
+
+    const formattedCast = response.cast.map<MovieCastType>((item) => {
+      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
+      return {
+        adult: item.adult,
+        castId: item.cast_id,
+        character: item.character,
+        creditId: item.credit_id,
+        gender: item.gender,
+        id: item.id,
+        knownForDepartment: item.known_for_department,
+        name: item.name,
+        order: item.order,
+        originalName: item.original_name,
+        popularity: item.popularity,
+        profilePath: profileFullPath,
+      }
+    })
+
+    return { cast: formattedCast, crew: formattedCrew }
   }
 
   async getRecommendedMovies(payload: {

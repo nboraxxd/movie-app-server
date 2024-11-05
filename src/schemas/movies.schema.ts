@@ -88,10 +88,6 @@ export const movieDetailDataSchema = movieDataSchema
     spokenLanguages: z.array(spokenLanguageSchema),
     status: z.string(),
     tagline: z.string().nullable(),
-    credits: z.object({
-      cast: z.array(movieCastSchema),
-      crew: z.array(movieCrewSchema),
-    }),
     videos: z.object({
       results: z.array(videoSchema),
     }),
@@ -155,6 +151,17 @@ export const movieDetailResponseSchema = z.object({
 })
 
 export type MovieDetailResponseType = z.TypeOf<typeof movieDetailResponseSchema>
+
+/* Movie credits schema */
+export const movieCreditsResponseSchema = z.object({
+  message: z.string(),
+  data: z.object({
+    cast: z.array(movieCastSchema),
+    crew: z.array(movieCrewSchema),
+  }),
+})
+
+export type MovieCreditsResponseType = z.TypeOf<typeof movieCreditsResponseSchema>
 
 /* Recommended movies schema */
 export const recommendedMoviesResponseSchema = z.object({

@@ -6,6 +6,7 @@ import { pageQuerySchema, searchQuerySchema } from '@/schemas/common-media.schem
 import { discoverMoviesQuerySchema, movieIdParamsSchema } from '@/schemas/movies.schema'
 import {
   discoverMoviesController,
+  getMovieCreditsController,
   getMovieDetailController,
   getRecommendedMoviesController,
   searchMoviesController,
@@ -244,6 +245,47 @@ moviesRouter.get(
   '/:movieId',
   zodValidator(movieIdParamsSchema, { location: 'params' }),
   wrapRequestHandler(getMovieDetailController)
+)
+
+/**
+ * @swagger
+ * /movies/{movieId}/credits:
+ *  get:
+ *   tags:
+ *   - movies
+ *   summary: Get movie credits
+ *   description: Get movie credits by movie ID
+ *   operationId: movieCredits
+ *   parameters:
+ *    - in: path
+ *      name: movieId
+ *      required: true
+ *      description: Movie ID.
+ *      schema:
+ *       type: string
+ *       example: 155
+ *   responses:
+ *    '200':
+ *     description: Get movie credits successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get movie credits successful
+ *         data:
+ *          $ref: '#/components/schemas/dataMovieCreditsResponseSchema'
+ *    '400':
+ *     description: Bad request
+ *    '404':
+ *     description: The resource you requested could not be found.
+ */
+moviesRouter.get(
+  '/:movieId/credits',
+  zodValidator(movieIdParamsSchema, { location: 'params' }),
+  wrapRequestHandler(getMovieCreditsController)
 )
 
 /**

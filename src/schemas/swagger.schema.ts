@@ -422,94 +422,6 @@
  *      type: string
  *      nullable: true
  *      example: "Why so serious?"
- *     credits:
- *      type: object
- *      properties:
- *       cast:
- *        type: array
- *        items:
- *         type: object
- *         properties:
- *          adult:
- *           type: boolean
- *           example: false
- *          gender:
- *           type: integer
- *           nullable: true
- *           example: 2
- *          id:
- *           type: integer
- *           example: 123
- *          knownForDepartment:
- *           type: string
- *           example: "Acting"
- *          name:
- *           type: string
- *           example: "Christian Bale"
- *          originalName:
- *           type: string
- *           example: "Christian Bale"
- *          popularity:
- *           type: number
- *           format: float
- *           example: 10.0
- *          profilePath:
- *           type: string
- *           nullable: true
- *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
- *          castId:
- *           type: integer
- *           example: 1
- *          character:
- *           type: string
- *           example: "Bruce Wayne / Batman"
- *          creditId:
- *           type: string
- *           example: "52fe4232c3a36847f800b579"
- *          order:
- *           type: integer
- *           example: 0
- *       crew:
- *        type: array
- *        items:
- *         type: object
- *         properties:
- *          adult:
- *           type: boolean
- *           example: false
- *          gender:
- *           type: integer
- *           nullable: true
- *           example: 2
- *          id:
- *           type: integer
- *           example: 123
- *          knownForDepartment:
- *           type: string
- *           example: "Directing"
- *          name:
- *           type: string
- *           example: "Christopher Nolan"
- *          originalName:
- *           type: string
- *           example: "Christopher Nolan"
- *          popularity:
- *           type: number
- *           format: float
- *           example: 10.0
- *          profilePath:
- *           type: string
- *           nullable: true
- *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
- *          creditId:
- *           type: string
- *           example: "52fe4232c3a36847f800b579"
- *          department:
- *           type: string
- *           example: "Directing"
- *          job:
- *           type: string
- *           example: "Director"
  *     videos:
  *      type: object
  *      properties:
@@ -553,6 +465,95 @@
  *      type: string
  *      nullable: true
  *      example: "PG-13"
+ *
+ *   dataMovieCreditsResponseSchema:
+ *    type: object
+ *    properties:
+ *     cast:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        adult:
+ *         type: boolean
+ *         example: false
+ *        gender:
+ *         type: integer
+ *         nullable: true
+ *         example: 2
+ *        id:
+ *         type: integer
+ *         example: 123
+ *        knownForDepartment:
+ *         type: string
+ *         example: "Acting"
+ *        name:
+ *         type: string
+ *         example: "Christian Bale"
+ *        originalName:
+ *         type: string
+ *         example: "Christian Bale"
+ *        popularity:
+ *         type: number
+ *         format: float
+ *         example: 10.0
+ *        profilePath:
+ *         type: string
+ *         nullable: true
+ *         example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *        castId:
+ *         type: integer
+ *         example: 1
+ *        character:
+ *         type: string
+ *         example: "Bruce Wayne / Batman"
+ *        creditId:
+ *         type: string
+ *         example: "52fe4232c3a36847f800b579"
+ *        order:
+ *         type: integer
+ *         example: 0
+ *     crew:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        adult:
+ *         type: boolean
+ *         example: false
+ *        gender:
+ *         type: integer
+ *         nullable: true
+ *         example: 2
+ *        id:
+ *         type: integer
+ *         example: 123
+ *        knownForDepartment:
+ *         type: string
+ *         example: "Directing"
+ *        name:
+ *         type: string
+ *         example: "Christopher Nolan"
+ *        originalName:
+ *         type: string
+ *         example: "Christopher Nolan"
+ *        popularity:
+ *         type: number
+ *         format: float
+ *         example: 10.0
+ *        profilePath:
+ *         type: string
+ *         nullable: true
+ *         example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *        creditId:
+ *         type: string
+ *         example: "52fe4232c3a36847f800b579"
+ *        department:
+ *         type: string
+ *         example: "Directing"
+ *        job:
+ *         type: string
+ *         example: "Director"
  *
  *   dataDiscoverTvsResponseSchema:
  *    type: array

@@ -318,10 +318,6 @@ export const tmdbMovieDetailResponseSchema = tmdbMovieResultSchema.omit({ media_
   spoken_languages: z.array(tmdbSpokenLanguageSchema),
   status: z.string(),
   tagline: z.string().nullable(),
-  credits: z.object({
-    cast: z.array(tmdbMovieCastSchema),
-    crew: z.array(tmdbMovieCrewSchema),
-  }),
   videos: z.object({
     results: z.array(tmdbVideoSchema),
   }),
@@ -331,6 +327,14 @@ export const tmdbMovieDetailResponseSchema = tmdbMovieResultSchema.omit({ media_
 })
 
 export type TMDBMovieDetailResponseType = z.TypeOf<typeof tmdbMovieDetailResponseSchema>
+
+export const tmdbMovieCreditsResponseSchema = z.object({
+  id: z.number(),
+  cast: z.array(tmdbMovieCastSchema),
+  crew: z.array(tmdbMovieCrewSchema),
+})
+
+export type TMDBMovieCreditsResponseType = z.TypeOf<typeof tmdbMovieCreditsResponseSchema>
 
 export const tmdbRecommendedMoviesResponseSchema = z.object({
   page: z.number(),

@@ -11,6 +11,7 @@ import {
   RecommendedMoviesResponseType,
   DiscoverMoviesQueryType,
   SearchMoviesResponseType,
+  MovieCreditsResponseType,
 } from '@/schemas/movies.schema'
 
 export const discoverMoviesController = async (
@@ -70,6 +71,17 @@ export const getMovieDetailController = async (
   const data = await moviesService.getMovieDetail(movieId)
 
   return res.json({ message: 'Get movie detail successful', data })
+}
+
+export const getMovieCreditsController = async (
+  req: Request<MovieIdParamsType>,
+  res: Response<MovieCreditsResponseType>
+) => {
+  const { movieId } = req.params
+
+  const data = await moviesService.getMovieCredits(movieId)
+
+  return res.json({ message: 'Get movie credits successful', data })
 }
 
 export const getRecommendedMoviesController = async (
