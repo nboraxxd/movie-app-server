@@ -6,6 +6,7 @@ import {
   TMDBRecommendedTvsResponseType,
   TMDBSearchTvsResponseType,
   TMDBTopRatedTvResponseType,
+  TMDBTvAggregateCreditsResponseType,
   TMDBTvDetailResponseType,
 } from '@/schemas/common-media.schema'
 import {
@@ -14,6 +15,7 @@ import {
   RecommendedTvsResponseType,
   SearchTvsResponseType,
   TopRatedTvsResponseType,
+  TvAggregateCreditsResponseType,
   TvCastType,
   TvCrewType,
   TVDataType,
@@ -155,53 +157,10 @@ class TVsService {
 
   async getTvDetail(tvId: number): Promise<TvDetailDataType> {
     const response = await http.get<TMDBTvDetailResponseType>(`/tv/${tvId}`, {
-      params: { append_to_response: 'content_ratings,aggregate_credits,videos' },
+      params: { append_to_response: 'content_ratings,videos' },
     })
 
     const certification = response.content_ratings.results.find((item) => item.iso_3166_1 === 'US')?.rating ?? null
-
-    const formattedCrew = response.aggregate_credits.crew.map<TvCrewType>((item) => {
-      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
-
-      return {
-        adult: item.adult,
-        department: item.department,
-        gender: item.gender,
-        id: item.id,
-        jobs: item.jobs.map((job) => ({
-          creditId: job.credit_id,
-          job: job.job,
-          episodeCount: job.episode_count,
-        })),
-        knownForDepartment: item.known_for_department,
-        name: item.name,
-        originalName: item.original_name,
-        popularity: item.popularity,
-        profilePath: profileFullPath,
-        totalEpisodeCount: item.total_episode_count,
-      }
-    })
-    const formattedCast = response.aggregate_credits.cast.map<TvCastType>((item) => {
-      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
-
-      return {
-        adult: item.adult,
-        gender: item.gender,
-        id: item.id,
-        knownForDepartment: item.known_for_department,
-        name: item.name,
-        order: item.order,
-        originalName: item.original_name,
-        popularity: item.popularity,
-        profilePath: profileFullPath,
-        roles: item.roles.map((role) => ({
-          creditId: role.credit_id,
-          character: role.character,
-          episodeCount: role.episode_count,
-        })),
-        totalEpisodeCount: item.total_episode_count,
-      }
-    })
 
     const backdropFullPath = response.backdrop_path
       ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${response.backdrop_path}`
@@ -210,10 +169,6 @@ class TVsService {
 
     return {
       adult: response.adult,
-      aggregateCredits: {
-        cast: formattedCast,
-        crew: formattedCrew,
-      },
       backdropPath: backdropFullPath,
       certification,
       createdBy: response.created_by.map((item) => ({
@@ -325,6 +280,54 @@ class TVsService {
       voteAverage: response.vote_average,
       voteCount: response.vote_count,
     }
+  }
+
+  async getTvAggregateCredits(tvId: number): Promise<TvAggregateCreditsResponseType['data']> {
+    const response = await http.get<TMDBTvAggregateCreditsResponseType>(`/tv/${tvId}/aggregate_credits`)
+
+    const formattedCrew = response.crew.map<TvCrewType>((item) => {
+      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
+      return {
+        adult: item.adult,
+        department: item.department,
+        gender: item.gender,
+        id: item.id,
+        jobs: item.jobs.map((job) => ({
+          creditId: job.credit_id,
+          job: job.job,
+          episodeCount: job.episode_count,
+        })),
+        knownForDepartment: item.known_for_department,
+        name: item.name,
+        originalName: item.original_name,
+        popularity: item.popularity,
+        profilePath: profileFullPath,
+        totalEpisodeCount: item.total_episode_count,
+      }
+    })
+
+    const formattedCast = response.cast.map<TvCastType>((item) => {
+      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
+      return {
+        adult: item.adult,
+        gender: item.gender,
+        id: item.id,
+        knownForDepartment: item.known_for_department,
+        name: item.name,
+        order: item.order,
+        originalName: item.original_name,
+        popularity: item.popularity,
+        profilePath: profileFullPath,
+        roles: item.roles.map((role) => ({
+          creditId: role.credit_id,
+          character: role.character,
+          episodeCount: role.episode_count,
+        })),
+        totalEpisodeCount: item.total_episode_count,
+      }
+    })
+
+    return { cast: formattedCast, crew: formattedCrew }
   }
 
   async getRecommendedTvs(payload: {

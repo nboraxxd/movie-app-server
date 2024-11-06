@@ -7,6 +7,7 @@ import { discoverTvsQuerySchema, tvIdParamsSchema } from '@/schemas/tv.schema'
 import {
   discoverTvsController,
   getRecommendedTvsController,
+  getTvAggregateCreditsController,
   getTvDetailController,
   searchTvsController,
   topRatedTvsController,
@@ -230,11 +231,54 @@ tvsRouter.get(
  *          $ref: '#/components/schemas/tvDetailDataSchema'
  *    '400':
  *     description: Bad request
+ *    '404':
+ *     description: The resource you requested could not be found.
  */
 tvsRouter.get(
   '/:tvId',
   zodValidator(tvIdParamsSchema, { location: 'params' }),
   wrapRequestHandler(getTvDetailController)
+)
+
+/**
+ * @swagger
+ * /tv/{tvId}:
+ *  get:
+ *   tags:
+ *   - tvs
+ *   summary: Get tv detail
+ *   description: Get tv detail by tv ID
+ *   operationId: tvDetail
+ *   parameters:
+ *    - in: path
+ *      name: tvId
+ *      required: true
+ *      description: Tv ID.
+ *      schema:
+ *       type: string
+ *       example: 1396
+ *   responses:
+ *    '200':
+ *     description: Get tv detail successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get tv detail successful
+ *         data:
+ *          $ref: '#/components/schemas/dataTvAggregateCreditsSchema'
+ *    '400':
+ *     description: Bad request
+ *    '404':
+ *     description: The resource you requested could not be found.
+ */
+tvsRouter.get(
+  '/:tvId/aggregate-credits',
+  zodValidator(tvIdParamsSchema, { location: 'params' }),
+  wrapRequestHandler(getTvAggregateCreditsController)
 )
 
 /**

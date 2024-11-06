@@ -11,6 +11,7 @@ import {
   SearchTvsResponseType,
   TopRatedTvsResponseType,
   TvDetailResponseType,
+  TvAggregateCreditsResponseType,
 } from '@/schemas/tv.schema'
 
 export const discoverTvsController = async (
@@ -66,6 +67,17 @@ export const getTvDetailController = async (req: Request<TvIdParamsType>, res: R
   const data = await tvsService.getTvDetail(tvId)
 
   return res.json({ message: 'Get tv detail successful', data })
+}
+
+export const getTvAggregateCreditsController = async (
+  req: Request<TvIdParamsType>,
+  res: Response<TvAggregateCreditsResponseType>
+) => {
+  const { tvId } = req.params
+
+  const data = await tvsService.getTvAggregateCredits(tvId)
+
+  return res.json({ message: 'Get tv credits successful', data })
 }
 
 export const getRecommendedTvsController = async (

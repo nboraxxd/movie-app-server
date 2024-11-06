@@ -466,7 +466,7 @@
  *      nullable: true
  *      example: "PG-13"
  *
- *   dataMovieCreditsResponseSchema:
+ *   dataMovieCreditsSchema:
  *    type: object
  *    properties:
  *     cast:
@@ -902,117 +902,118 @@
  *           type: string
  *           format: date-time
  *           example: "2024-09-27T08:46:24.000Z"
- *     aggregateCredits:
- *      type: object
- *      properties:
- *       cast:
- *        type: array
- *        items:
- *         type: object
- *         properties:
- *          adult:
- *           type: boolean
- *           example: false
- *          gender:
- *           type: integer
- *           nullable: true
- *           example: 2
- *          id:
- *           type: integer
- *           example: 123
- *          knownForDepartment:
- *           type: string
- *           example: "Acting"
- *          name:
- *           type: string
- *           example: "Christian Bale"
- *          order:
- *           type: integer
- *           example: 0
- *          originalName:
- *           type: string
- *           example: "Christian Bale"
- *          popularity:
- *           type: number
- *           format: float
- *           example: 10.0
- *          profilePath:
- *           type: string
- *           nullable: true
- *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
- *          roles:
- *           type: array
- *           items:
- *            type: object
- *            properties:
- *             creditId:
- *              type: string
- *              example: "52fe4232c3a36847f800b579"
- *             character:
- *              type: string
- *              example: "Bruce Wayne / Batman"
- *             episodeCount:
- *              type: integer
- *              example: 1
- *          totalEpisodeCount:
- *           type: integer
- *           example: 1
- *       crew:
- *        type: array
- *        items:
- *         type: object
- *         properties:
- *          adult:
- *           type: boolean
- *           example: false
- *          department:
- *           type: string
- *           example: "Directing"
- *          gender:
- *           type: integer
- *           nullable: true
- *           example: 2
- *          id:
- *           type: integer
- *           example: 123
- *          jobs:
- *           type: array
- *           items:
- *            type: object
- *            properties:
- *             creditId:
- *              type: string
- *              example: "52fe4232c3a36847f800b579"
- *             job:
- *              type: string
- *              example: "Director"
- *             episodeCount:
- *              type: integer
- *              example: 1
- *          knownForDepartment:
- *           type: string
- *           example: "Acting"
- *          name:
- *           type: string
- *           example: "Christian Bale"
- *          originalName:
- *           type: string
- *           example: "Christian Bale"
- *          popularity:
- *           type: number
- *           format: float
- *           example: 10.0
- *          profilePath:
- *           type: string
- *           nullable: true
- *           example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
- *          totalEpisodeCount:
- *           type: integer
- *           example: 1
  *     certification:
  *      type: string
  *      nullable: true
  *      example: "PG-13"
+ *
+ *   dataTvAggregateCreditsSchema:
+ *    type: object
+ *    properties:
+ *     cast:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        adult:
+ *         type: boolean
+ *         example: false
+ *        gender:
+ *         type: integer
+ *         nullable: true
+ *         example: 2
+ *        id:
+ *         type: integer
+ *         example: 123
+ *        knownForDepartment:
+ *         type: string
+ *         example: "Acting"
+ *        name:
+ *         type: string
+ *         example: "Christian Bale"
+ *        order:
+ *         type: integer
+ *         example: 0
+ *        originalName:
+ *         type: string
+ *         example: "Christian Bale"
+ *        popularity:
+ *         type: number
+ *         format: float
+ *         example: 10.0
+ *        profilePath:
+ *         type: string
+ *         nullable: true
+ *         example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *        roles:
+ *         type: array
+ *         items:
+ *          type: object
+ *          properties:
+ *           creditId:
+ *            type: string
+ *            example: "52fe4232c3a36847f800b579"
+ *           character:
+ *            type: string
+ *            example: "Bruce Wayne / Batman"
+ *           episodeCount:
+ *            type: integer
+ *            example: 1
+ *        totalEpisodeCount:
+ *         type: integer
+ *         example: 1
+ *     crew:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        adult:
+ *         type: boolean
+ *         example: false
+ *        department:
+ *         type: string
+ *         example: "Directing"
+ *        gender:
+ *         type: integer
+ *         nullable: true
+ *         example: 2
+ *        id:
+ *         type: integer
+ *         example: 123
+ *        jobs:
+ *         type: array
+ *         items:
+ *          type: object
+ *          properties:
+ *           creditId:
+ *            type: string
+ *            example: "52fe4232c3a36847f800b579"
+ *           job:
+ *            type: string
+ *            example: "Director"
+ *           episodeCount:
+ *            type: integer
+ *            example: 1
+ *        knownForDepartment:
+ *         type: string
+ *         example: "Acting"
+ *        name:
+ *         type: string
+ *         example: "Christian Bale"
+ *        originalName:
+ *         type: string
+ *         example: "Christian Bale"
+ *        popularity:
+ *         type: number
+ *         format: float
+ *         example: 10.0
+ *        profilePath:
+ *         type: string
+ *         nullable: true
+ *         example: "https://image.tmdb.org/t/p/original/3m0j3hCS8kMAaP9El6Vy5Lqnyft.jpg"
+ *        totalEpisodeCount:
+ *         type: integer
+ *         example: 1
  *
  *   commentDataResponseSchema:
  *    type: object

@@ -276,7 +276,7 @@ moviesRouter.get(
  *          type: string
  *          example: Get movie credits successful
  *         data:
- *          $ref: '#/components/schemas/dataMovieCreditsResponseSchema'
+ *          $ref: '#/components/schemas/dataMovieCreditsSchema'
  *    '400':
  *     description: Bad request
  *    '404':

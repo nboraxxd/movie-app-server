@@ -144,10 +144,6 @@ export const tvDetailDataSchema = tvDataSchema.omit({ mediaType: true, genreIds:
   videos: z.object({
     results: z.array(videoSchema),
   }),
-  aggregateCredits: z.object({
-    cast: z.array(tvCastSchema),
-    crew: z.array(tvCrewSchema),
-  }),
   certification: z.string().nullable(),
 })
 
@@ -204,6 +200,17 @@ export const tvDetailResponseSchema = z.object({
 })
 
 export type TvDetailResponseType = z.TypeOf<typeof tvDetailResponseSchema>
+
+/* Tv aggregate credits schema */
+export const tvAggregateCreditsResponseSchema = z.object({
+  message: z.string(),
+  data: z.object({
+    cast: z.array(tvCastSchema),
+    crew: z.array(tvCrewSchema),
+  }),
+})
+
+export type TvAggregateCreditsResponseType = z.TypeOf<typeof tvAggregateCreditsResponseSchema>
 
 /* Recommended tvs schema */
 export const recommendedTvsResponseSchema = z.object({

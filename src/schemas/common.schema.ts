@@ -23,6 +23,8 @@ export const queryPageSchema = z.coerce
   .max(500, { message: 'API just support maximum 500 pages' })
   .optional()
 
+export type QueryPageType = z.TypeOf<typeof queryPageSchema>
+
 export const messageResponseSchema = z.object({
   message: z.string(),
 })
