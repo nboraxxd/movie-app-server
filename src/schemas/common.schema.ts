@@ -31,9 +31,4 @@ export const messageResponseSchema = z.object({
 
 export type MessageResponseType = z.TypeOf<typeof messageResponseSchema>
 
-export const clientUrlShema = z
-  .string()
-  .url({ message: 'clientUrl must be a valid URL' })
-  .regex(/^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/, {
-    message: 'clientUrl must be a valid URL',
-  })
+export const clientUrlShema = z.string().url({ message: 'clientUrl must be a valid URL' })
