@@ -11,13 +11,6 @@ export function defaultErrorHandler(err: any, _req: Request, res: Response, _nex
   if (err instanceof ErrorWithStatus) {
     const { statusCode, message, ...rest } = err
 
-    if (statusCode === HttpStatusCode.NotFound && message === 'User not found') {
-      return res
-        .status(statusCode)
-        .set('X-Error-Code', 'USER_NOT_FOUND')
-        .json({ message, ...rest })
-    }
-
     return res.status(statusCode).json({ message, ...rest })
   } else {
     Object.getOwnPropertyNames(err).forEach((key) => {
