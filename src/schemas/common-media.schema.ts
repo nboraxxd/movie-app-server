@@ -491,3 +491,9 @@ export const tmdbPersonCombinedCreditsResponseSchema = z.object({
 })
 
 export type TMDBPersonCombinedCreditsResponseType = z.TypeOf<typeof tmdbPersonCombinedCreditsResponseSchema>
+
+export const tmdbGenresResponseSchema = z.object({
+  genres: z.array(tmdbGenreSchema),
+})
+
+export type TMDBGenresResponseType = z.TypeOf<typeof tmdbGenresResponseSchema>

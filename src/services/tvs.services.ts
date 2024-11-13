@@ -3,6 +3,7 @@ import envVariables from '@/schemas/env-variables.schema'
 import {
   PageQueryType,
   TMDBDiscoverTvResponseType,
+  TMDBGenresResponseType,
   TMDBRecommendedTvsResponseType,
   TMDBSearchTvsResponseType,
   TMDBTopRatedTvResponseType,
@@ -20,6 +21,7 @@ import {
   TvCrewType,
   TVDataType,
   TvDetailDataType,
+  TvGenresResponseType,
 } from '@/schemas/tv.schema'
 import favoritesService from '@/services/favorites.services'
 import { MovieDataType } from '@/schemas/movies.schema'
@@ -390,6 +392,12 @@ class TVsService {
       }),
       pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
     }
+  }
+
+  async getTvGenres(): Promise<TvGenresResponseType['data']> {
+    const response = await http.get<TMDBGenresResponseType>('/genre/tv/list')
+
+    return response.genres
   }
 }
 

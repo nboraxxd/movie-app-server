@@ -6,6 +6,7 @@ import { pageQuerySchema, searchQuerySchema } from '@/schemas/common-media.schem
 import { discoverMoviesQuerySchema, movieIdParamsSchema } from '@/schemas/movies.schema'
 import {
   discoverMoviesController,
+  getMovieGenresController,
   getMovieCreditsController,
   getMovieDetailController,
   getRecommendedMoviesController,
@@ -205,6 +206,40 @@ moviesRouter.get(
   zodValidator(searchQuerySchema, { location: 'query' }),
   wrapRequestHandler(searchMoviesController)
 )
+
+/**
+ * @swagger
+ * /movies/genres:
+ *  get:
+ *   tags:
+ *   - movies
+ *   summary: Get movie genres
+ *   description: Get movie genres list
+ *   operationId: movieGenres
+ *   responses:
+ *    '200':
+ *     description: Get genres successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get genres successful
+ *         data:
+ *          type: array
+ *          items:
+ *           type: object
+ *           properties:
+ *            id:
+ *             type: integer
+ *             example: 28
+ *            name:
+ *             type: string
+ *             example: Action
+ */
+moviesRouter.get('/genres', wrapRequestHandler(getMovieGenresController))
 
 /**
  * @swagger

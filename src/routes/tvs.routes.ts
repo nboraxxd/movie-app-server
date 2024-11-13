@@ -9,6 +9,7 @@ import {
   getRecommendedTvsController,
   getTvAggregateCreditsController,
   getTvDetailController,
+  getTvGenresController,
   searchTvsController,
   topRatedTvsController,
 } from '@/controllers/tvs.controllers'
@@ -198,6 +199,40 @@ tvsRouter.get(
   zodValidator(searchQuerySchema, { location: 'query' }),
   wrapRequestHandler(searchTvsController)
 )
+
+/**
+ * @swagger
+ * /tvs/genres:
+ *  get:
+ *   tags:
+ *   - tvs
+ *   summary: Get tv genres
+ *   description: Get tv genres list
+ *   operationId: tvGenres
+ *   responses:
+ *    '200':
+ *     description: Get genres successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get genres successful
+ *         data:
+ *          type: array
+ *          items:
+ *           type: object
+ *           properties:
+ *            id:
+ *             type: integer
+ *             example: 16
+ *            name:
+ *             type: string
+ *             example: Animation
+ */
+tvsRouter.get('/genres', wrapRequestHandler(getTvGenresController))
 
 /**
  * @swagger

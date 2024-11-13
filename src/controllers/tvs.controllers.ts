@@ -12,6 +12,7 @@ import {
   TopRatedTvsResponseType,
   TvDetailResponseType,
   TvAggregateCreditsResponseType,
+  TvGenresResponseType,
 } from '@/schemas/tv.schema'
 
 export const discoverTvsController = async (
@@ -91,4 +92,10 @@ export const getRecommendedTvsController = async (
   const { data, pagination } = await tvsService.getRecommendedTvs({ tvId, userId: tokenPayload?.userId })
 
   return res.json({ message: 'Get recommended successful', data, pagination })
+}
+
+export const getTvGenresController = async (_req: Request, res: Response<TvGenresResponseType>) => {
+  const data = await tvsService.getTvGenres()
+
+  return res.json({ message: 'Get genres successful', data })
 }

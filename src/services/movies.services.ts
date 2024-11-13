@@ -14,6 +14,7 @@ import {
   TMDBSearchMoviesResponseType,
   PageQueryType,
   TMDBMovieCreditsResponseType,
+  TMDBGenresResponseType,
 } from '@/schemas/common-media.schema'
 import {
   DiscoverMoviesQueryType,
@@ -23,6 +24,7 @@ import {
   MovieCrewType,
   MovieDataType,
   MovieDetailDataType,
+  MovieGenresResponseType,
   RecommendedMoviesResponseType,
   SearchMoviesResponseType,
   TopRatedMoviesResponseType,
@@ -341,6 +343,12 @@ class MoviesService {
       }),
       pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
     }
+  }
+
+  async getMovieGenres(): Promise<MovieGenresResponseType['data']> {
+    const response = await http.get<TMDBGenresResponseType>('/genre/movie/list')
+
+    return response.genres
   }
 }
 
