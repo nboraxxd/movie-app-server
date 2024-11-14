@@ -24,7 +24,7 @@ import {
   MovieCrewType,
   MovieDataType,
   MovieDetailDataType,
-  MovieGenresResponseType,
+  GenresMovieResponseType,
   RecommendedMoviesResponseType,
   SearchMoviesResponseType,
   TopRatedMoviesResponseType,
@@ -345,7 +345,7 @@ class MoviesService {
     }
   }
 
-  async getMovieGenres(): Promise<MovieGenresResponseType['data']> {
+  async getMovieGenres(): Promise<GenresMovieResponseType['data']> {
     const response = await http.get<TMDBGenresResponseType>('/genre/movie/list')
 
     return response.genres

@@ -52,26 +52,6 @@ export const videoSchema = z.object({
 
 export type VideoType = z.TypeOf<typeof videoSchema>
 
-export const discoverySortBySchema = z.enum(
-  [
-    'original_title.asc',
-    'original_title.desc',
-    'popularity.asc',
-    'popularity.desc',
-    'revenue.asc',
-    'revenue.desc',
-    'primary_release_date.asc',
-    'primary_release_date.desc',
-    'title.asc',
-    'title.desc',
-    'vote_average.asc',
-    'vote_average.desc',
-    'vote_count.asc',
-    'vote_count.desc',
-  ],
-  { message: 'Invalid sort by value' }
-)
-
 export const pageQuerySchema = z
   .object({
     page: queryPageSchema,

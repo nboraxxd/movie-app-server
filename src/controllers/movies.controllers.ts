@@ -12,7 +12,7 @@ import {
   DiscoverMoviesQueryType,
   SearchMoviesResponseType,
   MovieCreditsResponseType,
-  MovieGenresResponseType,
+  GenresMovieResponseType,
 } from '@/schemas/movies.schema'
 
 export const discoverMoviesController = async (
@@ -99,7 +99,7 @@ export const getRecommendedMoviesController = async (
   return res.json({ message: 'Get recommended successful', data, pagination })
 }
 
-export const getMovieGenresController = async (_req: Request, res: Response<MovieGenresResponseType>) => {
+export const getMovieGenresController = async (_req: Request, res: Response<GenresMovieResponseType>) => {
   const data = await moviesService.getMovieGenres()
 
   return res.json({ message: 'Get genres successful', data })

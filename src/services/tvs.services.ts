@@ -21,7 +21,7 @@ import {
   TvCrewType,
   TVDataType,
   TvDetailDataType,
-  TvGenresResponseType,
+  GenresTvResponseType,
 } from '@/schemas/tv.schema'
 import favoritesService from '@/services/favorites.services'
 import { MovieDataType } from '@/schemas/movies.schema'
@@ -394,7 +394,7 @@ class TVsService {
     }
   }
 
-  async getTvGenres(): Promise<TvGenresResponseType['data']> {
+  async getTvGenres(): Promise<GenresTvResponseType['data']> {
     const response = await http.get<TMDBGenresResponseType>('/genre/tv/list')
 
     return response.genres

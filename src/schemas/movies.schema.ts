@@ -1,7 +1,6 @@
 import z from 'zod'
 import { paginationResponseSchema, queryPageSchema } from '@/schemas/common.schema'
 import {
-  discoverySortBySchema,
   genreSchema,
   productionCompanySchema,
   productionCountrySchema,
@@ -97,6 +96,28 @@ export const movieDetailDataSchema = movieDataSchema
 export type MovieDetailDataType = z.TypeOf<typeof movieDetailDataSchema>
 
 /* Discover movies schema */
+export const movieSortOptionsSchema = z.enum(
+  [
+    'original_title.asc',
+    'original_title.desc',
+    'popularity.asc',
+    'popularity.desc',
+    'revenue.asc',
+    'revenue.desc',
+    'primary_release_date.asc',
+    'primary_release_date.desc',
+    'title.asc',
+    'title.desc',
+    'vote_average.asc',
+    'vote_average.desc',
+    'vote_count.asc',
+    'vote_count.desc',
+  ],
+  { message: 'Invalid sort by value' }
+)
+
+export type MovieSortOptionsType = z.TypeOf<typeof movieSortOptionsSchema>
+
 export const discoverMoviesQuerySchema = z
   .object({
     includeAdult: z.coerce
@@ -108,12 +129,12 @@ export const discoverMoviesQuerySchema = z
       .refine((value) => value === 0 || value === 1, { message: 'includeVideo must be 0 (false) or 1 (true)' })
       .optional(),
     page: queryPageSchema.optional(),
-    sortBy: discoverySortBySchema.optional(),
+    sortBy: movieSortOptionsSchema.optional(),
     voteAverageGte: z.coerce.number().optional(),
     voteAverageLte: z.coerce.number().optional(),
     withGenres: z
       .string()
-      .regex(/^(\d+)(,\d+)*$/)
+      .regex(/^(\d+)(,\d+)*$/, { message: 'withGenres must be a list of genre IDs separated by commas' })
       .optional(),
   })
   .strict({ message: 'Additional properties not allowed' })
@@ -172,10 +193,10 @@ export const recommendedMoviesResponseSchema = z.object({
 
 export type RecommendedMoviesResponseType = z.TypeOf<typeof recommendedMoviesResponseSchema>
 
-/* Movie genres schema */
-export const movieGenresResponseSchema = z.object({
+/* Genres movie schema */
+export const genresMovieResponseSchema = z.object({
   message: z.string(),
   data: z.array(genreSchema),
 })
 
-export type MovieGenresResponseType = z.TypeOf<typeof movieGenresResponseSchema>
+export type GenresMovieResponseType = z.TypeOf<typeof genresMovieResponseSchema>
