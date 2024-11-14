@@ -297,7 +297,7 @@ class AuthService {
 
     if (findAndDeleteResult === null) {
       throw new ErrorWithStatus({
-        message: 'Invalid refresh token',
+        message: 'Jwt expired',
         statusCode: HttpStatusCode.Unauthorized,
       })
     }

@@ -15,7 +15,7 @@ class FavoritesService {
 
     const mediaFavoritesMap: Record<number, Array<MediaType>> = {}
 
-    if (userId) {
+    if (userId && medias.length > 0) {
       const favoriteRecords = await databaseService.favorites
         .find(
           {
