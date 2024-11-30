@@ -19,14 +19,12 @@ export const discoverMoviesController = async (
   req: Request<ParamsDictionary, any, any, DiscoverMoviesQueryType>,
   res: Response<DiscoverMoviesResponseType>
 ) => {
-  const { page, includeAdult, includeVideo, sortBy, voteAverageGte, voteAverageLte, withGenres } = req.query
+  const { page, sortBy, voteAverageGte, voteAverageLte, withGenres } = req.query
 
   const tokenPayload = req.decodedAuthorization
 
   const { data, pagination } = await moviesService.discoverMovies({
     page,
-    includeAdult,
-    includeVideo,
     sortBy,
     withGenres,
     voteAverageGte,

@@ -30,12 +30,11 @@ class TVsService {
   async discoverTvs(
     payload: DiscoverTvsQueryType & { userId?: string }
   ): Promise<Omit<DiscoverTvsResponseType, 'message'>> {
-    const { includeAdult, page, sortBy, voteAverageGte, voteAverageLte, withGenres, userId } = payload
+    const { page, sortBy, voteAverageGte, voteAverageLte, withGenres, userId } = payload
 
     const response = await http.get<TMDBDiscoverTvResponseType>('/discover/tv', {
       params: {
         page,
-        include_adult: includeAdult === 1 ? true : false,
         sort_by: sortBy,
         'vote_average.gte': voteAverageGte,
         'vote_average.lte': voteAverageLte,

@@ -120,14 +120,6 @@ export type MovieSortOptionsType = z.TypeOf<typeof movieSortOptionsSchema>
 
 export const discoverMoviesQuerySchema = z
   .object({
-    includeAdult: z.coerce
-      .number()
-      .refine((value) => value === 0 || value === 1, { message: 'includeAdult must be 0 (false) or 1 (true)' })
-      .optional(),
-    includeVideo: z.coerce
-      .number()
-      .refine((value) => value === 0 || value === 1, { message: 'includeVideo must be 0 (false) or 1 (true)' })
-      .optional(),
     page: queryPageSchema.optional(),
     sortBy: movieSortOptionsSchema.optional(),
     voteAverageGte: z.coerce.number().optional(),

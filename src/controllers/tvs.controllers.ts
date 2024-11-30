@@ -19,13 +19,12 @@ export const discoverTvsController = async (
   req: Request<ParamsDictionary, any, any, DiscoverTvsQueryType>,
   res: Response<DiscoverTvsResponseType>
 ) => {
-  const { page, includeAdult, sortBy, voteAverageGte, voteAverageLte, withGenres } = req.query
+  const { page, sortBy, voteAverageGte, voteAverageLte, withGenres } = req.query
 
   const tokenPayload = req.decodedAuthorization
 
   const { data, pagination } = await tvsService.discoverTvs({
     page,
-    includeAdult,
     sortBy,
     withGenres,
     voteAverageGte,

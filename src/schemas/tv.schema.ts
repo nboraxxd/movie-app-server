@@ -173,10 +173,6 @@ export type TvSortOptionsType = z.TypeOf<typeof tvSortOptionsSchema>
 
 export const discoverTvsQuerySchema = z
   .object({
-    includeAdult: z
-      .number()
-      .refine((value) => value === 0 || value === 1, { message: 'includeAdult must be 0 (false) or 1 (true)' })
-      .optional(),
     page: queryPageSchema.optional(),
     sortBy: tvSortOptionsSchema.optional(),
     voteAverageGte: z.coerce.number().optional(),

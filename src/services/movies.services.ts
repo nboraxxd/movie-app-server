@@ -34,13 +34,11 @@ class MoviesService {
   async discoverMovies(
     payload: DiscoverMoviesQueryType & { userId?: string }
   ): Promise<Omit<DiscoverMoviesResponseType, 'message'>> {
-    const { includeAdult, includeVideo, page, sortBy, voteAverageGte, voteAverageLte, withGenres, userId } = payload
+    const { page, sortBy, voteAverageGte, voteAverageLte, withGenres, userId } = payload
 
     const response = await http.get<TMDBDiscoverMovieResponseType>('/discover/movie', {
       params: {
         page,
-        include_adult: includeAdult === 1 ? true : false,
-        include_video: includeVideo === 1 ? true : false,
         sort_by: sortBy,
         'vote_average.gte': voteAverageGte,
         'vote_average.lte': voteAverageLte,

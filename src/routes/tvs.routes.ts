@@ -35,13 +35,6 @@ const tvsRouter = Router()
  *       nullable: true
  *       example: null
  *    - in: query
- *      name: includeAdult
- *      required: false
- *      description: Include adult content.
- *      schema:
- *       type: boolean
- *       example: null
- *    - in: query
  *      name: voteAverageGte
  *      required: false
  *      description: Vote average greater than or equal to value.
