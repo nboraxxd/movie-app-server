@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 
 import Review from '@/models/review.model'
 import { ErrorWithStatus } from '@/models/errors'
@@ -13,74 +13,24 @@ class ReviewsService {
   async addReview(payload: AddReviewBodyType & { userId: string }) {
     const { content, mediaId, mediaPoster, mediaReleaseDate, mediaTitle, mediaType, userId } = payload
 
-    const result = await databaseService.reviews.insertOne(
-      new Review({
-        content,
-        mediaId,
-        mediaPoster,
-        mediaReleaseDate,
-        mediaTitle,
-        mediaType,
-        userId: new ObjectId(userId),
-      })
-    )
+    const currentDate = new Date()
 
-    const [review] = await databaseService.reviews
-      .aggregate<AggregatedReviewType>([
-        {
-          $match: {
-            _id: result.insertedId,
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            localField: 'userId',
-            foreignField: '_id',
-            as: 'user',
-          },
-        },
-        {
-          $project: {
-            userId: 0,
-          },
-        },
-        {
-          $addFields: {
-            user: {
-              $map: {
-                input: '$user',
-                as: 'item',
-                in: {
-                  _id: '$$item._id',
-                  name: '$$item.name',
-                  email: '$$item.email',
-                  isVerified: {
-                    $cond: {
-                      if: {
-                        $eq: ['$$item.emailVerifyToken', null],
-                      },
-                      then: true,
-                      else: false,
-                    },
-                  },
-                  avatar: '$$item.avatar',
-                },
-              },
-            },
-          },
-        },
-        {
-          $addFields: {
-            user: {
-              $arrayElemAt: ['$user', 0],
-            },
-          },
-        },
-      ])
-      .toArray()
+    const review = new Review({
+      _id: new ObjectId(),
+      content,
+      mediaId,
+      mediaPoster,
+      mediaReleaseDate,
+      mediaTitle,
+      mediaType,
+      userId: new ObjectId(userId),
+      createdAt: currentDate,
+      updatedAt: currentDate,
+    })
 
-    return review
+    await databaseService.reviews.insertOne(review)
+
+    return review as WithId<Review>
   }
 
   async getReviewsByMedia(payload: { mediaId: number; mediaType: MediaType; page?: number }) {

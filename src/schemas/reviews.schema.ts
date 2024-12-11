@@ -40,7 +40,7 @@ export type AddReviewBodyType = z.TypeOf<typeof addReviewBodySchema>
 
 export const addReviewResponseSchema = z.object({
   message: z.string(),
-  data: reviewDataResponseSchema,
+  data: reviewDocumentSchema,
 })
 
 export type AddReviewResponseType = z.TypeOf<typeof addReviewResponseSchema>

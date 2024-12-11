@@ -36,11 +36,8 @@ export const addReviewController = async (
     message: 'Review added successful',
     data: {
       ...result,
+      userId: result.userId.toHexString(),
       _id: result._id.toHexString(),
-      user: {
-        ...result.user,
-        _id: result.user._id.toHexString(),
-      },
     },
   })
 }
