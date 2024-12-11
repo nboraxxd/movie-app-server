@@ -1015,7 +1015,7 @@
  *         type: integer
  *         example: 1
  *
- *   commentDataResponseSchema:
+ *   reviewDataResponseSchema:
  *    type: object
  *    properties:
  *     _id:
@@ -1055,7 +1055,7 @@
  *      format: date-time
  *      example: "2025-02-19T08:46:24.000Z"
  *
- *   addCommentBodySchema:
+ *   addReviewBodySchema:
  *    required:
  *    - mediaId
  *    - mediaTitle
@@ -1090,9 +1090,9 @@
  *      minLength: 1
  *      maxLength: 500
  *
- *   commentExtendDataResponseSchema:
+ *   reviewExtendDataResponseSchema:
  *    allOf:
- *    - $ref: '#/components/schemas/commentDataResponseSchema'
+ *    - $ref: '#/components/schemas/reviewDataResponseSchema'
  *    - type: object
  *      properties:
  *       user:

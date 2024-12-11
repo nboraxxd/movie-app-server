@@ -3,37 +3,37 @@ import { Router } from 'express'
 import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
 import { pageQuerySchema } from '@/schemas/common-media.schema'
-import { addCommentBodySchema, deleteCommentParamsSchema, getCommentsByMediaParams } from '@/schemas/comments.schema'
+import { addReviewBodySchema, deleteReviewParamsSchema, getReviewsByMediaParams } from '@/schemas/reviews.schema'
 import {
-  addCommentController,
-  deleteCommentController,
-  getCommentsByMediaController,
-  getMyCommentsController,
-} from '@/controllers/comments.controllers'
+  addReviewController,
+  deleteReviewController,
+  getReviewsByMediaController,
+  getMyReviewsController,
+} from '@/controllers/reviews.controllers'
 
-const commentsRouter = Router()
+const reviewsRouter = Router()
 
 /**
  * @swagger
- * /comments:
+ * /reviews:
  *  post:
  *   tags:
- *   - comments
- *   summary: Add comment
- *   description: Add comment with media id, media title, media type, media poster, media release date and content
- *   operationId: addComment
+ *   - reviews
+ *   summary: Add review
+ *   description: Add review with media id, media title, media type, media poster, media release date and content
+ *   operationId: addReview
  *   security:
  *    - bearerAuth: []
  *   requestBody:
- *    description: Comment information
+ *    description: Review information
  *    required: true
  *    content:
  *     application/json:
  *      schema:
- *       $ref: '#/components/schemas/addCommentBodySchema'
+ *       $ref: '#/components/schemas/addReviewBodySchema'
  *   responses:
  *    '200':
- *     description: Comment added successful
+ *     description: Review added successful
  *     content:
  *      application/json:
  *       schema:
@@ -41,33 +41,33 @@ const commentsRouter = Router()
  *        properties:
  *         message:
  *          type: string
- *          example: Comment added successful
+ *          example: Review added successful
  *         data:
- *          $ref: '#/components/schemas/commentExtendDataResponseSchema'
+ *          $ref: '#/components/schemas/reviewExtendDataResponseSchema'
  *    '400':
  *     description: Bad request
  */
-commentsRouter.post(
+reviewsRouter.post(
   '/',
   authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
-  zodValidator(addCommentBodySchema, { location: 'body' }),
-  wrapRequestHandler(addCommentController)
+  zodValidator(addReviewBodySchema, { location: 'body' }),
+  wrapRequestHandler(addReviewController)
 )
 
 /**
  * @swagger
- * /comments/medias/{mediaId}/{mediaType}:
+ * /reviews/medias/{mediaId}/{mediaType}:
  *  get:
  *   tags:
- *   - comments
- *   summary: Get comments by media
- *   description: Get comments by media id and media type with query parameters
- *   operationId: getCommentsByMedia
+ *   - reviews
+ *   summary: Get reviews by media
+ *   description: Get reviews by media id and media type with query parameters
+ *   operationId: getReviewsByMedia
  *   parameters:
  *    - in: path
  *      name: mediaId
  *      required: true
- *      description: Media id need to get comments.
+ *      description: Media id need to get reviews.
  *      schema:
  *       type: string
  *       example: 533535
@@ -82,14 +82,14 @@ commentsRouter.post(
  *    - in: query
  *      name: page
  *      required: false
- *      description: Page number of comments list. If not provided, page 1 will be used.
+ *      description: Page number of reviews list. If not provided, page 1 will be used.
  *      schema:
  *       type: integer
  *       nullable: true
  *       example: null
  *   responses:
  *    '200':
- *     description: Get comments successful
+ *     description: Get reviews successful
  *     content:
  *      application/json:
  *       schema:
@@ -97,46 +97,46 @@ commentsRouter.post(
  *        properties:
  *         message:
  *          type: string
- *          example: Get comments successful
+ *          example: Get reviews successful
  *         data:
  *          type: array
  *          items:
- *           $ref: '#/components/schemas/commentExtendDataResponseSchema'
+ *           $ref: '#/components/schemas/reviewExtendDataResponseSchema'
  *         pagination:
  *          $ref: '#/components/schemas/paginationResponseSchema'
  *    '400':
  *     description: Bad request
  */
-commentsRouter.get(
+reviewsRouter.get(
   '/medias/:mediaId/:mediaType',
-  zodValidator(getCommentsByMediaParams, { location: 'params' }),
+  zodValidator(getReviewsByMediaParams, { location: 'params' }),
   zodValidator(pageQuerySchema, { location: 'query' }),
-  wrapRequestHandler(getCommentsByMediaController)
+  wrapRequestHandler(getReviewsByMediaController)
 )
 
 /**
  * @swagger
- * /comments/me:
+ * /reviews/me:
  *  get:
  *   tags:
- *   - comments
- *   summary: Get my comments
- *   description: Get all comments of current user with query parameters
- *   operationId: getCommentsByUserId
+ *   - reviews
+ *   summary: Get my reviews
+ *   description: Get all reviews of current user with query parameters
+ *   operationId: getReviewsByUserId
  *   security:
  *    - bearerAuth: []
  *   parameters:
  *    - in: query
  *      name: page
  *      required: false
- *      description: Page number of comment list. If not provided, page 1 will be used.
+ *      description: Page number of review list. If not provided, page 1 will be used.
  *      schema:
  *       type: integer
  *       nullable: true
  *       example: null
  *   responses:
  *    '200':
- *     description: Get comments successful
+ *     description: Get reviews successful
  *     content:
  *      application/json:
  *       schema:
@@ -144,43 +144,43 @@ commentsRouter.get(
  *        properties:
  *         message:
  *          type: string
- *          example: Get comments successful
+ *          example: Get reviews successful
  *         data:
  *          type: array
  *          items:
- *           $ref: '#/components/schemas/commentDataResponseSchema'
+ *           $ref: '#/components/schemas/reviewDataResponseSchema'
  *         pagination:
  *          $ref: '#/components/schemas/paginationResponseSchema'
  *    '400':
  *     description: Bad request
  */
-commentsRouter.get(
+reviewsRouter.get(
   '/me',
   authorizationValidator({ isLoginRequired: true }),
   zodValidator(pageQuerySchema, { location: 'query' }),
-  wrapRequestHandler(getMyCommentsController)
+  wrapRequestHandler(getMyReviewsController)
 )
 
 /**
  * @swagger
- * /comments/{commentId}:
+ * /reviews/{reviewId}:
  *  delete:
  *   tags:
- *   - comments
- *   summary: Delete comment
- *   description: Delete comment by comment id
- *   operationId: deleteComment
+ *   - reviews
+ *   summary: Delete review
+ *   description: Delete review by review id
+ *   operationId: deleteReview
  *   parameters:
  *    - in: path
- *      name: commentId
+ *      name: reviewId
  *      required: true
- *      description: Comment id need to delete.
+ *      description: Review id need to delete.
  *      schema:
  *       type: string
  *       example: 123abc...
  *   responses:
  *    '200':
- *     description: Delete comment successful
+ *     description: Delete review successful
  *     content:
  *      application/json:
  *       schema:
@@ -188,19 +188,19 @@ commentsRouter.get(
  *        properties:
  *         message:
  *          type: string
- *          example: Delete comment successful
+ *          example: Delete review successful
  *    '400':
- *     description: Missing or invalid comment id
+ *     description: Missing or invalid review id
  *    '401':
  *     description: Unauthorized
  *    '404':
- *     description: Comment not found
+ *     description: Review not found
  */
-commentsRouter.delete(
-  '/:commentId',
+reviewsRouter.delete(
+  '/:reviewId',
   authorizationValidator({ isLoginRequired: true, ensureUserExistsAndVerify: true }),
-  zodValidator(deleteCommentParamsSchema, { location: 'params' }),
-  wrapRequestHandler(deleteCommentController)
+  zodValidator(deleteReviewParamsSchema, { location: 'params' }),
+  wrapRequestHandler(deleteReviewController)
 )
 
-export default commentsRouter
+export default reviewsRouter

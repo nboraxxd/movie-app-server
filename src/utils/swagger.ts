@@ -45,8 +45,8 @@ const options: swaggerJSDoc.Options = {
         description: 'Operations about favorites',
       },
       {
-        name: 'comments',
-        description: 'Operations about comments',
+        name: 'reviews',
+        description: 'Operations about reviews',
       },
     ],
     components: {

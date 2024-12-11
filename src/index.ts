@@ -14,7 +14,7 @@ import profileRouter from '@/routes/profile.routes'
 import favoritesRouter from '@/routes/favorites.routes'
 import moviesRouter from '@/routes/movies.routes'
 import tvsRouter from '@/routes/tvs.routes'
-import commentsRouter from '@/routes/comments.routes'
+import reviewsRouter from '@/routes/reviews.routes'
 import peopleRouter from '@/routes/people.routes'
 
 const app = express()
@@ -25,7 +25,7 @@ databaseService.connect().then(() => {
   databaseService.setupUsersCollection()
   databaseService.setUpRefreshTokensCollection()
   databaseService.setUpFavoritesCollection()
-  databaseService.setUpCommentsCollection()
+  databaseService.setUpReviewsCollection()
 })
 
 // Quy định CORS
@@ -53,7 +53,7 @@ app.use('/people', peopleRouter)
 
 app.use('/favorites', favoritesRouter)
 
-app.use('/comments', commentsRouter)
+app.use('/reviews', reviewsRouter)
 
 app.use(defaultErrorHandler)
 

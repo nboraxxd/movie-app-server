@@ -134,7 +134,7 @@ class ProfileService {
 
       await Promise.all([
         databaseService.favorites.deleteMany({ userId }, { session }),
-        databaseService.comments.deleteMany({ userId }, { session }),
+        databaseService.reviews.deleteMany({ userId }, { session }),
         databaseService.refreshTokens.deleteMany({ userId }, { session }),
       ])
 

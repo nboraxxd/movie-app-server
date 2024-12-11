@@ -1,20 +1,20 @@
 import { ObjectId } from 'mongodb'
 
-import Comment from '@/models/comment.model'
+import Review from '@/models/review.model'
 import { ErrorWithStatus } from '@/models/errors'
-import { COMMENT_PAGE_LIMIT } from '@/constants'
+import { REVIEW_PAGE_LIMIT } from '@/constants'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import { MediaType } from '@/schemas/common-media.schema'
 import { PaginationResponseType } from '@/schemas/common.schema'
-import { AddCommentBodyType, AggregatedCommentType } from '@/schemas/comments.schema'
+import { AddReviewBodyType, AggregatedReviewType } from '@/schemas/reviews.schema'
 
-class CommentsService {
-  async addComment(payload: AddCommentBodyType & { userId: string }) {
+class ReviewsService {
+  async addReview(payload: AddReviewBodyType & { userId: string }) {
     const { content, mediaId, mediaPoster, mediaReleaseDate, mediaTitle, mediaType, userId } = payload
 
-    const result = await databaseService.comments.insertOne(
-      new Comment({
+    const result = await databaseService.reviews.insertOne(
+      new Review({
         content,
         mediaId,
         mediaPoster,
@@ -25,8 +25,8 @@ class CommentsService {
       })
     )
 
-    const [comment] = await databaseService.comments
-      .aggregate<AggregatedCommentType>([
+    const [review] = await databaseService.reviews
+      .aggregate<AggregatedReviewType>([
         {
           $match: {
             _id: result.insertedId,
@@ -80,14 +80,14 @@ class CommentsService {
       ])
       .toArray()
 
-    return comment
+    return review
   }
 
-  async getCommentsByMedia(payload: { mediaId: number; mediaType: MediaType; page?: number }) {
+  async getReviewsByMedia(payload: { mediaId: number; mediaType: MediaType; page?: number }) {
     const { mediaId, mediaType, page = 1 } = payload
 
-    const [response] = await databaseService.comments
-      .aggregate<{ data: AggregatedCommentType[]; pagination: PaginationResponseType }>([
+    const [response] = await databaseService.reviews
+      .aggregate<{ data: AggregatedReviewType[]; pagination: PaginationResponseType }>([
         {
           $match: {
             mediaId,
@@ -138,10 +138,10 @@ class CommentsService {
                 },
               },
               {
-                $skip: (page - 1) * COMMENT_PAGE_LIMIT,
+                $skip: (page - 1) * REVIEW_PAGE_LIMIT,
               },
               {
-                $limit: COMMENT_PAGE_LIMIT,
+                $limit: REVIEW_PAGE_LIMIT,
               },
             ],
             totalCount: [
@@ -167,7 +167,7 @@ class CommentsService {
                         0,
                       ],
                     },
-                    COMMENT_PAGE_LIMIT,
+                    REVIEW_PAGE_LIMIT,
                   ],
                 },
               },
@@ -188,12 +188,12 @@ class CommentsService {
     return response
   }
 
-  async getMyComments(payload: { userId: string; page?: number }) {
+  async getMyReviews(payload: { userId: string; page?: number }) {
     const { userId, page = 1 } = payload
 
-    const [response] = await databaseService.comments
+    const [response] = await databaseService.reviews
       .aggregate<{
-        data: Omit<AggregatedCommentType, 'user'>[]
+        data: Omit<AggregatedReviewType, 'user'>[]
         pagination: PaginationResponseType
       }>([
         {
@@ -210,10 +210,10 @@ class CommentsService {
                 },
               },
               {
-                $skip: (page - 1) * COMMENT_PAGE_LIMIT,
+                $skip: (page - 1) * REVIEW_PAGE_LIMIT,
               },
               {
-                $limit: COMMENT_PAGE_LIMIT,
+                $limit: REVIEW_PAGE_LIMIT,
               },
             ],
             totalCount: [
@@ -239,7 +239,7 @@ class CommentsService {
                         0,
                       ],
                     },
-                    COMMENT_PAGE_LIMIT,
+                    REVIEW_PAGE_LIMIT,
                   ],
                 },
               },
@@ -260,22 +260,22 @@ class CommentsService {
     return response
   }
 
-  async deleteComment({ commentId, userId }: { commentId: string; userId: string }) {
+  async deleteReview({ reviewId: reviewId, userId }: { reviewId: string; userId: string }) {
     // Phải deleteOne theo _id và userId
-    // Vì để tránh trường hợp người dùng xóa comment của người khác
-    const result = await databaseService.comments.deleteOne({
-      _id: new ObjectId(commentId),
+    // Vì để tránh trường hợp người dùng xóa review của người khác
+    const result = await databaseService.reviews.deleteOne({
+      _id: new ObjectId(reviewId),
       userId: new ObjectId(userId),
     })
 
     if (result.deletedCount === 0) {
       throw new ErrorWithStatus({
-        message: 'Comment not found or does not belong to you.',
+        message: 'Review not found or does not belong to you.',
         statusCode: HttpStatusCode.NotFound,
       })
     }
   }
 }
 
-const commentsService = new CommentsService()
-export default commentsService
+const reviewsService = new ReviewsService()
+export default reviewsService

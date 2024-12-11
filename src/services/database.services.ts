@@ -2,7 +2,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 
 import envVariables from '@/schemas/env-variables.schema'
 import User from '@/models/user.model'
-import Comment from '@/models/comment.model'
+import Review from '@/models/review.model'
 import Favorite from '@/models/favorite.model'
 import RefreshToken from '@/models/refresh-token.model'
 
@@ -193,23 +193,23 @@ class DatabaseService {
     }
   }
 
-  async setUpCommentsCollection() {
-    const isExistCollection = await this.db.listCollections({ name: 'comments' }).hasNext()
+  async setUpReviewsCollection() {
+    const isExistCollection = await this.db.listCollections({ name: 'reviews' }).hasNext()
     if (!isExistCollection) {
-      this.db.createCollection('comments', {
+      this.db.createCollection('reviews', {
         validator: {
           $jsonSchema: {
-            title: 'Comments Schema',
+            title: 'Reviews Schema',
             bsonType: 'object',
             required: ['userId', 'mediaId', 'mediaTitle', 'mediaType', 'content', 'createdAt', 'updatedAt'],
             properties: {
               _id: {
                 bsonType: 'objectId',
-                description: 'Unique identifier for the comment',
+                description: 'Unique identifier for the review',
               },
               userId: {
                 bsonType: 'objectId',
-                description: 'The user who made the comment, required',
+                description: 'The user who made the review, required',
               },
               mediaId: {
                 bsonType: 'number',
@@ -234,15 +234,15 @@ class DatabaseService {
               },
               content: {
                 bsonType: 'string',
-                description: 'Content of the comment, required',
+                description: 'Content of the review, required',
               },
               createdAt: {
                 bsonType: 'date',
-                description: 'The date when the comment was created, required',
+                description: 'The date when the review was created, required',
               },
               updatedAt: {
                 bsonType: 'date',
-                description: 'The date when the comment was last updated, required',
+                description: 'The date when the review was last updated, required',
               },
             },
             additionalProperties: false,
@@ -251,11 +251,11 @@ class DatabaseService {
       })
     }
 
-    const isIndexExist = await this.comments.indexExists(['mediaId_1_mediaType_1', 'userId_1', '_id_1_userId_1'])
+    const isIndexExist = await this.reviews.indexExists(['mediaId_1_mediaType_1', 'userId_1', '_id_1_userId_1'])
     if (!isIndexExist) {
-      this.comments.createIndex({ mediaId: 1, mediaType: 1 })
-      this.comments.createIndex({ userId: 1 })
-      this.comments.createIndex({ _id: 1, userId: 1 })
+      this.reviews.createIndex({ mediaId: 1, mediaType: 1 })
+      this.reviews.createIndex({ userId: 1 })
+      this.reviews.createIndex({ _id: 1, userId: 1 })
     }
   }
 
@@ -271,8 +271,8 @@ class DatabaseService {
     return this.db.collection('favorites')
   }
 
-  get comments(): Collection<Comment> {
-    return this.db.collection('comments')
+  get reviews(): Collection<Review> {
+    return this.db.collection('reviews')
   }
 }
 

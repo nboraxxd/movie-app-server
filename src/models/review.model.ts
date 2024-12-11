@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 import { MediaType } from '@/schemas/common-media.schema'
 
-type CommentType = {
+type ReviewType = {
   _id?: ObjectId
   userId: ObjectId
   mediaId: number
@@ -14,7 +14,7 @@ type CommentType = {
   updatedAt?: Date
 }
 
-export default class Comment {
+export default class Review {
   _id?: ObjectId
   userId: ObjectId
   mediaId: number
@@ -26,18 +26,18 @@ export default class Comment {
   createdAt: Date
   updatedAt: Date
 
-  constructor(comment: CommentType) {
+  constructor(review: ReviewType) {
     const currentDate = new Date()
 
-    this._id = comment._id
-    this.userId = comment.userId
-    this.mediaId = comment.mediaId
-    this.mediaTitle = comment.mediaTitle
-    this.mediaType = comment.mediaType
-    this.mediaPoster = comment.mediaPoster
-    this.mediaReleaseDate = comment.mediaReleaseDate
-    this.content = comment.content
-    this.createdAt = comment.createdAt || currentDate
-    this.updatedAt = comment.updatedAt || currentDate
+    this._id = review._id
+    this.userId = review.userId
+    this.mediaId = review.mediaId
+    this.mediaTitle = review.mediaTitle
+    this.mediaType = review.mediaType
+    this.mediaPoster = review.mediaPoster
+    this.mediaReleaseDate = review.mediaReleaseDate
+    this.content = review.content
+    this.createdAt = review.createdAt || currentDate
+    this.updatedAt = review.updatedAt || currentDate
   }
 }
