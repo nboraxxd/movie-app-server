@@ -22,10 +22,10 @@ class FavoritesService {
             userId: new ObjectId(userId),
             $or: medias.map((media) => ({
               mediaId: media.id,
-              type: media.type,
+              mediaType: media.type,
             })),
           },
-          { projection: { mediaId: 1, type: 1 } }
+          { projection: { mediaId: 1, mediaType: 1 } }
         )
         .toArray()
 
