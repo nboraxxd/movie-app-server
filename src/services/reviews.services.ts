@@ -88,6 +88,11 @@ class ReviewsService {
                 },
               },
               {
+                $sort: {
+                  createdAt: -1,
+                },
+              },
+              {
                 $skip: (page - 1) * REVIEW_PAGE_LIMIT,
               },
               {
@@ -157,6 +162,11 @@ class ReviewsService {
               {
                 $project: {
                   userId: 0,
+                },
+              },
+              {
+                $sort: {
+                  createdAt: -1,
                 },
               },
               {
