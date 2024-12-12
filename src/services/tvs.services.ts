@@ -337,12 +337,12 @@ class TVsService {
   }): Promise<Omit<RecommendedTvsResponseType, 'message'>> {
     const { tvId, userId } = payload
 
-    const [response, favoriteRecord] = await Promise.all([
-      http.get<TMDBRecommendedTvsResponseType>(`/tv/${tvId}/recommendations`),
-      userId ? favoritesService.getFavorite({ mediaId: tvId, mediaType: 'tv', userId }) : null,
-    ])
+    const response = await http.get<TMDBRecommendedTvsResponseType>(`/tv/${tvId}/recommendations`)
 
-    const isFavorite = !userId ? null : Boolean(favoriteRecord)
+    const tvFavoritesMap = await favoritesService.getMediaFavoritesMap({
+      medias: response.results.map((item) => ({ id: item.id, type: 'tv' })),
+      userId,
+    })
 
     return {
       data: response.results.map<MovieDataType | TVDataType>((item) => {
@@ -358,7 +358,7 @@ class TVsService {
               backdropPath: backdropFullPath,
               genreIds: item.genre_ids,
               id: item.id,
-              isFavorite,
+              isFavorite: userId ? (tvFavoritesMap[item.id]?.includes('movie') ?? false) : null,
               originalLanguage: item.original_language,
               originalTitle: item.original_title,
               overview: item.overview,
@@ -377,7 +377,7 @@ class TVsService {
               genreIds: item.genre_ids,
               id: item.id,
               firstAirDate: item.first_air_date,
-              isFavorite,
+              isFavorite: userId ? (tvFavoritesMap[item.id]?.includes('tv') ?? false) : null,
               name: item.name,
               originCountry: item.origin_country,
               originalLanguage: item.original_language,
