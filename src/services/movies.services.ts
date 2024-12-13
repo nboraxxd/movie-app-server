@@ -291,13 +291,15 @@ class MoviesService {
       params: { page },
     })
 
+    const filteredResults = response.results.filter((item) => item.media_type === 'movie' || item.media_type === 'tv')
+
     const movieFavoritesMap = await favoritesService.getMediaFavoritesMap({
-      medias: response.results.map((item) => ({ id: item.id, type: 'movie' })),
+      medias: filteredResults.map((item) => ({ id: item.id, type: 'movie' })),
       userId,
     })
 
     return {
-      data: response.results.map<MovieDataType | TVDataType>((item) => {
+      data: filteredResults.map<MovieDataType | TVDataType>((item) => {
         const backdropFullPath = item.backdrop_path
           ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
           : null

@@ -249,6 +249,20 @@ export const tmdbTvResultSchema = z.object({
 
 export type TMDBTvResultType = z.TypeOf<typeof tmdbTvResultSchema>
 
+export const tmdbCollectionResultSchema = z.object({
+  adult: z.boolean(),
+  backdrop_path: z.string().nullable(),
+  id: z.number(),
+  media_type: z.literal('collection'),
+  original_language: z.string(),
+  original_title: z.string(),
+  overview: z.string(),
+  poster_path: z.string().nullable(),
+  title: z.string(),
+})
+
+export type TMDBCollectionResultType = z.TypeOf<typeof tmdbCollectionResultSchema>
+
 /* TMDB movie server schema */
 export const tmdbDiscoverMovieResponseSchema = z.object({
   page: z.number(),
@@ -318,7 +332,7 @@ export type TMDBMovieCreditsResponseType = z.TypeOf<typeof tmdbMovieCreditsRespo
 
 export const tmdbRecommendedMoviesResponseSchema = z.object({
   page: z.number(),
-  results: z.array(z.union([tmdbMovieResultSchema, tmdbTvResultSchema])),
+  results: z.array(z.union([tmdbMovieResultSchema, tmdbTvResultSchema, tmdbCollectionResultSchema])),
   total_pages: z.number(),
   total_results: z.number(),
 })

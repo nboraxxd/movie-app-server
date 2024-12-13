@@ -339,13 +339,15 @@ class TVsService {
 
     const response = await http.get<TMDBRecommendedTvsResponseType>(`/tv/${tvId}/recommendations`)
 
+    const filteredResults = response.results.filter((item) => item.media_type === 'movie' || item.media_type === 'tv')
+
     const tvFavoritesMap = await favoritesService.getMediaFavoritesMap({
-      medias: response.results.map((item) => ({ id: item.id, type: 'tv' })),
+      medias: filteredResults.map((item) => ({ id: item.id, type: 'tv' })),
       userId,
     })
 
     return {
-      data: response.results.map<MovieDataType | TVDataType>((item) => {
+      data: filteredResults.map<MovieDataType | TVDataType>((item) => {
         const backdropFullPath = item.backdrop_path
           ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
           : null
