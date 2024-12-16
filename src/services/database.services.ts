@@ -186,10 +186,12 @@ class DatabaseService {
       })
     }
 
-    const isIndexExist = await this.favorites.indexExists(['userId_1_mediaId_1_mediaType_1', 'userId_1'])
+    const isIndexExist = await this.favorites.indexExists(['userId_1_mediaId_1_mediaType_1', 'userId_1', 'createdAt_1'])
+
     if (!isIndexExist) {
       this.favorites.createIndex({ userId: 1, mediaId: 1, mediaType: 1 })
       this.favorites.createIndex({ userId: 1 })
+      this.favorites.createIndex({ createdAt: 1 })
     }
   }
 
@@ -251,11 +253,18 @@ class DatabaseService {
       })
     }
 
-    const isIndexExist = await this.reviews.indexExists(['mediaId_1_mediaType_1', 'userId_1', '_id_1_userId_1'])
+    const isIndexExist = await this.reviews.indexExists([
+      'mediaId_1_mediaType_1',
+      'userId_1',
+      '_id_1_userId_1',
+      'createdAt_1',
+    ])
+
     if (!isIndexExist) {
       this.reviews.createIndex({ mediaId: 1, mediaType: 1 })
       this.reviews.createIndex({ userId: 1 })
       this.reviews.createIndex({ _id: 1, userId: 1 })
+      this.reviews.createIndex({ createdAt: 1 })
     }
   }
 
