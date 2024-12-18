@@ -2,10 +2,10 @@ import { ObjectId, WithId } from 'mongodb'
 
 import Review from '@/models/review.model'
 import { ErrorWithStatus } from '@/models/errors'
-import { REVIEW_PAGE_LIMIT } from '@/constants'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import { MediaType } from '@/schemas/common-media.schema'
+import envVariables from '@/schemas/env-variables.schema'
 import { AddReviewBodyType, AggregatedReviewType } from '@/schemas/reviews.schema'
 
 class ReviewsService {
@@ -99,7 +99,7 @@ class ReviewsService {
                 },
               },
               {
-                $limit: REVIEW_PAGE_LIMIT + 1,
+                $limit: envVariables.REVIEWS_PER_PAGE_LIMIT + 1,
               },
             ],
           },
@@ -107,14 +107,14 @@ class ReviewsService {
         {
           $project: {
             data: {
-              $slice: ['$data', REVIEW_PAGE_LIMIT],
+              $slice: ['$data', envVariables.REVIEWS_PER_PAGE_LIMIT],
             },
             hasNextPage: {
               $gt: [
                 {
                   $size: '$data',
                 },
-                REVIEW_PAGE_LIMIT,
+                envVariables.REVIEWS_PER_PAGE_LIMIT,
               ],
             },
           },
@@ -159,7 +159,7 @@ class ReviewsService {
                 },
               },
               {
-                $limit: REVIEW_PAGE_LIMIT + 1,
+                $limit: envVariables.REVIEWS_PER_PAGE_LIMIT + 1,
               },
             ],
           },
@@ -167,14 +167,14 @@ class ReviewsService {
         {
           $project: {
             data: {
-              $slice: ['$data', REVIEW_PAGE_LIMIT],
+              $slice: ['$data', envVariables.REVIEWS_PER_PAGE_LIMIT],
             },
             hasNextPage: {
               $gt: [
                 {
                   $size: '$data',
                 },
-                REVIEW_PAGE_LIMIT,
+                envVariables.REVIEWS_PER_PAGE_LIMIT,
               ],
             },
           },

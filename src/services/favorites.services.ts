@@ -2,9 +2,9 @@ import { ObjectId, WithId } from 'mongodb'
 
 import Favorite from '@/models/favorite.model'
 import { ErrorWithStatus } from '@/models/errors'
-import { FAVORITE_PAGE_LIMIT } from '@/constants'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
+import envVariables from '@/schemas/env-variables.schema'
 import { MediaType } from '@/schemas/common-media.schema'
 import { PaginationResponseType } from '@/schemas/common.schema'
 import { AddFavoriteBodyType, FavoriteDocumentType } from '@/schemas/favorite.schema'
@@ -103,10 +103,10 @@ class FavoritesService {
                 },
               },
               {
-                $skip: (page - 1) * FAVORITE_PAGE_LIMIT,
+                $skip: (page - 1) * envVariables.FAVORITES_PER_PAGE_LIMIT,
               },
               {
-                $limit: FAVORITE_PAGE_LIMIT,
+                $limit: envVariables.FAVORITES_PER_PAGE_LIMIT,
               },
             ],
             totalCount: [
@@ -132,7 +132,7 @@ class FavoritesService {
                         0,
                       ],
                     },
-                    FAVORITE_PAGE_LIMIT,
+                    envVariables.FAVORITES_PER_PAGE_LIMIT,
                   ],
                 },
               },

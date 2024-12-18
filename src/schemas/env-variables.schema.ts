@@ -26,6 +26,8 @@ const envSchema = z.object({
 
   PASSWORD_SUFFIX_SECRET: z.string(),
   RESEND_EMAIL_DEBOUNCE_TIME: z.string(),
+  REVIEWS_PER_PAGE_LIMIT: z.coerce.number().int(),
+  FAVORITES_PER_PAGE_LIMIT: z.coerce.number().int(),
 
   MAILGUN_API_KEY: z.string(),
   MAILGUN_DOMAIN: z.string(),
