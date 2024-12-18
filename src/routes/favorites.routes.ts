@@ -6,7 +6,7 @@ import {
   deleteFavoriteByIdParamsSchema,
   favoriteByMediaParamsSchema,
 } from '@/schemas/favorite.schema'
-import { pageQuerySchema } from '@/schemas/common-media.schema'
+import { cursorPageQuerySchema } from '@/schemas/common-media.schema'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
 import {
   addFavoriteController,
@@ -78,11 +78,11 @@ favoritesRouter.post(
  *    - bearerAuth: []
  *   parameters:
  *    - in: query
- *      name: page
- *      required: false
- *      description: Page number of favorite list. If not provided, default is 1.
+ *      name: cursor
+ *      required: true
+ *      description: _id of last item in current page. If not provided, get first page.
  *      schema:
- *       type: integer
+ *       type: string
  *       nullable: true
  *       example: null
  *   responses:
@@ -100,15 +100,16 @@ favoritesRouter.post(
  *          type: array
  *          items:
  *           $ref: '#/components/schemas/favoriteDataResponseSchema'
- *         pagination:
- *          $ref: '#/components/schemas/paginationResponseSchema'
+ *         hasNextPage:
+ *          type: boolean
+ *          example: true
  *    '400':
  *     description: Bad request
  */
 favoritesRouter.get(
   '/me',
   authorizationValidator({ isLoginRequired: true, ensureUserExists: true }),
-  zodValidator(pageQuerySchema, { location: 'query' }),
+  zodValidator(cursorPageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getMyFavoritesController)
 )
 

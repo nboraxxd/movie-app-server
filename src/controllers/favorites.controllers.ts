@@ -4,7 +4,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '@/types/token.type'
 import { capitalizeFirstLetter } from '@/utils/common'
 import { MessageResponseType } from '@/schemas/common.schema'
-import { PageQueryType } from '@/schemas/common-media.schema'
+import { CursorPageQueryType } from '@/schemas/common-media.schema'
 import {
   AddFavoriteBodyType,
   AddFavoriteResponseType,
@@ -43,13 +43,13 @@ export const addFavoriteController = async (
 }
 
 export const getMyFavoritesController = async (
-  req: Request<ParamsDictionary, any, any, PageQueryType>,
+  req: Request<ParamsDictionary, any, any, CursorPageQueryType>,
   res: Response<GetMyFavoritesResponseType>
 ) => {
-  const { page } = req.query
+  const { cursor } = req.query
   const { userId } = req.decodedAuthorization as TokenPayload
 
-  const { data, pagination } = await favoritesService.getMyFavorites({ userId, page })
+  const { data, hasNextPage } = await favoritesService.getMyFavorites({ userId, cursor })
 
   return res.json({
     message: 'Get favorites successful',
@@ -57,7 +57,7 @@ export const getMyFavoritesController = async (
       ...favorite,
       _id: favorite._id.toHexString(),
     })),
-    pagination,
+    hasNextPage,
   })
 }
 

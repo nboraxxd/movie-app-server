@@ -41,13 +41,7 @@ class ReviewsService {
           $match: {
             mediaId,
             mediaType,
-            ...(cursor
-              ? {
-                  _id: {
-                    $lt: new ObjectId(cursor),
-                  },
-                }
-              : {}),
+            ...(cursor ? { _id: { $lt: new ObjectId(cursor) } } : {}),
           },
         },
         {
@@ -110,12 +104,7 @@ class ReviewsService {
               $slice: ['$data', envVariables.REVIEWS_PER_PAGE_LIMIT],
             },
             hasNextPage: {
-              $gt: [
-                {
-                  $size: '$data',
-                },
-                envVariables.REVIEWS_PER_PAGE_LIMIT,
-              ],
+              $gt: [{ $size: '$data' }, envVariables.REVIEWS_PER_PAGE_LIMIT],
             },
           },
         },

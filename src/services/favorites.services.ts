@@ -6,7 +6,6 @@ import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import envVariables from '@/schemas/env-variables.schema'
 import { MediaType } from '@/schemas/common-media.schema'
-import { PaginationResponseType } from '@/schemas/common.schema'
 import { AddFavoriteBodyType, FavoriteDocumentType } from '@/schemas/favorite.schema'
 
 class FavoritesService {
@@ -76,17 +75,18 @@ class FavoritesService {
     return databaseService.favorites.findOne({ mediaId, mediaType, userId: new ObjectId(userId) })
   }
 
-  async getMyFavorites(payload: { userId: string; page?: number }) {
-    const { userId, page = 1 } = payload
+  async getMyFavorites(payload: { userId: string; cursor?: string }) {
+    const { userId, cursor } = payload
 
     const [response] = await databaseService.favorites
       .aggregate<{
         data: WithId<Omit<FavoriteDocumentType, '_id' | 'userId'>>[]
-        pagination: PaginationResponseType
+        hasNextPage: boolean
       }>([
         {
           $match: {
             userId: new ObjectId(userId),
+            ...(cursor ? { _id: { $lt: new ObjectId(cursor) } } : {}),
           },
         },
         {
@@ -103,47 +103,18 @@ class FavoritesService {
                 },
               },
               {
-                $skip: (page - 1) * envVariables.FAVORITES_PER_PAGE_LIMIT,
-              },
-              {
-                $limit: envVariables.FAVORITES_PER_PAGE_LIMIT,
-              },
-            ],
-            totalCount: [
-              {
-                $count: 'count',
+                $limit: envVariables.FAVORITES_PER_PAGE_LIMIT + 1,
               },
             ],
           },
         },
         {
           $project: {
-            data: 1,
-            pagination: {
-              currentPage: { $literal: page },
-              totalPages: {
-                $ceil: {
-                  $divide: [
-                    {
-                      $ifNull: [
-                        {
-                          $arrayElemAt: ['$totalCount.count', 0],
-                        },
-                        0,
-                      ],
-                    },
-                    envVariables.FAVORITES_PER_PAGE_LIMIT,
-                  ],
-                },
-              },
-              count: {
-                $ifNull: [
-                  {
-                    $arrayElemAt: ['$totalCount.count', 0],
-                  },
-                  0,
-                ],
-              },
+            data: {
+              $slice: ['$data', envVariables.FAVORITES_PER_PAGE_LIMIT],
+            },
+            hasNextPage: {
+              $gt: [{ $size: '$data' }, envVariables.FAVORITES_PER_PAGE_LIMIT],
             },
           },
         },

@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
-import { cursorPageQuerySchema, pageQuerySchema } from '@/schemas/common-media.schema'
+import { cursorPageQuerySchema } from '@/schemas/common-media.schema'
 import { addReviewBodySchema, deleteReviewParamsSchema, getReviewsByMediaParams } from '@/schemas/reviews.schema'
 import {
   addReviewController,
@@ -159,7 +159,7 @@ reviewsRouter.get(
 reviewsRouter.get(
   '/me',
   authorizationValidator({ isLoginRequired: true }),
-  zodValidator(pageQuerySchema, { location: 'query' }),
+  zodValidator(cursorPageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getMyReviewsController)
 )
 
