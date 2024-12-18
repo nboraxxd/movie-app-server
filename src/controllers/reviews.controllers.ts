@@ -4,7 +4,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '@/types/token.type'
 import reviewsService from '@/services/reviews.services'
 import { MessageResponseType } from '@/schemas/common.schema'
-import { PageQueryType } from '@/schemas/common-media.schema'
+import { CursorPageQueryType } from '@/schemas/common-media.schema'
 import {
   AddReviewBodyType,
   AddReviewResponseType,
@@ -43,13 +43,13 @@ export const addReviewController = async (
 }
 
 export const getReviewsByMediaController = async (
-  req: Request<GetReviewsByMediaParamsType, any, any, PageQueryType>,
+  req: Request<GetReviewsByMediaParamsType, any, any, CursorPageQueryType>,
   res: Response<GetReviewsByMediaResponseType>
 ) => {
   const { mediaId, mediaType } = req.params
-  const { page } = req.query
+  const { cursor } = req.query
 
-  const result = await reviewsService.getReviewsByMedia({ mediaId, mediaType, page })
+  const result = await reviewsService.getReviewsByMedia({ mediaId, mediaType, cursor })
 
   return res.json({
     message: 'Get reviews successful',
@@ -61,18 +61,18 @@ export const getReviewsByMediaController = async (
         _id: review.user._id.toHexString(),
       },
     })),
-    pagination: result.pagination,
+    hasNextPage: result.hasNextPage,
   })
 }
 
 export const getMyReviewsController = async (
-  req: Request<ParamsDictionary, any, any, PageQueryType>,
+  req: Request<ParamsDictionary, any, any, CursorPageQueryType>,
   res: Response<GetMyReviewsResponseType>
 ) => {
-  const { page } = req.query
+  const { cursor } = req.query
   const { userId } = req.decodedAuthorization as TokenPayload
 
-  const result = await reviewsService.getMyReviews({ userId, page })
+  const result = await reviewsService.getMyReviews({ userId, cursor })
 
   return res.json({
     message: 'Get reviews successful',
@@ -80,7 +80,7 @@ export const getMyReviewsController = async (
       ...review,
       _id: review._id.toHexString(),
     })),
-    pagination: result.pagination,
+    hasNextPage: result.hasNextPage,
   })
 }
 

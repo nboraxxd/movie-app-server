@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { authorizationValidator, zodValidator } from '@/middlewares/validators.middleware'
-import { pageQuerySchema } from '@/schemas/common-media.schema'
+import { cursorPageQuerySchema, pageQuerySchema } from '@/schemas/common-media.schema'
 import { addReviewBodySchema, deleteReviewParamsSchema, getReviewsByMediaParams } from '@/schemas/reviews.schema'
 import {
   addReviewController,
@@ -80,11 +80,11 @@ reviewsRouter.post(
  *       enum: [movie, tv]
  *       example: movie
  *    - in: query
- *      name: page
+ *      name: cursor
  *      required: false
- *      description: Page number of reviews list. If not provided, page 1 will be used.
+ *      description: _id of last item in current page. If not provided, get first page.
  *      schema:
- *       type: integer
+ *       type: string
  *       nullable: true
  *       example: null
  *   responses:
@@ -102,15 +102,16 @@ reviewsRouter.post(
  *          type: array
  *          items:
  *           $ref: '#/components/schemas/reviewExtendDataResponseSchema'
- *         pagination:
- *          $ref: '#/components/schemas/paginationResponseSchema'
+ *         hasNextPage:
+ *          type: boolean
+ *          example: true
  *    '400':
  *     description: Bad request
  */
 reviewsRouter.get(
   '/medias/:mediaId/:mediaType',
   zodValidator(getReviewsByMediaParams, { location: 'params' }),
-  zodValidator(pageQuerySchema, { location: 'query' }),
+  zodValidator(cursorPageQuerySchema, { location: 'query' }),
   wrapRequestHandler(getReviewsByMediaController)
 )
 
@@ -127,11 +128,11 @@ reviewsRouter.get(
  *    - bearerAuth: []
  *   parameters:
  *    - in: query
- *      name: page
- *      required: false
- *      description: Page number of review list. If not provided, page 1 will be used.
+ *      name: cursor
+ *      required: true
+ *      description: _id of last item in current page. If not provided, get first page.
  *      schema:
- *       type: integer
+ *       type: string
  *       nullable: true
  *       example: null
  *   responses:
@@ -149,8 +150,9 @@ reviewsRouter.get(
  *          type: array
  *          items:
  *           $ref: '#/components/schemas/reviewDataResponseSchema'
- *         pagination:
- *          $ref: '#/components/schemas/paginationResponseSchema'
+ *         hasNextPage:
+ *          type: boolean
+ *          example: true
  *    '400':
  *     description: Bad request
  */

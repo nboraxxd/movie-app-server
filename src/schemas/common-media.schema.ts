@@ -1,4 +1,6 @@
 import z from 'zod'
+import { ObjectId } from 'mongodb'
+
 import { queryPageSchema } from '@/schemas/common.schema'
 
 /* Common media schema */
@@ -59,6 +61,22 @@ export const pageQuerySchema = z
   .strict({ message: 'Additional properties not allowed' })
 
 export type PageQueryType = z.TypeOf<typeof pageQuerySchema>
+
+export const cursorPageQuerySchema = z.object({
+  cursor: z
+    .string()
+    .optional()
+    .refine(
+      (value) => {
+        if (value === undefined) return true
+
+        return ObjectId.isValid(value)
+      },
+      { message: 'Invalid cursor' }
+    ),
+})
+
+export type CursorPageQueryType = z.TypeOf<typeof cursorPageQuerySchema>
 
 export const searchQuerySchema = z
   .object({

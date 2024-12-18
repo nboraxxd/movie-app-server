@@ -2,7 +2,6 @@ import z from 'zod'
 import { ObjectId, WithId } from 'mongodb'
 
 import { userDocumentResponseSchema } from '@/schemas/profile.schema'
-import { paginationResponseSchema } from '@/schemas/common.schema'
 
 const reviewDocumentSchema = z.object({
   _id: z.string(),
@@ -12,7 +11,7 @@ const reviewDocumentSchema = z.object({
   mediaType: z.enum(['movie', 'tv']),
   mediaPoster: z.string().nullable(),
   mediaReleaseDate: z.string(),
-  content: z.string().min(1).max(1000),
+  content: z.string().min(1).max(2000),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
@@ -32,7 +31,7 @@ export const addReviewBodySchema = z
     mediaType: z.enum(['movie', 'tv']),
     mediaPoster: z.string().nullable(),
     mediaReleaseDate: z.string(),
-    content: z.string().min(1).max(1000),
+    content: z.string().min(1).max(2000),
   })
   .strict({ message: 'Additional properties not allowed' })
 
@@ -57,7 +56,7 @@ export type GetReviewsByMediaParamsType = z.TypeOf<typeof getReviewsByMediaParam
 export const getReviewsByMediaResponseSchema = z.object({
   message: z.string(),
   data: z.array(reviewDataResponseSchema),
-  pagination: paginationResponseSchema,
+  hasNextPage: z.boolean(),
 })
 
 export type GetReviewsByMediaResponseType = z.TypeOf<typeof getReviewsByMediaResponseSchema>
@@ -69,7 +68,7 @@ export type AggregatedReviewType = WithId<Omit<GetReviewsByMediaResponseType['da
 export const getMyReviewsResponseSchema = z.object({
   message: z.string(),
   data: z.array(reviewDocumentSchema.omit({ userId: true })),
-  pagination: paginationResponseSchema,
+  hasNextPage: z.boolean(),
 })
 
 export type GetMyReviewsResponseType = z.TypeOf<typeof getMyReviewsResponseSchema>

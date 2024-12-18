@@ -6,7 +6,6 @@ import { REVIEW_PAGE_LIMIT } from '@/constants'
 import { HttpStatusCode } from '@/constants/http-status-code'
 import databaseService from '@/services/database.services'
 import { MediaType } from '@/schemas/common-media.schema'
-import { PaginationResponseType } from '@/schemas/common.schema'
 import { AddReviewBodyType, AggregatedReviewType } from '@/schemas/reviews.schema'
 
 class ReviewsService {
@@ -33,15 +32,22 @@ class ReviewsService {
     return review as WithId<Review>
   }
 
-  async getReviewsByMedia(payload: { mediaId: number; mediaType: MediaType; page?: number }) {
-    const { mediaId, mediaType, page = 1 } = payload
+  async getReviewsByMedia(payload: { mediaId: number; mediaType: MediaType; cursor?: string }) {
+    const { mediaId, mediaType, cursor } = payload
 
     const [response] = await databaseService.reviews
-      .aggregate<{ data: AggregatedReviewType[]; pagination: PaginationResponseType }>([
+      .aggregate<{ data: AggregatedReviewType[]; hasNextPage: boolean }>([
         {
           $match: {
             mediaId,
             mediaType,
+            ...(cursor
+              ? {
+                  _id: {
+                    $lt: new ObjectId(cursor),
+                  },
+                }
+              : {}),
           },
         },
         {
@@ -93,47 +99,23 @@ class ReviewsService {
                 },
               },
               {
-                $skip: (page - 1) * REVIEW_PAGE_LIMIT,
-              },
-              {
-                $limit: REVIEW_PAGE_LIMIT,
-              },
-            ],
-            totalCount: [
-              {
-                $count: 'count',
+                $limit: REVIEW_PAGE_LIMIT + 1,
               },
             ],
           },
         },
         {
           $project: {
-            data: 1,
-            pagination: {
-              currentPage: { $literal: page },
-              totalPages: {
-                $ceil: {
-                  $divide: [
-                    {
-                      $ifNull: [
-                        {
-                          $arrayElemAt: ['$totalCount.count', 0],
-                        },
-                        0,
-                      ],
-                    },
-                    REVIEW_PAGE_LIMIT,
-                  ],
+            data: {
+              $slice: ['$data', REVIEW_PAGE_LIMIT],
+            },
+            hasNextPage: {
+              $gt: [
+                {
+                  $size: '$data',
                 },
-              },
-              count: {
-                $ifNull: [
-                  {
-                    $arrayElemAt: ['$totalCount.count', 0],
-                  },
-                  0,
-                ],
-              },
+                REVIEW_PAGE_LIMIT,
+              ],
             },
           },
         },
@@ -143,17 +125,24 @@ class ReviewsService {
     return response
   }
 
-  async getMyReviews(payload: { userId: string; page?: number }) {
-    const { userId, page = 1 } = payload
+  async getMyReviews(payload: { userId: string; cursor?: string }) {
+    const { userId, cursor } = payload
 
     const [response] = await databaseService.reviews
       .aggregate<{
         data: Omit<AggregatedReviewType, 'user'>[]
-        pagination: PaginationResponseType
+        hasNextPage: boolean
       }>([
         {
           $match: {
             userId: new ObjectId(userId),
+            ...(cursor
+              ? {
+                  _id: {
+                    $lt: new ObjectId(cursor),
+                  },
+                }
+              : {}),
           },
         },
         {
@@ -170,47 +159,23 @@ class ReviewsService {
                 },
               },
               {
-                $skip: (page - 1) * REVIEW_PAGE_LIMIT,
-              },
-              {
-                $limit: REVIEW_PAGE_LIMIT,
-              },
-            ],
-            totalCount: [
-              {
-                $count: 'count',
+                $limit: REVIEW_PAGE_LIMIT + 1,
               },
             ],
           },
         },
         {
           $project: {
-            data: 1,
-            pagination: {
-              currentPage: { $literal: page },
-              totalPages: {
-                $ceil: {
-                  $divide: [
-                    {
-                      $ifNull: [
-                        {
-                          $arrayElemAt: ['$totalCount.count', 0],
-                        },
-                        0,
-                      ],
-                    },
-                    REVIEW_PAGE_LIMIT,
-                  ],
+            data: {
+              $slice: ['$data', REVIEW_PAGE_LIMIT],
+            },
+            hasNextPage: {
+              $gt: [
+                {
+                  $size: '$data',
                 },
-              },
-              count: {
-                $ifNull: [
-                  {
-                    $arrayElemAt: ['$totalCount.count', 0],
-                  },
-                  0,
-                ],
-              },
+                REVIEW_PAGE_LIMIT,
+              ],
             },
           },
         },
@@ -220,7 +185,7 @@ class ReviewsService {
     return response
   }
 
-  async deleteReview({ reviewId: reviewId, userId }: { reviewId: string; userId: string }) {
+  async deleteReview({ reviewId, userId }: { reviewId: string; userId: string }) {
     // Phải deleteOne theo _id và userId
     // Vì để tránh trường hợp người dùng xóa review của người khác
     const result = await databaseService.reviews.deleteOne({
