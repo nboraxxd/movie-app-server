@@ -29,7 +29,7 @@ export const getPersonDetailController = async (
 
   const data = await peopleService.getPersonDetail(personId)
 
-  return res.json({ message: 'Get movie detail successful', data })
+  return res.json({ message: 'Get person detail successful', data })
 }
 
 export const getPersonCombinedCreditsController = async (

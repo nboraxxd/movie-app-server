@@ -36,7 +36,7 @@ export function buildTMDBImageUrl({
   imageType: 'backdrop' | 'poster' | 'profile'
 }) {
   const baseUrls = {
-    backdrop: envVariables.TMDB_IMAGE_W1280_URL,
+    backdrop: envVariables.TMDB_IMAGE_W1920_URL,
     poster: envVariables.TMDB_IMAGE_W500_URL,
     profile: envVariables.TMDB_IMAGE_W276_H350_URL,
   }

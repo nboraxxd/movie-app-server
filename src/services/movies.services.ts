@@ -183,7 +183,7 @@ class MoviesService {
       originalTitle: response.original_title,
       overview: response.overview,
       popularity: response.popularity,
-      posterPath: buildTMDBImageUrl({ imagePath: response.poster_path, imageType: 'backdrop' }),
+      posterPath: buildTMDBImageUrl({ imagePath: response.poster_path, imageType: 'poster' }),
       productionCompanies: response.production_companies.map<ProductionCompanyType>((item) => ({
         id: item.id,
         logoPath: item.logo_path,
