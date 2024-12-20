@@ -1,5 +1,5 @@
 import http from '@/utils/http'
-import envVariables from '@/schemas/env-variables.schema'
+import { buildTMDBImageUrl } from '@/utils/common'
 import {
   GetPersonCombinedCreditsResponseType,
   GetPersonDetailResponseType,
@@ -22,8 +22,6 @@ class PeopleService {
 
     return {
       data: response.results.map<PersonDataType>(({ known_for_department, original_name, profile_path, ...item }) => {
-        const profileFullPath = profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${profile_path}` : null
-
         return {
           adult: item.adult,
           gender: item.gender,
@@ -32,7 +30,7 @@ class PeopleService {
           name: item.name,
           originalName: original_name,
           popularity: item.popularity,
-          profilePath: profileFullPath,
+          profilePath: buildTMDBImageUrl({ imagePath: profile_path, imageType: 'profile' }),
           mediaType: 'person',
         }
       }),
@@ -59,7 +57,7 @@ class PeopleService {
       name: result.name,
       placeOfBirth: result.place_of_birth,
       popularity: result.popularity,
-      profilePath: result.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${result.profile_path}` : null,
+      profilePath: buildTMDBImageUrl({ imagePath: result.profile_path, imageType: 'profile' }),
     }
   }
 
@@ -68,23 +66,21 @@ class PeopleService {
 
     return {
       cast: result.cast.map((item) => {
-        const backdropFullPath = item.backdrop_path
-          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-          : null
-        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+        const backdropUrl = buildTMDBImageUrl({ imagePath: item.backdrop_path, imageType: 'backdrop' })
+        const posterUrl = buildTMDBImageUrl({ imagePath: item.poster_path, imageType: 'poster' })
 
         return item.media_type === 'movie'
           ? {
               mediaType: item.media_type,
               adult: item.adult,
-              backdropPath: backdropFullPath,
+              backdropPath: backdropUrl,
               genreIds: item.genre_ids,
               id: item.id,
               originalLanguage: item.original_language,
               originalTitle: item.original_title,
               overview: item.overview,
               popularity: item.popularity,
-              posterPath: posterFullPath,
+              posterPath: posterUrl,
               releaseDate: item.release_date,
               title: item.title,
               video: item.video,
@@ -97,7 +93,7 @@ class PeopleService {
           : {
               mediaType: item.media_type,
               adult: item.adult,
-              backdropPath: backdropFullPath,
+              backdropPath: backdropUrl,
               firstAirDate: item.first_air_date,
               genreIds: item.genre_ids,
               id: item.id,
@@ -107,7 +103,7 @@ class PeopleService {
               originalName: item.original_name,
               overview: item.overview,
               popularity: item.popularity,
-              posterPath: posterFullPath,
+              posterPath: posterUrl,
               voteAverage: item.vote_average,
               voteCount: item.vote_count,
               character: item.character,
@@ -116,23 +112,21 @@ class PeopleService {
             }
       }),
       crew: result.crew.map((item) => {
-        const backdropFullPath = item.backdrop_path
-          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-          : null
-        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+        const backdropUrl = buildTMDBImageUrl({ imagePath: item.backdrop_path, imageType: 'backdrop' })
+        const posterUrl = buildTMDBImageUrl({ imagePath: item.poster_path, imageType: 'poster' })
 
         return item.media_type === 'movie'
           ? {
               mediaType: item.media_type,
               adult: item.adult,
-              backdropPath: backdropFullPath,
+              backdropPath: backdropUrl,
               genreIds: item.genre_ids,
               id: item.id,
               originalLanguage: item.original_language,
               originalTitle: item.original_title,
               overview: item.overview,
               popularity: item.popularity,
-              posterPath: posterFullPath,
+              posterPath: posterUrl,
               releaseDate: item.release_date,
               title: item.title,
               video: item.video,
@@ -145,7 +139,7 @@ class PeopleService {
           : {
               mediaType: item.media_type,
               adult: item.adult,
-              backdropPath: backdropFullPath,
+              backdropPath: backdropUrl,
               firstAirDate: item.first_air_date,
               genreIds: item.genre_ids,
               id: item.id,
@@ -155,7 +149,7 @@ class PeopleService {
               originalName: item.original_name,
               overview: item.overview,
               popularity: item.popularity,
-              posterPath: posterFullPath,
+              posterPath: posterUrl,
               voteAverage: item.vote_average,
               voteCount: item.vote_count,
               creditId: item.credit_id,

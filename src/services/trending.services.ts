@@ -1,10 +1,10 @@
 import http from '@/utils/http'
+import { buildTMDBImageUrl } from '@/utils/common'
 import favoritesService from '@/services/favorites.services'
-import envVariables from '@/schemas/env-variables.schema'
 import { TVDataType } from '@/schemas/tv.schema'
 import { MovieDataType } from '@/schemas/movies.schema'
-import { PageQueryType, TMDBTrendingResponseType } from '@/schemas/common-media.schema'
 import { TrendingParamsType, TrendingResponseType } from '@/schemas/trending.shema'
+import { PageQueryType, TMDBTrendingResponseType } from '@/schemas/common-media.schema'
 
 class TrendingService {
   async trending(
@@ -23,17 +23,15 @@ class TrendingService {
 
     return {
       data: response.results.map((item) => {
-        const backdropFullPath = item.backdrop_path
-          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-          : null
-        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+        const backdropUrl = buildTMDBImageUrl({ imagePath: item.backdrop_path, imageType: 'backdrop' })
+        const posterUrl = buildTMDBImageUrl({ imagePath: item.poster_path, imageType: 'poster' })
 
         const data: TVDataType | MovieDataType =
           item.media_type === 'movie'
             ? {
                 mediaType: item.media_type,
                 adult: item.adult,
-                backdropPath: backdropFullPath,
+                backdropPath: backdropUrl,
                 genreIds: item.genre_ids,
                 id: item.id,
                 originalLanguage: item.original_language,
@@ -41,7 +39,7 @@ class TrendingService {
                 isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes(item.media_type) ?? false) : null,
                 overview: item.overview,
                 popularity: item.popularity,
-                posterPath: posterFullPath,
+                posterPath: posterUrl,
                 releaseDate: item.release_date,
                 title: item.title,
                 video: item.video,
@@ -51,7 +49,7 @@ class TrendingService {
             : {
                 mediaType: item.media_type,
                 adult: item.adult,
-                backdropPath: backdropFullPath,
+                backdropPath: backdropUrl,
                 firstAirDate: item.first_air_date,
                 genreIds: item.genre_ids,
                 id: item.id,
@@ -62,7 +60,7 @@ class TrendingService {
                 originalName: item.original_name,
                 overview: item.overview,
                 popularity: item.popularity,
-                posterPath: posterFullPath,
+                posterPath: posterUrl,
                 voteAverage: item.vote_average,
                 voteCount: item.vote_count,
               }

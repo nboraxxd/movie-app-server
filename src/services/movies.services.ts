@@ -1,6 +1,6 @@
 import http from '@/utils/http'
+import { buildTMDBImageUrl } from '@/utils/common'
 import favoritesService from '@/services/favorites.services'
-import envVariables from '@/schemas/env-variables.schema'
 import { TVDataType } from '@/schemas/tv.schema'
 import {
   TMDBDiscoverMovieResponseType,
@@ -53,9 +53,6 @@ class MoviesService {
 
     return {
       data: response.results.map<MovieDataType>(({ backdrop_path, poster_path, ...item }) => {
-        const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
-        const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
-
         return {
           adult: item.adult,
           genreIds: item.genre_ids,
@@ -70,8 +67,8 @@ class MoviesService {
           video: item.video,
           voteAverage: item.vote_average,
           voteCount: item.vote_count,
-          backdropPath: backdropFullPath,
-          posterPath: posterFullPath,
+          backdropPath: buildTMDBImageUrl({ imagePath: backdrop_path, imageType: 'backdrop' }),
+          posterPath: buildTMDBImageUrl({ imagePath: poster_path, imageType: 'poster' }),
           isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes('movie') ?? false) : null,
         }
       }),
@@ -92,13 +89,10 @@ class MoviesService {
 
     return {
       data: response.results.map<MovieDataType>(({ backdrop_path, poster_path, ...item }) => {
-        const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
-        const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
-
         return {
           adult: item.adult,
           genreIds: item.genre_ids,
-          backdropPath: backdropFullPath,
+          backdropPath: buildTMDBImageUrl({ imagePath: backdrop_path, imageType: 'backdrop' }),
           id: item.id,
           isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes('movie') ?? false) : null,
           mediaType: 'movie',
@@ -106,7 +100,7 @@ class MoviesService {
           originalTitle: item.original_title,
           overview: item.overview,
           popularity: item.popularity,
-          posterPath: posterFullPath,
+          posterPath: buildTMDBImageUrl({ imagePath: poster_path, imageType: 'poster' }),
           releaseDate: item.release_date,
           title: item.title,
           video: item.video,
@@ -136,9 +130,6 @@ class MoviesService {
 
     return {
       data: response.results.map<MovieDataType>(({ backdrop_path, poster_path, ...item }) => {
-        const backdropFullPath = backdrop_path ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${backdrop_path}` : null
-        const posterFullPath = poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${poster_path}` : null
-
         return {
           adult: item.adult,
           genreIds: item.genre_ids,
@@ -153,8 +144,8 @@ class MoviesService {
           video: item.video,
           voteAverage: item.vote_average,
           voteCount: item.vote_count,
-          backdropPath: backdropFullPath,
-          posterPath: posterFullPath,
+          backdropPath: buildTMDBImageUrl({ imagePath: backdrop_path, imageType: 'backdrop' }),
+          posterPath: buildTMDBImageUrl({ imagePath: poster_path, imageType: 'poster' }),
           isFavorite: userId ? (mediaFavoritesMap[item.id]?.includes('movie') ?? false) : null,
         }
       }),
@@ -170,14 +161,9 @@ class MoviesService {
     const certification =
       response.release_dates.results.find((item) => item.iso_3166_1 === 'US')?.release_dates[0].certification || null
 
-    const backdropFullPath = response.backdrop_path
-      ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${response.backdrop_path}`
-      : null
-    const posterFullPath = response.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${response.poster_path}` : null
-
     return {
       adult: response.adult,
-      backdropPath: backdropFullPath,
+      backdropPath: buildTMDBImageUrl({ imagePath: response.backdrop_path, imageType: 'backdrop' }),
       belongsToCollection: response.belongs_to_collection
         ? {
             backdropPath: response.belongs_to_collection.backdrop_path,
@@ -197,7 +183,7 @@ class MoviesService {
       originalTitle: response.original_title,
       overview: response.overview,
       popularity: response.popularity,
-      posterPath: posterFullPath,
+      posterPath: buildTMDBImageUrl({ imagePath: response.poster_path, imageType: 'backdrop' }),
       productionCompanies: response.production_companies.map<ProductionCompanyType>((item) => ({
         id: item.id,
         logoPath: item.logo_path,
@@ -243,7 +229,6 @@ class MoviesService {
     const response = await http.get<TMDBMovieCreditsResponseType>(`/movie/${movieId}/credits`)
 
     const formattedCrew = response.crew.map<MovieCrewType>((item) => {
-      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
       return {
         adult: item.adult,
         creditId: item.credit_id,
@@ -255,12 +240,11 @@ class MoviesService {
         name: item.name,
         originalName: item.original_name,
         popularity: item.popularity,
-        profilePath: profileFullPath,
+        profilePath: buildTMDBImageUrl({ imagePath: item.profile_path, imageType: 'profile' }),
       }
     })
 
     const formattedCast = response.cast.map<MovieCastType>((item) => {
-      const profileFullPath = item.profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${item.profile_path}` : null
       return {
         adult: item.adult,
         castId: item.cast_id,
@@ -273,7 +257,7 @@ class MoviesService {
         order: item.order,
         originalName: item.original_name,
         popularity: item.popularity,
-        profilePath: profileFullPath,
+        profilePath: buildTMDBImageUrl({ imagePath: item.profile_path, imageType: 'profile' }),
       }
     })
 
@@ -300,16 +284,14 @@ class MoviesService {
 
     return {
       data: filteredResults.map<MovieDataType | TVDataType>((item) => {
-        const backdropFullPath = item.backdrop_path
-          ? `${envVariables.TMDB_IMAGE_ORIGINAL_URL}${item.backdrop_path}`
-          : null
-        const posterFullPath = item.poster_path ? `${envVariables.TMDB_IMAGE_W500_URL}${item.poster_path}` : null
+        const backdropUrl = buildTMDBImageUrl({ imagePath: item.backdrop_path, imageType: 'backdrop' })
+        const posterUrl = buildTMDBImageUrl({ imagePath: item.poster_path, imageType: 'poster' })
 
         return item.media_type === 'movie'
           ? {
               mediaType: 'movie',
               adult: item.adult,
-              backdropPath: backdropFullPath,
+              backdropPath: backdropUrl,
               genreIds: item.genre_ids,
               id: item.id,
               isFavorite: userId ? (movieFavoritesMap[item.id]?.includes('movie') ?? false) : null,
@@ -317,7 +299,7 @@ class MoviesService {
               originalTitle: item.original_title,
               overview: item.overview,
               popularity: item.popularity,
-              posterPath: posterFullPath,
+              posterPath: posterUrl,
               releaseDate: item.release_date,
               title: item.title,
               video: item.video,
@@ -327,7 +309,7 @@ class MoviesService {
           : {
               mediaType: 'tv',
               adult: item.adult,
-              backdropPath: backdropFullPath,
+              backdropPath: backdropUrl,
               genreIds: item.genre_ids,
               id: item.id,
               firstAirDate: item.first_air_date,
@@ -338,7 +320,7 @@ class MoviesService {
               overview: item.overview,
               originalName: item.original_name,
               popularity: item.popularity,
-              posterPath: posterFullPath,
+              posterPath: posterUrl,
               voteAverage: item.vote_average,
               voteCount: item.vote_count,
             }
