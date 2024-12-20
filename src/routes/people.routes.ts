@@ -2,10 +2,91 @@ import { Router } from 'express'
 
 import { wrapRequestHandler } from '@/utils/handlers'
 import { zodValidator } from '@/middlewares/validators.middleware'
+import { searchQuerySchema } from '@/schemas/common-media.schema'
 import { personDetailParamsSchema } from '@/schemas/people.schema'
-import { getPersonCombinedCreditsController, getPersonDetailController } from '@/controllers/people.controllers'
+import {
+  getPersonCombinedCreditsController,
+  getPersonDetailController,
+  searchPeopleController,
+} from '@/controllers/people.controllers'
 
 const peopleRouter = Router()
+
+/**
+ * @swagger
+ * /people/search:
+ *  get:
+ *   tags:
+ *   - people
+ *   summary: Search people
+ *   description: Search people by query parameters
+ *   operationId: searchPeople
+ *   parameters:
+ *    - in: query
+ *      name: query
+ *      required: true
+ *      description: Search query.
+ *      schema:
+ *       type: string
+ *       example: Scarlett Johansson
+ *    - in: query
+ *      name: page
+ *      required: false
+ *      description: Page number of search list. If not provided, page 1 will be used.
+ *      schema:
+ *       type: integer
+ *       example: null
+ *   responses:
+ *    '200':
+ *     description: Get search people list successful
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Get search people list successful
+ *         data:
+ *          type: array
+ *          items:
+ *           type: object
+ *           properties:
+ *            adult:
+ *             type: boolean
+ *             example: false
+ *            gender:
+ *             type: number
+ *             example: 1
+ *            id:
+ *             type: number
+ *             example: 1245
+ *            knownForDepartment:
+ *             type: string
+ *             example: 'Acting'
+ *            name:
+ *             type: string
+ *             example: 'Scarlett Johansson'
+ *            originalName:
+ *             type: string
+ *             example: 'Scarlett Johansson'
+ *            popularity:
+ *             type: number
+ *             example: 10.0
+ *            profilePath:
+ *             type: string
+ *             nullable: true
+ *             example: 'https://media.themoviedb.org/t/p/w276_and_h350_face/6NsMbJXRlDZuDzatN2akFdGuTvx.jpg'
+ *         pagination:
+ *          $ref: '#/components/schemas/paginationResponseSchema'
+ *    '400':
+ *     description: Bad request
+ */
+peopleRouter.get(
+  '/search',
+  zodValidator(searchQuerySchema, { location: 'query' }),
+  wrapRequestHandler(searchPeopleController)
+)
 
 /**
  * @swagger

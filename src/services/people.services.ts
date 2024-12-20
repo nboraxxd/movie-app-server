@@ -1,9 +1,45 @@
 import http from '@/utils/http'
 import envVariables from '@/schemas/env-variables.schema'
-import { GetPersonCombinedCreditsResponseType, GetPersonDetailResponseType } from '@/schemas/people.schema'
-import { TMDBPersonCombinedCreditsResponseType, TMDBPersonDetailResponseType } from '@/schemas/common-media.schema'
+import {
+  GetPersonCombinedCreditsResponseType,
+  GetPersonDetailResponseType,
+  PersonDataType,
+  SearchPeopleResponseType,
+} from '@/schemas/people.schema'
+import {
+  TMDBPersonCombinedCreditsResponseType,
+  TMDBPersonDetailResponseType,
+  TMDBSearchPeopleResponseType,
+} from '@/schemas/common-media.schema'
 
 class PeopleService {
+  async searchPeople(payload: { query: string; page?: number }): Promise<Omit<SearchPeopleResponseType, 'message'>> {
+    const { page, query } = payload
+
+    const response = await http.get<TMDBSearchPeopleResponseType>('/search/person', {
+      params: { page, query },
+    })
+
+    return {
+      data: response.results.map<PersonDataType>(({ known_for_department, original_name, profile_path, ...item }) => {
+        const profileFullPath = profile_path ? `${envVariables.TMDB_IMAGE_W276_H350_URL}${profile_path}` : null
+
+        return {
+          adult: item.adult,
+          gender: item.gender,
+          id: item.id,
+          knownForDepartment: known_for_department,
+          name: item.name,
+          originalName: original_name,
+          popularity: item.popularity,
+          profilePath: profileFullPath,
+          mediaType: 'person',
+        }
+      }),
+      pagination: { currentPage: response.page, totalPages: response.total_pages, count: response.total_results },
+    }
+  }
+
   async getPersonDetail(personId: number): Promise<GetPersonDetailResponseType['data']> {
     const result = await http.get<TMDBPersonDetailResponseType>(`/person/${personId}`, {
       params: { append_to_response: 'release_dates,credits,videos' },

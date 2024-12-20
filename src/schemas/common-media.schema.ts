@@ -462,6 +462,28 @@ export const tmdbTrendingResponseSchema = z.object({
 export type TMDBTrendingResponseType = z.TypeOf<typeof tmdbTrendingResponseSchema>
 
 /* TMDB people schema */
+export const tmdbPersonResultSchema = z.object({
+  adult: z.boolean(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  known_for_department: z.string(),
+  name: z.string(),
+  original_name: z.string(),
+  popularity: z.number(),
+  profile_path: z.string().nullable(),
+})
+
+export type TMDBPersonResultType = z.TypeOf<typeof tmdbPersonResultSchema>
+
+export const tmdbSearchPeopleResponseSchema = z.object({
+  results: z.array(tmdbPersonResultSchema),
+  page: z.number(),
+  total_pages: z.number(),
+  total_results: z.number(),
+})
+
+export type TMDBSearchPeopleResponseType = z.TypeOf<typeof tmdbSearchPeopleResponseSchema>
+
 export const tmdbPersonDetailResponseSchema = z.object({
   adult: z.boolean(),
   also_known_as: z.array(z.string()),

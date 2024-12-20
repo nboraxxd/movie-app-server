@@ -1,7 +1,30 @@
 import z from 'zod'
 
-import { movieDataSchema } from '@/schemas/movies.schema'
 import { tvDataSchema } from '@/schemas/tv.schema'
+import { movieDataSchema } from '@/schemas/movies.schema'
+import { paginationResponseSchema } from '@/schemas/common.schema'
+
+export const personDataSchema = z.object({
+  adult: z.boolean(),
+  gender: z.number().nullable(),
+  id: z.number(),
+  knownForDepartment: z.string(),
+  name: z.string(),
+  originalName: z.string(),
+  popularity: z.number(),
+  profilePath: z.string().nullable(),
+  mediaType: z.literal('person'),
+})
+
+export type PersonDataType = z.TypeOf<typeof personDataSchema>
+
+export const searchPeopleResponseSchema = z.object({
+  message: z.string(),
+  data: z.array(personDataSchema),
+  pagination: paginationResponseSchema,
+})
+
+export type SearchPeopleResponseType = z.TypeOf<typeof searchPeopleResponseSchema>
 
 export const personDetailParamsSchema = z.object({
   personId: z.coerce.number({ message: 'Person ID must be a number' }).int({ message: 'Person ID must be an integer' }),
